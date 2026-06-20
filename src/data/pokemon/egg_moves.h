@@ -2666,7 +2666,7 @@ static const u16 sVanilliteEggMoveLearnset[] = {
 
 #if P_FAMILY_DEERLING
 static const u16 sDeerlingEggMoveLearnset[] = {
-    MOVE_SYNTHESIS,
+    MOVE_HEADBUTT,
     MOVE_UNAVAILABLE,
 };
 #endif //P_FAMILY_DEERLING

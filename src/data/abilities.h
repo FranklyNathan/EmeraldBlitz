@@ -2436,10 +2436,10 @@ const struct AbilityInfo gAbilitiesInfo[ABILITIES_COUNT] =
         .aiRating = 8,
     },
     
-    [ABILITY_313] =
+    [ABILITY_EELEVATE] =
     {
-        .name = _("-------"),
-        .description = COMPOUND_STRING("No special ability."),
+        .name = _("Eelevate"),
+        .description = COMPOUND_STRING("Levitate and Beast Boost."),
     },
 
     [ABILITY_314] =
@@ -2454,10 +2454,10 @@ const struct AbilityInfo gAbilitiesInfo[ABILITIES_COUNT] =
         .description = COMPOUND_STRING("Unimplemented."),
     },
 
-    [ABILITY_316] =
+    [ABILITY_FIRE_MANE] =
     {
-        .name = _("-------"),
-        .description = COMPOUND_STRING("No special ability."),
+        .name = _("Fire Mane"),
+        .description = COMPOUND_STRING("Ups Fire-type moves."),
     },
 
     [ABILITY_317] =

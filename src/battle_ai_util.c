@@ -5729,6 +5729,7 @@ bool32 IsMoxieTypeAbility(enum Ability ability)
     case ABILITY_AS_ONE_ICE_RIDER:
     case ABILITY_GRIM_NEIGH:
     case ABILITY_AS_ONE_SHADOW_RIDER:
+    case ABILITY_EELEVATE:
         return TRUE;
     default:
         return FALSE;

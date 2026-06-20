@@ -160,6 +160,17 @@ const struct SpriteTemplate gZapCannonSparkSpriteTemplate =
     .callback = AnimZapCannonSpark,
 };
 
+const struct SpriteTemplate gWeatherBallElectricDownSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_SPARK_2,
+    .paletteTag = ANIM_TAG_SPARK_2,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gAnims_ElectricPuff,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimWeatherBallDown,
+};
+
 static const union AnimCmd sAnim_ThunderboltOrb[] =
 {
     ANIMCMD_FRAME(0, 6),

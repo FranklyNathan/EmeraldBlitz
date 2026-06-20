@@ -25239,6 +25239,23 @@ gBattleAnimMove_LeafBlade::
 	createvisualtask AnimTask_ShakeMon2, 2, ANIM_TARGET, 2, 0, 8, 1
 	playsewithpan SE_M_CUT, SOUND_PAN_TARGET
 	waitforvisualfinish
+	end
+
+WeatherBallElectric:
+	loadspritegfx ANIM_TAG_SPARK_2
+	createsprite gWeatherBallElectricDownSpriteTemplate, ANIM_TARGET, 2, -30, -100, 25, 1, 0, 0
+	playsewithpan SE_M_THUNDERBOLT, SOUND_PAN_TARGET
+	delay 10
+	createsprite gWeatherBallElectricDownSpriteTemplate, ANIM_TARGET, 2, -30, -100, 25, 1, -40, 20
+	playsewithpan SE_M_THUNDERBOLT, SOUND_PAN_TARGET
+	delay 10
+	createsprite gWeatherBallElectricDownSpriteTemplate, ANIM_TARGET, 2, -30, -100, 25, 1, 0, 0
+	playsewithpan SE_M_THUNDERBOLT, SOUND_PAN_TARGET
+	waitforvisualfinish
+	playsewithpan SE_M_THUNDERBOLT2, SOUND_PAN_TARGET
+	createvisualtask AnimTask_ShakeMon, 2, ANIM_TARGET, 0, 3, 8, 1
+	waitforvisualfinish
+	end
 	monbg ANIM_TARGET
 	setalpha 12, 8
 	delay 12
@@ -30613,6 +30630,7 @@ gBattleAnimMove_WeatherBall::
 	jumpreteq ANIM_WEATHER_HAIL, WeatherBallIce
 	jumpreteq ANIM_WEATHER_SNOW, WeatherBallIce
 	jumpreteq ANIM_WEATHER_FOG, WeatherBallNormal
+	jumpreteq ANIM_WEATHER_THUNDERSTORM, WeatherBallElectric
 WeatherBallNormal:
 	loadspritegfx ANIM_TAG_IMPACT
 	createsprite gWeatherBallNormalDownSpriteTemplate, ANIM_TARGET, 2, -30, -100, 25, 1, 0, 0

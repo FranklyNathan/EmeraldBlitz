@@ -1139,6 +1139,24 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
         }
     }
 
+    // 50% chance to penalize certain status/annoyance moves
+    switch (move)
+    {
+    case MOVE_YAWN:
+    case MOVE_ATTRACT:
+    case MOVE_SWAGGER:
+    case MOVE_SUPERSONIC:
+    case MOVE_SWEET_KISS:
+    case MOVE_CONFUSE_RAY:
+    case MOVE_TEETER_DANCE:
+    case MOVE_SAND_ATTACK:
+    case MOVE_FLASH:
+    case MOVE_SMOKESCREEN:
+        if (Random() % 2 == 0)
+            ADJUST_SCORE(-8);
+        break;
+    }
+
     if (effectiveness == UQ_4_12(0.0))
         RETURN_SCORE_MINUS(20);
 
@@ -1990,7 +2008,7 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
                 ADJUST_SCORE(-10);
             break;
         case EFFECT_MAGNITUDE:
-            if (aiData->abilities[battlerDef] == ABILITY_LEVITATE)
+            if (aiData->abilities[battlerDef] == ABILITY_LEVITATE || aiData->abilities[battlerDef] == ABILITY_EELEVATE)
                 ADJUST_SCORE(-10);
             break;
         case EFFECT_PARTING_SHOT:
@@ -3454,6 +3472,7 @@ static s32 AI_DoubleBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
                 break;
             case ABILITY_EARTH_EATER:
             case ABILITY_LEVITATE:
+            case ABILITY_EELEVATE:
                 if (moveType == TYPE_GROUND)
                 {
                     if (moveTarget == MOVE_TARGET_FOES_AND_ALLY)
@@ -4916,7 +4935,7 @@ static s32 AI_CalcMoveEffectScore(u32 battlerAtk, u32 battlerDef, u32 move, stru
         if (isBattle1v1
         && (AI_IsSlower(battlerAtk, battlerDef, move, predictedMoveSpeedCheck, CONSIDER_PRIORITY))
         && BattlerWillFaintFromSecondaryDamage(battlerDef, aiData->abilities[battlerDef]))
-            break; // Don't use if the attract won't have a change to activate
+            break; // Don't use if the attract won't have a chance to activate
         if (gBattleMons[battlerDef].status1 & STATUS1_ANY
         || gBattleMons[battlerDef].volatiles.confusionTurns > 0
         || IsBattlerTrapped(battlerAtk, battlerDef))

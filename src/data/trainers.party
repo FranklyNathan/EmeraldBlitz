@@ -14596,10 +14596,7 @@ Level: 12
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Swift Swim
-- Bubble
-- Quick Attack
-- Bug Bite
-- Sticky Web
+- Giga Drain
 
 Nincada (F)
 Level: 12
@@ -14769,7 +14766,7 @@ Ability: Swarm
 - Giga Drain
 - Air Cutter
 - Bug Bite
-- Psychic
+- Whirlwind
 
 === TRAINER_VIOLA_5 ===
 Name: VIOLA
@@ -15836,7 +15833,7 @@ Level: 48
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Static
-- Fire Fang
+- Flamethrower
 - Wild Charge
 - Shock Wave
 - Crunch
@@ -18280,7 +18277,7 @@ Froslass (F)
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Snow Cloak
+Ability: Cursed Body
 - Draining Kiss
 - Shadow Ball
 - Hail
@@ -18414,7 +18411,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Levitate
 - Flamethrower
-- Crunch
+- Boomburst
 - Dragon Breath
 - Earthquake
 
@@ -18426,7 +18423,7 @@ Ability: Intimidate
 - Flamethrower
 - Dragon Claw
 - Rock Slide
-- Crunch
+- Brick Break
 
 === TRAINER_BRANDON ===
 Name: BRANDON
