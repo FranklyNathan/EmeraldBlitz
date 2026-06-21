@@ -14426,7 +14426,7 @@ Level: 31
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Rock Head
-- Dive
+- Waterfall
 - Rock Tomb
 - Flail
 - Ancient Power
@@ -14596,7 +14596,10 @@ Level: 12
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Swift Swim
-- Giga Drain
+- Bubble
+- Quick Attack
+- Bug Bite
+- Sticky Web
 
 Nincada (F)
 Level: 12
@@ -15773,7 +15776,7 @@ Level: 42
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Static
-- Fire Fang
+- Flamethrower
 - Wild Charge
 - Shock Wave
 - Crunch
@@ -16098,7 +16101,7 @@ Ability: Cursed Body
 - Thrash
 - Sunny Day
 
-Slugma (F)
+Magcargo (F)
 Level: 31
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
@@ -17285,7 +17288,7 @@ Nature: Serious
 Ability: Levitate
 - Psybeam
 - Bulldoze
-- Calm Mind
+- Explosion
 - Rapid Spin
 
 Lunatone @ Sitrus Berry
@@ -17335,7 +17338,7 @@ Nature: Serious
 Ability: Levitate
 - Psybeam
 - Earthquake
-- Calm Mind
+- Explosion
 - Rapid Spin
 
 Oranguru (M)
@@ -18359,7 +18362,7 @@ Level: 55
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Synchronize
-- Shadow Sneak
+- Shadow Ball
 - Psychic
 - Draining Kiss
 - Calm Mind

@@ -1153,7 +1153,7 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
     case MOVE_FLASH:
     case MOVE_SMOKESCREEN:
         if (Random() % 2 == 0)
-            ADJUST_SCORE(-8);
+            ADJUST_SCORE(-10);
         break;
     }
 
@@ -1385,6 +1385,11 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
             else if (IsAbilityOnField(ABILITY_DAMP) && !DoesBattlerIgnoreAbilityChecks(battlerAtk, aiData->abilities[battlerAtk], move))
             {
                 ADJUST_SCORE(-10);
+            }
+            else if (gDisableStructs[battlerAtk].turnsActive >= 5
+                && Random() % 100 < 50)
+            {
+                ADJUST_SCORE(BOOYAH_EFFECT);
             }
             //else if (CountUsablePartyMons(battlerAtk) == 0)
             //{

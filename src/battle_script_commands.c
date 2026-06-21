@@ -5969,10 +5969,11 @@ static bool32 HandleMoveEndMoveBlock(u32 moveEffect)
             effect = TRUE;
         }
         break;
-    case EFFECT_RECOIL_IF_MISS:
-        if (IsBattlerAlive(gBattlerAttacker)
-         && (!IsBattlerTurnDamaged(gBattlerTarget) || gBattleStruct->moveResultFlags[gBattlerTarget] & MOVE_RESULT_NO_EFFECT)
-         && !gBattleStruct->noTargetPresent)
+case EFFECT_RECOIL_IF_MISS:
+    if (IsBattlerAlive(gBattlerAttacker)
+        && (gBattleStruct->moveDamage[gBattlerTarget] == 0
+            || gBattleStruct->moveResultFlags[gBattlerTarget] & MOVE_RESULT_NO_EFFECT)
+        && !gBattleStruct->noTargetPresent)
         {
             s32 recoil = 0;
             if (B_RECOIL_IF_MISS_DMG >= GEN_5 || (B_CRASH_IF_TARGET_IMMUNE == GEN_4 && gBattleStruct->moveResultFlags[gBattlerTarget] & MOVE_RESULT_DOESNT_AFFECT_FOE))
@@ -6257,13 +6258,19 @@ static void Cmd_moveend(void)
             }
             gBattleScripting.moveendState++;
             break;
-        case MOVEEND_ABSORB:
-            if (gHitMarker & HITMARKER_UNABLE_TO_USE_MOVE
-             || !IsBattlerTurnDamaged(gBattlerTarget))
-            {
-                gBattleScripting.moveendState++;
-                break;
-            }
+
+case MOVEEND_ABSORB:
+    if (gHitMarker & HITMARKER_UNABLE_TO_USE_MOVE
+     || (!IsBattlerTurnDamaged(gBattlerTarget)
+         && !(DoesSubstituteBlockMove(gBattlerAttacker,
+                                      gBattlerTarget,
+                                      gCurrentMove)
+              && gBattleStruct->moveDamage[gBattlerTarget] > 0)))
+    {
+        gBattleScripting.moveendState++;
+        break;
+    }
+
             switch (moveEffect)
             {
             case EFFECT_ABSORB:
@@ -13268,7 +13275,12 @@ static void Cmd_switchoutabilities(void)
         }
     }
 
-    switch (GetBattlerAbility(battler))
+u32 ability = GetBattlerAbility(battler);
+
+if (gBattleStruct->regeneratorPending[battler])
+    ability = ABILITY_REGENERATOR;
+
+switch (ability)
     {
     case ABILITY_NATURAL_CURE:
         if (gBattleMons[battler].status1 & STATUS1_SLEEP)
@@ -13283,6 +13295,8 @@ static void Cmd_switchoutabilities(void)
         break;
     case ABILITY_REGENERATOR:
     {
+    gBattleStruct->regeneratorPending[battler] = 0;
+
         u32 regenerate = GetNonDynamaxMaxHP(battler) / 3;
         regenerate += gBattleMons[battler].hp;
         if (regenerate > gBattleMons[battler].maxHP)
@@ -18183,6 +18197,15 @@ void BS_UndoMega(void)
 
     if (GetActiveGimmick(battler) == GIMMICK_MEGA)
     {
+        if (GetBattlerAbility(battler) == ABILITY_REGENERATOR)
+        {
+            gBattleStruct->regeneratorPending[battler] = TRUE;
+        }
+        else
+        {
+            gBattleStruct->regeneratorPending[battler] = FALSE;
+        }
+
         UndoMega(battler);
         gBattleScripting.battler = battler;
         BattleScriptCall(BattleScript_MegaEvolutionEnds_Ret);

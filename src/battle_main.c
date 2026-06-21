@@ -3139,6 +3139,8 @@ static void BattleStartClearSetData(void)
     for (i = 0; i < MAX_BATTLERS_COUNT; i++)
     {
         gDisableStructs[i].isFirstTurn = 2;
+        gDisableStructs[i].turnsActive = 0;
+        gBattleStruct->regeneratorPending[i] = 0;
         gLastMoves[i] = MOVE_NONE;
         gLastLandedMoves[i] = MOVE_NONE;
         gLastHitByType[i] = 0;
@@ -3330,6 +3332,7 @@ void SwitchInClearSetData(u32 battler, struct Volatiles *volatilesCopy)
 
     gBattleStruct->moveResultFlags[battler] = 0;
     gDisableStructs[battler].isFirstTurn = 2;
+    gDisableStructs[battler].turnsActive = 0;
     gDisableStructs[battler].truantSwitchInHack = disableStructCopy.truantSwitchInHack;
     gLastMoves[battler] = MOVE_NONE;
     gLastLandedMoves[battler] = MOVE_NONE;
@@ -3451,6 +3454,7 @@ const u8* FaintClearSetData(u32 battler)
     gProtectStructs[battler].pranksterElevated = FALSE;
 
     gDisableStructs[battler].isFirstTurn = 2;
+    gDisableStructs[battler].turnsActive = 0;
 
     gLastMoves[battler] = MOVE_NONE;
     gLastLandedMoves[battler] = MOVE_NONE;
@@ -5292,6 +5296,9 @@ static void TurnValuesCleanUp(bool8 var0)
 
             if (gDisableStructs[i].isFirstTurn)
                 gDisableStructs[i].isFirstTurn--;
+
+            if (gBattleMons[i].hp != 0)
+                gDisableStructs[i].turnsActive++;
 
             if (gDisableStructs[i].rechargeTimer)
                 gDisableStructs[i].rechargeTimer--;

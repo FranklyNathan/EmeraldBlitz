@@ -101,6 +101,7 @@ struct DisableStruct
     u8 battlerPreventingEscape;
     u8 battlerWithSureHit;
     u8 isFirstTurn;
+    u8 turnsActive;
     u8 mimickedMoves:4;
     u8 rechargeTimer:4;
     u8 autotomizeCount;
@@ -794,6 +795,7 @@ struct BattleStruct
     u16 flingItem;
     u8 incrementEchoedVoice:1;
     u8 echoedVoiceCounter:3;
+    u8 regeneratorPending[MAX_BATTLERS_COUNT];
     u8 padding3:4;
 };
 
