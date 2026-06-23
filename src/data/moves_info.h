@@ -14786,7 +14786,7 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
         #if B_USE_FROSTBITE == TRUE
             "types. May cause frostbite."),
         #else
-            "types. May cause freezing."),
+            "types."),
         #endif
         .effect = EFFECT_SUPER_EFFECTIVE_ON_ARG,
         .power = 70,
@@ -14797,10 +14797,10 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
         .priority = 0,
         .category = DAMAGE_CATEGORY_SPECIAL,
         .argument = { .type = TYPE_WATER },
-        .additionalEffects = ADDITIONAL_EFFECTS({
-            .moveEffect = MOVE_EFFECT_FREEZE_OR_FROSTBITE,
-            .chance = 10,
-        }),
+        //.additionalEffects = ADDITIONAL_EFFECTS({
+            //.moveEffect = MOVE_EFFECT_FREEZE_OR_FROSTBITE,
+            //.chance = 10,
+        //}),
         .contestEffect = CONTEST_EFFECT_REPETITION_NOT_BORING,
         .contestCategory = CONTEST_CATEGORY_BEAUTY,
         .contestComboStarterId = 0,
