@@ -38,7 +38,34 @@
 
 InsideOfTruck_MapScripts::
 	map_script MAP_SCRIPT_ON_LOAD, InsideOfTruck_OnLoad
+	map_script MAP_SCRIPT_ON_FRAME_TABLE, InsideOfTruck_OnFrameTable
 	.byte 0
+
+InsideOfTruck_OnFrameTable:
+	map_script_2 VAR_TRUCK_SAVE_TRIGGER, 0, InsideOfTruck_EventScript_ForceSave
+	.2byte 0
+
+InsideOfTruck_EventScript_ForceSave::
+	lockall
+	delay 40
+	setvar VAR_TRUCK_SAVE_TRIGGER, 1 @ Stops the script from looping infinitely
+	forcesave
+	releaseall
+	end
+
+InsideOfTruck_EventScript_WarpToNathansLair:
+	lockall
+	msgbox InsideOfTruck_Text_WarpToNathansLair, MSGBOX_YESNO
+	closemessage
+	goto_if_eq VAR_RESULT, 1, InsideOfTruck_EventScript_DoWarpToNathansLair
+	releaseall
+	return
+
+InsideOfTruck_EventScript_DoWarpToNathansLair:
+	warp 4, 5, 4, 3
+	waitstate
+	releaseall
+	end
 
 InsideOfTruck_OnLoad:
 	setweather WEATHER_NONE
@@ -62,8 +89,20 @@ InsideOfTruck_OnLoad:
 	setflag FLAG_HIDE_TRUCK_PANSEAR
 	setflag FLAG_HIDE_TRUCK_KECLEON
 	setflag FLAG_HIDE_TRUCK_VIGOROTH
+	@ Check if a scenario was already selected (saved)
+	copyvar VAR_RESULT, VAR_TRUCK_SCENARIO
+	compare VAR_RESULT, 255 @ 255 = not set yet
+	goto_if_eq VAR_RESULT, 255, InsideOfTruck_EventScript_SelectRandomScenario
+	@ Use saved scenario
+	goto InsideOfTruck_EventScript_ApplyScenario
+
+InsideOfTruck_EventScript_SelectRandomScenario:
 	@ Randomly select a scenario and un-hide the corresponding NPCs
 	random 13 @ Number of scenarios
+	copyvar VAR_TRUCK_SCENARIO, VAR_RESULT @ Save the selection
+
+InsideOfTruck_EventScript_ApplyScenario:
+	copyvar VAR_RESULT, VAR_TRUCK_SCENARIO
 	switch VAR_RESULT
 	case 0, InsideOfTruck_EventScript_SetupKommoo
 	case 1, InsideOfTruck_EventScript_SetupShuppets
@@ -478,3 +517,6 @@ InsideOfTruck_Text_Vigoroth:
 	.string "moving truck for all eternity.\p"
 	.string "…I guess you'll have to learn from\n"
 	.string "its positive attitude.$"
+
+InsideOfTruck_Text_WarpToNathansLair:
+	.string "Warp to Nathan's Lair?$"

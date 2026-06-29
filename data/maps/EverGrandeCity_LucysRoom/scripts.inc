@@ -69,6 +69,9 @@ EverGrandeCity_LucysRoom_EventScript_Defeated::
 	setflag FLAG_DEFEATED_ELITE_4_PHOEBE
 	call PokemonLeague_EliteFour_SetAdvanceToNextRoomMetatiles
 	msgbox EverGrandeCity_LucysRoom_Text_PostBattleSpeech, MSGBOX_DEFAULT
+
+	turnobject LOCALID_PLAYER, DIR_SOUTH
+	forcesave
 	release
 	end
 

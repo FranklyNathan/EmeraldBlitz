@@ -1547,7 +1547,63 @@ OldaleTown_House2_Basement_Text_Slowbro_Disabled:
 
 OldaleTown_House2_Basement_Text_Slowbro_Enable:
     .string "Critical hits are currently disabled.\n"
-    .string "Would you like to re-enable them?$"
+    .string "Would you like to enable them?$"
 
 OldaleTown_House2_Basement_Text_Slowbro_EnabledMsg:
-    .string "Critical hits have been re-enabled.$"
+    .string "Critical hits have been enabled.$"
+
+OldaleTown_House2_Basement_EventScript_Hypno::
+    lock
+    faceplayer
+    msgbox OldaleTown_House2_Basement_Text_HypnoIntro, MSGBOX_YESNO
+    goto_if_eq VAR_RESULT, NO, OldaleTown_House2_Basement_EventScript_Hypno_Decline
+	closemessage
+    fadescreen FADE_TO_BLACK
+    special AdvanceTimeToNextPeriod
+    fadescreen FADE_FROM_BLACK
+    gettimeofday
+    copyvar VAR_RESULT, VAR_0x8000
+    switch VAR_RESULT
+    case 0, OldaleTown_House2_Basement_EventScript_Hypno_Morning
+    case 1, OldaleTown_House2_Basement_EventScript_Hypno_Day
+    case 2, OldaleTown_House2_Basement_EventScript_Hypno_Night
+    case 3, OldaleTown_House2_Basement_EventScript_Hypno_Night
+	release
+    end
+
+OldaleTown_House2_Basement_EventScript_Hypno_Morning::
+    msgbox OldaleTown_House2_Basement_Text_HypnoMorning, MSGBOX_DEFAULT
+    release
+    end
+
+OldaleTown_House2_Basement_EventScript_Hypno_Day::
+    msgbox OldaleTown_House2_Basement_Text_HypnoDay, MSGBOX_DEFAULT
+    release
+    end
+
+OldaleTown_House2_Basement_EventScript_Hypno_Night::
+    msgbox OldaleTown_House2_Basement_Text_HypnoNight, MSGBOX_DEFAULT
+    release
+    end
+
+OldaleTown_House2_Basement_EventScript_Hypno_Decline::
+    msgbox OldaleTown_House2_Basement_Text_HypnoDecline, MSGBOX_DEFAULT
+    release
+    end
+
+OldaleTown_House2_Basement_Text_HypnoIntro:
+    .string "HYPNO's pendulum swings rhythmically.\p"
+    .string "Would you like me to advance time\n"
+    .string "to the next period?$"
+
+OldaleTown_House2_Basement_Text_HypnoMorning:
+    .string "It is now morning.$"
+
+OldaleTown_House2_Basement_Text_HypnoDay:
+    .string "It is now day.$"
+
+OldaleTown_House2_Basement_Text_HypnoNight:
+    .string "It is now night.$"
+
+OldaleTown_House2_Basement_Text_HypnoDecline:
+    .string "HYPNO continues swinging its pendulum…$"

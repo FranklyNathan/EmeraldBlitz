@@ -75,6 +75,7 @@ void SaveBattlerTarget(u32 battler);
 void SaveBattlerAttacker(u32 battler);
 bool32 CanBurnHitThaw(u16 move);
 bool32 EmergencyExitCanBeTriggered(u32 battler);
+bool8 IsBossTrainer(u16 trainerId);
 
 extern void (*const gBattleScriptingCommandsTable[])(void);
 extern const struct StatFractions gAccuracyStageRatios[];

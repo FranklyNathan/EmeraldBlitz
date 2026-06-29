@@ -4,6 +4,7 @@
 #include "battle_setup.h"
 #include "battle_tower.h"
 #include "battle_transition.h"
+#include "battle_script_commands.h"
 #include "main.h"
 #include "task.h"
 #include "safari_zone.h"
@@ -84,12 +85,18 @@ static void RegisterTrainerInMatchCall(void);
 static void HandleRematchVarsOnBattleEnd(void);
 static const u8 *GetIntroSpeechOfApproachingTrainer(void);
 static const u8 *GetTrainerCantBattleSpeech(void);
+static void SnapshotBossChallengeTime(void);
+static void ClearBossChallengeTime(void);
 
 EWRAM_DATA TrainerBattleParameter gTrainerBattleParameter = {0};
 EWRAM_DATA u16 gPartnerTrainerId = 0;
 EWRAM_DATA static u8 *sTrainerBattleEndScript = NULL;
 EWRAM_DATA static bool8 sShouldCheckTrainerBScript = FALSE;
 EWRAM_DATA static u8 sNoOfPossibleTrainerRetScripts = 0;
+EWRAM_DATA static bool8 sHasBossChallengeTime = FALSE;
+EWRAM_DATA static u16 sBossChallengeHours = 0;
+EWRAM_DATA static u8 sBossChallengeMinutes = 0;
+EWRAM_DATA static u8 sBossChallengeSeconds = 0;
 
 // The first transition is used if the enemy Pokémon are lower level than our Pokémon.
 // Otherwise, the second transition is used.
@@ -1216,6 +1223,10 @@ void BattleSetup_StartTrainerBattle(void)
         }
     }
 
+    // Snapshot time if challenging a boss trainer
+    if (IsBossTrainer(TRAINER_BATTLE_PARAM.opponentA))
+        SnapshotBossChallengeTime();
+
     if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
     {
         VarSet(VAR_TEMP_PLAYING_PYRAMID_MUSIC, 0);
@@ -1340,6 +1351,9 @@ static void CB2_EndTrainerBattle(void)
             SetBattledTrainersFlags();
         }
     }
+
+    // Clear boss challenge time after battle ends
+    ClearBossChallengeTime();
 }
 
 static void CB2_EndRematchBattle(void)
@@ -1952,10 +1966,43 @@ u16 CountBattledRematchTeams(u16 trainerId)
     for (i = 1; i < REMATCHES_COUNT; i++)
     {
         if (gRematchTable[trainerId].trainerIds[i] == 0)
-            break;
-        if (!HasTrainerBeenFought(gRematchTable[trainerId].trainerIds[i]))
-            break;
+            return i;
     }
+    return REMATCHES_COUNT;
+}
 
-    return i;
+static void SnapshotBossChallengeTime(void)
+{
+    sBossChallengeHours = gSaveBlock2Ptr->playTimeHours;
+    sBossChallengeMinutes = gSaveBlock2Ptr->playTimeMinutes;
+    sBossChallengeSeconds = gSaveBlock2Ptr->playTimeSeconds;
+    sHasBossChallengeTime = TRUE;
+}
+
+static void ClearBossChallengeTime(void)
+{
+    sBossChallengeHours = 0;
+    sBossChallengeMinutes = 0;
+    sBossChallengeSeconds = 0;
+    sHasBossChallengeTime = FALSE;
+}
+
+u16 GetBossChallengeHours(void)
+{
+    return sBossChallengeHours;
+}
+
+u8 GetBossChallengeMinutes(void)
+{
+    return sBossChallengeMinutes;
+}
+
+u8 GetBossChallengeSeconds(void)
+{
+    return sBossChallengeSeconds;
+}
+
+bool8 HasBossChallengeTime(void)
+{
+    return sHasBossChallengeTime;
 }

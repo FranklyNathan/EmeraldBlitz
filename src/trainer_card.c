@@ -1881,9 +1881,19 @@ void RecordTrainerCardLoss(u16 trainerId)
     {
         u8 count = gSaveBlock2Ptr->trainerCardWinsCount;
         gSaveBlock2Ptr->trainerCardWins[count].trainerId = trainerId | 0x8000;
-        gSaveBlock2Ptr->trainerCardWins[count].hours = gSaveBlock2Ptr->playTimeHours;
-        gSaveBlock2Ptr->trainerCardWins[count].minutes = gSaveBlock2Ptr->playTimeMinutes;
-        gSaveBlock2Ptr->trainerCardWins[count].seconds = gSaveBlock2Ptr->playTimeSeconds;
+        // Use challenge time if available (for boss trainers), otherwise use current time
+        if (HasBossChallengeTime())
+        {
+            gSaveBlock2Ptr->trainerCardWins[count].hours = GetBossChallengeHours();
+            gSaveBlock2Ptr->trainerCardWins[count].minutes = GetBossChallengeMinutes();
+            gSaveBlock2Ptr->trainerCardWins[count].seconds = GetBossChallengeSeconds();
+        }
+        else
+        {
+            gSaveBlock2Ptr->trainerCardWins[count].hours = gSaveBlock2Ptr->playTimeHours;
+            gSaveBlock2Ptr->trainerCardWins[count].minutes = gSaveBlock2Ptr->playTimeMinutes;
+            gSaveBlock2Ptr->trainerCardWins[count].seconds = gSaveBlock2Ptr->playTimeSeconds;
+        }
         gSaveBlock2Ptr->trainerCardWinsCount++;
     }
 }

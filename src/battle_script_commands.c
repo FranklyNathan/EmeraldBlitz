@@ -882,7 +882,7 @@ const struct StatFractions gAccuracyStageRatios[] =
 };
 
 // Identifies trainers that are recorded on the trainer card
-static bool8 IsBossTrainer(u16 trainerId)
+bool8 IsBossTrainer(u16 trainerId)
 {
     u32 trainerClass = GetTrainerClassFromId(trainerId);
 

@@ -1847,6 +1847,8 @@ void CB2_WhiteOut(void)
         SetFieldVBlankCallback();
         SetMainCallback1(CB1_Overworld);
         SetMainCallback2(CB2_Overworld);
+        // Set flag to enable LAIR menu option
+        FlagSet(FLAG_WHITEOUT_LAIR);
     }
 }
 
