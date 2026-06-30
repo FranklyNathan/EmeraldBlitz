@@ -229,7 +229,7 @@ static bool32 ShouldSwitchIfHasBadOdds(u32 battler)
         return FALSE;
 
     // Torkoal and Tropius should never switch out if their SpAtk is -1 or worse
-    if ((gBattleMons[battler].species == SPECIES_TORKOAL || gBattleMons[battler].species == SPECIES_TROPIUS)
+    if ((gBattleMons[battler].species == SPECIES_TORKOAL || gBattleMons[battler].species == SPECIES_TROPIUS  || gBattleMons[battler].species == SPECIES_NUMEL  || gBattleMons[battler].species == SPECIES_SLUGMA|| gBattleMons[battler].species == SPECIES_CAMERUPT || gBattleMons[battler].species == SPECIES_VULPIX || gBattleMons[battler].species == SPECIES_NINETALES  || gBattleMons[battler].species == SPECIES_MAGCARGO)
         && gBattleMons[battler].statStages[STAT_SPATK] <= (DEFAULT_STAT_STAGE - 1))
         return FALSE;
 
