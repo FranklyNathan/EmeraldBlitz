@@ -734,6 +734,8 @@ const u8 gText_Jackpot[] = _("jackpot");
 const u8 gText_First[] = _("first");
 const u8 gText_Second[] = _("second");
 const u8 gText_Third[] = _("third");
+const u8 gText_FourthWeather[] = _("fourth");
+const u8 gText_Fifth[] = _("fifth");
 #if OW_POISON_DAMAGE < GEN_4
 const u8 gText_PkmnFainted_FldPsn[] = _("{STR_VAR_1} fainted…\p\n");
 #else

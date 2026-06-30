@@ -28,6 +28,7 @@
 #include "bg.h"
 #include "string_util.h"
 #include "pokemon_icon.h"
+#include "strings.h"
 #include "caps.h"
 #include "m4a.h"
 #include "mail.h"
@@ -603,6 +604,7 @@ static void Cmd_setnonvolatilestatus(void);
 static void Cmd_tryoverwriteability(void);
 static void Cmd_callnative(void);
 void BS_GluttonyOranBerry(void);
+void BS_BufferWeatherTurnCount(void);
 
 void (*const gBattleScriptingCommandsTable[])(void) =
 {
@@ -18237,6 +18239,50 @@ void BS_TryAbsorbToxicSpikesOnFaint(void)
         BattleScriptCall(BattleScript_ToxicSpikesAbsorbed);
         return;
     }
+    gBattlescriptCurrInstr = cmd->nextInstr;
+}
 
+void BS_BufferWeatherTurnCount(void)
+{
+    NATIVE_ARGS();
+    u8 turnNumber;
+    u8 *dst;
+    const u8 *ordinalStr;
+
+    // Calculate current turn number
+    // weatherDuration tracks remaining turns, so we need to calculate which turn this is
+    // Weather starts with duration 5, then decrements at end of each turn
+    // First continuation message is shown when duration is 4 (after turn 1 ends)
+    turnNumber = 5 - gWishFutureKnock.weatherDuration;
+
+    // Convert to ordinal string
+    switch (turnNumber)
+    {
+        case 1:
+            ordinalStr = gText_First;
+            break;
+        case 2:
+            ordinalStr = gText_Second;
+            break;
+        case 3:
+            ordinalStr = gText_Third;
+            break;
+        case 4:
+            ordinalStr = gText_FourthWeather;
+            break;
+        case 5:
+            ordinalStr = gText_Fifth;
+            break;
+        default:
+            // Fallback to number string for higher turns
+            dst = ConvertIntToDecimalStringN(gBattleTextBuff1, turnNumber, STR_CONV_MODE_LEFT_ALIGN, 2);
+            *dst++ = CHAR_SPACE;
+            *dst = EOS;
+            gBattlescriptCurrInstr = cmd->nextInstr;
+            return;
+    }
+
+    // Copy ordinal string to buffer
+    StringCopy(gBattleTextBuff1, ordinalStr);
     gBattlescriptCurrInstr = cmd->nextInstr;
 }

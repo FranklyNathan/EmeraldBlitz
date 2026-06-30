@@ -11,6 +11,10 @@ OldaleTown_House2_EventScript_SetStairs::
 	return
 
 OldaleTown_House2_EventScript_FallIntoBasement::
+	goto_if_set FLAG_OLDALE_HOUSE_SECRET_STAIRS, OldaleTown_House2_EventScript_DoFall
+	return
+
+OldaleTown_House2_EventScript_DoFall::
 	lockall
 	playse SE_FALL
 	setholewarp MAP_OLDALE_TOWN_HOUSE2_BASEMENT, 13, 11

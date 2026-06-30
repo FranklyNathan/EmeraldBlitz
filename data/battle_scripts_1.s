@@ -4788,6 +4788,7 @@ BattleScript_LearnMoveReturn::
 	return
 
 BattleScript_WeatherContinues::
+	callnative BS_BufferWeatherTurnCount
 	printfromtable gWeatherTurnStringIds
 	waitmessage B_WAIT_TIME_LONG
 	playanimation_var BS_ATTACKER, sB_ANIM_ARG1

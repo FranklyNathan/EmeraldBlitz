@@ -101,6 +101,8 @@ extern const u8 gText_ReelTimeHelp[];
 extern const u8 gText_First[];
 extern const u8 gText_Second[];
 extern const u8 gText_Third[];
+extern const u8 gText_FourthWeather[];
+extern const u8 gText_Fifth[];
 
 extern const u8 gText_NoDecorations[];
 extern const u8 gText_NoDecorationsInUse[];
