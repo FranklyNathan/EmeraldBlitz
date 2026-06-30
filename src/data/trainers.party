@@ -15849,7 +15849,7 @@ Gender: Female
 Music: Female
 Items: Potion
 Double Battle: No
-AI: Basic Trainer / Smart Mon Choices
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Slugma (F)
 Level: 12
@@ -15889,7 +15889,7 @@ Gender: Female
 Music: Female
 Items: Super Potion
 Double Battle: No
-AI: Basic Trainer / Smart Mon Choices
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Slugma (F) 
 Level: 16
@@ -15939,7 +15939,7 @@ Gender: Female
 Music: Female
 Items: Super Potion
 Double Battle: No
-AI: Basic Trainer / Smart Mon Choices
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Slugma (F) 
 Level: 22
@@ -15989,7 +15989,7 @@ Gender: Female
 Music: Female
 Items: Hyper Potion
 Double Battle: No
-AI: Basic Trainer / Smart Mon Choices
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Marowak-Alola (F) 
 Level: 26
@@ -16039,7 +16039,7 @@ Gender: Female
 Music: Female
 Items: Hyper Potion / Hyper Potion
 Double Battle: No
-AI: Basic Trainer / Smart Mon Choices
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Marowak-Alola (F) @ Thick Club
 Level: 30
@@ -16089,7 +16089,7 @@ Gender: Female
 Music: Female
 Items: Hyper Potion / Hyper Potion
 Double Battle: No
-AI: Basic Trainer / Smart Mon Choices
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Marowak-Alola (F) @ Thick Club
 Level: 33
@@ -16149,7 +16149,7 @@ Gender: Female
 Music: Female
 Items: Hyper Potion / Hyper Potion
 Double Battle: No
-AI: Basic Trainer / Smart Mon Choices
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Marowak-Alola (F) @ Thick Club
 Level: 41
@@ -16209,7 +16209,7 @@ Gender: Female
 Music: Female
 Items: Hyper Potion / Hyper Potion
 Double Battle: No
-AI: Basic Trainer / Smart Mon Choices
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Marowak-Alola (F) @ Thick Club
 Level: 46
@@ -16269,7 +16269,7 @@ Gender: Male
 Music: Male
 Items: Potion
 Double Battle: No
-AI: Basic Trainer
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Zorua-Hisui (M)
 Level: 12
@@ -16309,7 +16309,7 @@ Gender: Male
 Music: Male
 Items: Super Potion
 Double Battle: No
-AI: Basic Trainer
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Spinda (M)
 Level: 15
@@ -16359,7 +16359,7 @@ Gender: Male
 Music: Male
 Items: Super Potion
 Double Battle: No
-AI: Basic Trainer
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Spinda (M)
 Level: 20
@@ -16409,7 +16409,7 @@ Gender: Male
 Music: Male
 Items: Hyper Potion
 Double Battle: No
-AI: Basic Trainer
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Spinda (M)
 Level: 24
@@ -16459,7 +16459,7 @@ Gender: Male
 Music: Male
 Items: Hyper Potion / Hyper Potion
 Double Battle: No
-AI: Basic Trainer
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Spinda (M)
 Level: 28
@@ -16509,7 +16509,7 @@ Gender: Male
 Music: Male
 Items: Hyper Potion / Hyper Potion
 Double Battle: No
-AI: Basic Trainer
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Spinda (M)
 Level: 31
@@ -16569,7 +16569,7 @@ Gender: Male
 Music: Male
 Items: Hyper Potion / Hyper Potion
 Double Battle: No
-AI: Basic Trainer
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Spinda (M)
 Level: 40
@@ -16629,7 +16629,7 @@ Gender: Male
 Music: Male
 Items: Hyper Potion / Hyper Potion
 Double Battle: No
-AI: Basic Trainer
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Spinda (M)
 Level: 43

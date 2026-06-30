@@ -228,6 +228,11 @@ static bool32 ShouldSwitchIfHasBadOdds(u32 battler)
     if (IsDoubleBattle())
         return FALSE;
 
+    // Torkoal and Tropius should never switch out if their SpAtk is -1 or worse
+    if ((gBattleMons[battler].species == SPECIES_TORKOAL || gBattleMons[battler].species == SPECIES_TROPIUS)
+        && gBattleMons[battler].statStages[STAT_SPATK] <= (DEFAULT_STAT_STAGE - 1))
+        return FALSE;
+
     opposingPosition = BATTLE_OPPOSITE(GetBattlerPosition(battler));
     opposingBattler = GetBattlerAtPosition(opposingPosition);
     u16 *playerMoves = GetMovesArray(opposingBattler);
@@ -1064,7 +1069,7 @@ static bool32 ShouldSwitchIfAttackingStatsLowered(u32 battler)
         return FALSE;
 
     // Physical attacker
-    if (gBattleMons[battler].attack > gBattleMons[battler].spAttack)
+    if (gBattleMons[battler].attack >= gBattleMons[battler].spAttack)
     {
         // Don't switch if attack isn't below -1
         if (attackingStage > DEFAULT_STAT_STAGE - 1)
