@@ -228,11 +228,6 @@ static bool32 ShouldSwitchIfHasBadOdds(u32 battler)
     if (IsDoubleBattle())
         return FALSE;
 
-    // Torkoal and Tropius should never switch out if their SpAtk is -1 or worse
-    if ((gBattleMons[battler].species == SPECIES_TORKOAL || gBattleMons[battler].species == SPECIES_TROPIUS  || gBattleMons[battler].species == SPECIES_NUMEL  || gBattleMons[battler].species == SPECIES_SLUGMA|| gBattleMons[battler].species == SPECIES_CAMERUPT || gBattleMons[battler].species == SPECIES_VULPIX || gBattleMons[battler].species == SPECIES_NINETALES  || gBattleMons[battler].species == SPECIES_MAGCARGO)
-        && gBattleMons[battler].statStages[STAT_SPATK] <= (DEFAULT_STAT_STAGE - 1))
-        return FALSE;
-
     opposingPosition = BATTLE_OPPOSITE(GetBattlerPosition(battler));
     opposingBattler = GetBattlerAtPosition(opposingPosition);
     u16 *playerMoves = GetMovesArray(opposingBattler);
@@ -1127,6 +1122,11 @@ bool32 ShouldSwitch(u32 battler)
 
     // Sequence Switching AI never switches mid-battle
     if (gAiThinkingStruct->aiFlags[battler] & AI_FLAG_SEQUENCE_SWITCHING)
+        return FALSE;
+
+    // Some Pokemon should never switch out if their SpAtk is -1 or worse
+    if ((gBattleMons[battler].species == SPECIES_TORKOAL || gBattleMons[battler].species == SPECIES_TROPIUS || gBattleMons[battler].species == SPECIES_NUMEL || gBattleMons[battler].species == SPECIES_SLUGMA || gBattleMons[battler].species == SPECIES_CAMERUPT || gBattleMons[battler].species == SPECIES_VULPIX || gBattleMons[battler].species == SPECIES_NINETALES || gBattleMons[battler].species == SPECIES_MAGCARGO)
+        && gBattleMons[battler].statStages[STAT_SPATK] <= (DEFAULT_STAT_STAGE - 1))
         return FALSE;
 
     availableToSwitch = 0;
