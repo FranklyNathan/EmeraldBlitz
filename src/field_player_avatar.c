@@ -1139,6 +1139,9 @@ void SetPlayerAvatarTransitionFlags(u16 transitionFlags)
 {
     gPlayerAvatar.transitionFlags |= transitionFlags;
     DoPlayerAvatarTransition();
+    // Set up shadow if transitioning to bike state
+    if (transitionFlags & (PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
+        SetUpShadow(&gObjectEvents[gPlayerAvatar.objectEventId]);
 }
 
 static void DoPlayerAvatarTransition(void)
@@ -1220,6 +1223,8 @@ static void PlayerAvatarTransition_Normal(struct ObjectEvent *objEvent)
     }
     ObjectEventTurn(objEvent, objEvent->movementDirection);
     SetPlayerAvatarStateMask(PLAYER_AVATAR_FLAG_ON_FOOT);
+    // Remove shadow when dismounting bike
+    objEvent->noShadow = TRUE;
 }
 
 static void PlayerAvatarTransition_MachBike(struct ObjectEvent *objEvent)
@@ -1229,6 +1234,8 @@ static void PlayerAvatarTransition_MachBike(struct ObjectEvent *objEvent)
     ObjectEventTurn(objEvent, objEvent->movementDirection);
     SetPlayerAvatarStateMask(PLAYER_AVATAR_FLAG_MACH_BIKE);
     BikeClearState(0, 0);
+    objEvent->noShadow = FALSE;
+    SetUpShadow(objEvent);
 }
 
 static void PlayerAvatarTransition_AcroBike(struct ObjectEvent *objEvent)
@@ -1252,6 +1259,8 @@ static void PlayerAvatarTransition_AcroBike(struct ObjectEvent *objEvent)
     gFieldEffectArguments[1] = objEvent->currentCoords.y;
     gFieldEffectArguments[2] = gPlayerAvatar.objectEventId;
     spriteId = FieldEffectStart(FLDEFF_SURF_BLOB);
+    objEvent->noShadow = FALSE;
+    SetUpShadow(objEvent);
     objEvent->fieldEffectSpriteId = spriteId;
     gSprites[spriteId].invisible = TRUE;
     SetSurfBlob_BobState(spriteId, BOB_JUST_MON);

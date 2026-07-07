@@ -88,6 +88,7 @@ FortreeCity_Gym_EventScript_WinonaDefeated::
 	call FortreeCity_Gym_EventScript_GiveAerialAce
 	closemessage
 	delay 30
+	call_if_ge VAR_BADGE_COUNT, 3, Common_EventScript_SetScottEncounterPending
 	//playfanfare MUS_REGISTER_MATCH_CALL
 	//msgbox FortreeCity_Gym_Text_RegisteredWinona, MSGBOX_DEFAULT
 	//waitfanfare

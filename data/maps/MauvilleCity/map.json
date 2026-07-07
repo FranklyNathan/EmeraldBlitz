@@ -170,8 +170,8 @@
     {
       "local_id": "LOCALID_MAUVILLE_SCOTT",
       "graphics_id": "OBJ_EVENT_GFX_SCOTT",
-      "x": 12,
-      "y": 14,
+      "x": 6,
+      "y": 5,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_FACE_UP",
       "movement_range_x": 0,

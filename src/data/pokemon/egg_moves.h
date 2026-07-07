@@ -1245,19 +1245,6 @@ static const u16 sDunsparceEggMoveLearnset[] = {
 #if P_FAMILY_GLIGAR
 static const u16 sGligarEggMoveLearnset[] = {
     MOVE_METAL_CLAW,
-    MOVE_WING_ATTACK,
-    MOVE_RAZOR_WIND,
-    MOVE_COUNTER,
-    MOVE_SAND_TOMB,
-    MOVE_AGILITY,
-    MOVE_BATON_PASS,
-    MOVE_DOUBLE_EDGE,
-    MOVE_FEINT,
-    MOVE_NIGHT_SLASH,
-    MOVE_CROSS_POISON,
-    MOVE_POWER_TRICK,
-    MOVE_ROCK_CLIMB,
-    MOVE_POISON_TAIL,
     MOVE_UNAVAILABLE,
 };
 #endif //P_FAMILY_GLIGAR

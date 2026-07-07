@@ -699,5 +699,10 @@ extern const u8 EventScript_WarpHomeSootopolis[];
 extern const u8 EventScript_Statue[];
 extern const u8 EventScript_FlygonLearnedFly[];
 
+extern const u8 EventScript_WarpHomeDewford_ClearScott[];
+extern const u8 EventScript_WarpHomeRustboro_ClearScott[];
+extern const u8 EventScript_WarpHomeMauville_ClearScott[];
+extern const u8 EventScript_WarpHomeLavaridge_ClearScott[];
+
 
 #endif // GUARD_EVENT_SCRIPTS_H

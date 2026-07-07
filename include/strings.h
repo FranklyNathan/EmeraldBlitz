@@ -434,6 +434,10 @@ extern const u8 gText_GoBackPrevMenu[];
 extern const u8 gText_Cancel[];
 
 extern const u8 gText_Cancel2[];
+extern const u8 gText_Reroll[];
+extern const u8 gText_Invert[];
+extern const u8 gText_RerollDescription[];
+extern const u8 gText_InvertDescription[];
 
 extern const u8 gText_NoItems[];
 extern const u8 gText_WhatToDoWithVar1sMail[];
@@ -756,6 +760,7 @@ extern const u8 gText_ShopSell[];
 extern const u8 gText_ShopQuit[];
 extern const u8 gText_ThatItemIsSoldOut[];
 extern const u8 gText_SoldOut[];
+extern const u8 gText_Purchased[];
 
 extern const u8 gText_OhABite[];
 extern const u8 gText_PokemonOnHook[];

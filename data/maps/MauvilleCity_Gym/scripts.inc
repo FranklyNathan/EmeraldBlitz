@@ -149,7 +149,8 @@ MauvilleCity_Gym_EventScript_WattsonDefeated::
 	playse SE_UNLOCK
 	call MauvilleCity_Gym_EventScript_GiveShockWave
 	closemessage
-	//delay 30
+	delay 30
+	call_if_ge VAR_BADGE_COUNT, 3, Common_EventScript_SetScottEncounterPending
 	//playfanfare MUS_REGISTER_MATCH_CALL
 	//msgbox MauvilleCity_Gym_Text_RegisteredWattson, MSGBOX_DEFAULT
 	//waitfanfare

@@ -94,6 +94,7 @@ MauvilleCity_OnFrame:
 
 MauvilleCity_EventScript_WalkDown::
 	lockall
+	goto_if_set FLAG_SCOTT_ENCOUNTER_PENDING, MauvilleCity_EventScript_CheckScottEncounter
 	setvar VAR_STEP_DOWN, 0
 	setvar VAR_MAUVILLE_CITY_STATE, 0
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkDown
@@ -103,6 +104,52 @@ MauvilleCity_EventScript_WalkDown::
 	releaseall
 	end
 
+MauvilleCity_EventScript_CheckScottEncounter::
+	call_if_ge VAR_BADGE_COUNT, 4, MauvilleCity_EventScript_ScottEncounter
+	releaseall
+	end
+
+MauvilleCity_EventScript_ScottEncounter::
+	lockall
+	clearflag FLAG_SCOTT_ENCOUNTER_PENDING
+	setvar VAR_LAST_TALKED, LOCALID_MAUVILLE_SCOTT
+	call Common_EventScript_ScottExclamation
+	applymovement LOCALID_MAUVILLE_SCOTT, Common_Movement_ScottApproachAlt
+	waitmovement 0
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceLeft
+	waitmovement 0
+	call_if_eq VAR_BADGE_COUNT, 3, MauvilleCity_EventScript_ScottText0
+	call_if_eq VAR_BADGE_COUNT, 4, MauvilleCity_EventScript_ScottText1
+	setflag FLAG_HIDE_MAUVILLE_CITY_SCOTT
+	releaseall
+	end
+
+MauvilleCity_EventScript_ScottText0::
+	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_MAUVILLE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+MauvilleCity_EventScript_ScottText1::
+	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_MAUVILLE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+MauvilleCity_EventScript_ScottText2::
+	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_MAUVILLE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence2, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
 
 MauvilleCity_EventScript_MoveWattsonBackToGym::
 	clearflag FLAG_HIDE_MAUVILLE_GYM_WATTSON

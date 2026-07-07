@@ -1156,11 +1156,16 @@ EventScript_WarpHomeRustboro::
     setvar VAR_RUSTBORO_LOCKED, 1
     call_if_eq VAR_BADGE_COUNT, 2, Common_EventScript_GotTwoBadges
     call_if_eq VAR_BADGE_COUNT, 4, Common_EventScript_ReadyPetalburgGymForBattle
+	call_if_eq VAR_BADGE_COUNT, 4, EventScript_WarpHomeRustboro_ClearScott
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_RUSTBORO_CITY, 27, 20
 	waitstate
 	releaseall
 	end
+
+EventScript_WarpHomeRustboro_ClearScott::
+	clearflag FLAG_HIDE_RUSTBORO_CITY_SCOTT
+	return
 
 EventScript_WarpHomeDewford::
 	lockall
@@ -1170,29 +1175,38 @@ EventScript_WarpHomeDewford::
     setvar VAR_DEWFORD_TOWN_STATE, 2
     call_if_eq VAR_BADGE_COUNT, 2, Common_EventScript_GotTwoBadges
     call_if_eq VAR_BADGE_COUNT, 4, Common_EventScript_ReadyPetalburgGymForBattle
+	setvar VAR_BRINEY_LOCATION, 2
+	call_if_eq VAR_BADGE_COUNT, 4, EventScript_WarpHomeDewford_ClearScott
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_DEWFORD_TOWN, 8, 17
 	waitstate
 	releaseall
-	setvar VAR_BRINEY_LOCATION, 2
 	call EventScript_MoveMrBrineyToDewford
 	end
+
+EventScript_WarpHomeDewford_ClearScott::
+	clearflag FLAG_HIDE_DEWFORD_TOWN_SCOTT
+	return
 
 EventScript_WarpHomeMauville::
 	lockall
 	addvar VAR_BADGE_COUNT, 1
 	@ call_if_eq VAR_BADGE_COUNT, 3, EventScript_FlygonLearnedFly
 	setvar VAR_SLATEPORT_OUTSIDE_MUSEUM_STATE, 3
-	clearflag FLAG_HIDE_VERDANTURF_TOWN_SCOTT
 	setvar VAR_MAUVILLE_CITY_STATE, 2
     setvar VAR_MAUVILLE_LOCKED, 1
     call_if_eq VAR_BADGE_COUNT, 2, Common_EventScript_GotTwoBadges
     call_if_eq VAR_BADGE_COUNT, 4, Common_EventScript_ReadyPetalburgGymForBattle
+	call_if_eq VAR_BADGE_COUNT, 4, EventScript_WarpHomeMauville_ClearScott
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_MAUVILLE_CITY, 8, 6
 	waitstate
 	releaseall
 	end
+
+EventScript_WarpHomeMauville_ClearScott::
+	clearflag FLAG_HIDE_MAUVILLE_CITY_SCOTT
+	return
 
 EventScript_WarpHomeLavaridge::
 	lockall
@@ -1203,11 +1217,16 @@ EventScript_WarpHomeLavaridge::
     setvar VAR_LAVARIDGE_LOCKED, 1
     call_if_eq VAR_BADGE_COUNT, 2, Common_EventScript_GotTwoBadges
    	call_if_eq VAR_BADGE_COUNT, 4, Common_EventScript_ReadyPetalburgGymForBattle
+	call_if_eq VAR_BADGE_COUNT, 4, EventScript_WarpHomeLavaridge_ClearScott
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_LAVARIDGE_TOWN, 5, 15
 	waitstate
 	releaseall
 	end
+
+EventScript_WarpHomeLavaridge_ClearScott::
+	clearflag FLAG_HIDE_LAVARIDGE_TOWN_SCOTT
+	return
 
 EventScript_WarpHomePetalburg::
 	lockall
@@ -1217,6 +1236,7 @@ EventScript_WarpHomePetalburg::
     setvar VAR_PETALBURG_LOCKED, 1
 	setvar VAR_PETALBURG_CITY_STATE, 7
 	setvar VAR_STEP_DOWN, 1
+	clearflag FLAG_HIDE_PETALBURG_CITY_SCOTT
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_PETALBURG_CITY, 15, 8
 	waitstate
@@ -1235,9 +1255,7 @@ EventScript_WarpHomeFortree::
 	setflag FLAG_VISITED_SOOTOPOLIS_CITY
 	setvar VAR_FORTREE_CITY_STATE, 2
     setvar VAR_FORTREE_LOCKED, 1
-	giveitem ITEM_HM_FLY
-	setflag FLAG_RECEIVED_HM_FLY
-	msgbox gText_FlygonUniversalFly, MSGBOX_DEFAULT
+	clearflag FLAG_HIDE_FORTREE_CITY_SCOTT
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_FORTREE_CITY, 22, 11
 	waitstate
@@ -1250,6 +1268,7 @@ EventScript_WarpHomeMossdeep::
 	call_if_eq VAR_BADGE_COUNT, 8, EventScript_SetEverGrandeVisited
 	setvar VAR_MOSSDEEP_CITY_STATE, 8
     setvar VAR_MOSSDEEP_LOCKED, 1
+	clearflag FLAG_HIDE_MOSSDEEP_CITY_SCOTT
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_MOSSDEEP_CITY, 38, 9
 	waitstate
@@ -1262,6 +1281,7 @@ EventScript_WarpHomeSootopolis::
 	call_if_eq VAR_BADGE_COUNT, 8, EventScript_SetEverGrandeVisited
 	setvar VAR_SOOTOPOLIS_CITY_STATE, 7
     setvar VAR_SOOTOPOLIS_LOCKED, 1
+	clearflag FLAG_HIDE_SOOTOPOLIS_CITY_SCOTT
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_SOOTOPOLIS_CITY, 31, 32
 	waitstate
@@ -1275,6 +1295,10 @@ EventScript_SetEverGrandeVisited::
 
 EventScript_FlygonLearnedFly::
 	msgbox gText_FlygonLearnedFly, MSGBOX_DEFAULT
+	return
+
+Common_EventScript_SetScottEncounterPending::
+	setflag FLAG_SCOTT_ENCOUNTER_PENDING
 	return
 
 	.include "data/scripts/pc_transfer.inc"

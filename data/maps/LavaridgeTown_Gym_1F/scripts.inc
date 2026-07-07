@@ -147,6 +147,7 @@ LavaridgeTown_Gym_1F_EventScript_DoRecord:
 	call LavaridgeTown_Gym_1F_EventScript_GiveOverheat
 	closemessage
 	delay 30
+	call_if_ge VAR_BADGE_COUNT, 3, Common_EventScript_SetScottEncounterPending
 	//playfanfare MUS_REGISTER_MATCH_CALL
 	//msgbox LavaridgeTown_Gym_1F_Text_RegisteredFlannery, MSGBOX_DEFAULT
 	//waitfanfare

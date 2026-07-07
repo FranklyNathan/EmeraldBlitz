@@ -107,23 +107,55 @@ PetalburgCity_OnFrame:
 
 PetalburgCity_EventScript_WalkDown::
 	lockall
+	goto_if_set FLAG_SCOTT_ENCOUNTER_PENDING, PetalburgCity_EventScript_CheckScottEncounter
 	setvar VAR_STEP_DOWN, 0
 	setvar VAR_PETALBURG_CITY_STATE, 5
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkDown
 	waitmovement 0
-	msgbox PetalburgCity_Text_ImLookingForTalentedTrainers, MSGBOX_DEFAULT
-	playfanfare MUS_OBTAIN_ITEM
-	giveitem ITEM_HM_SURF
-	waitfanfare
-	setflag FLAG_RECEIVED_HM_SURF
-	msgbox PetalburgCity_Text_FlygonLearnedSurf, MSGBOX_DEFAULT
-	playfanfare MUS_OBTAIN_ITEM
-	waitfanfare
-	closemessage
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall
 	end
+
+PetalburgCity_EventScript_CheckScottEncounter::
+	call_if_ge VAR_BADGE_COUNT, 4, PetalburgCity_EventScript_ScottEncounter
+	releaseall
+	end
+
+PetalburgCity_EventScript_ScottEncounter::
+	lockall
+	clearflag FLAG_SCOTT_ENCOUNTER_PENDING
+	setvar VAR_LAST_TALKED, LOCALID_PETALBURG_SCOTT
+	call Common_EventScript_ScottExclamation
+	applymovement LOCALID_PETALBURG_SCOTT, Common_Movement_ScottApproachAlt
+	waitmovement 0
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceLeft
+	waitmovement 0
+	call_if_eq VAR_BADGE_COUNT, 4, PetalburgCity_EventScript_ScottText1
+	call_if_eq VAR_BADGE_COUNT, 5, PetalburgCity_EventScript_ScottText2
+	setflag FLAG_HIDE_PETALBURG_CITY_SCOTT
+	setflag FLAG_RECEIVED_HM_SURF
+	msgbox gText_ScottFinalSentence2, MSGBOX_DEFAULT
+	playfanfare MUS_OBTAIN_ITEM
+	giveitem ITEM_HM_SURF
+	waitfanfare
+	call Common_EventScript_ScottFlyAway
+	releaseall
+	end
+
+PetalburgCity_EventScript_ScottText1::
+	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_PETALBURG_SCOTT
+	special OpenScottTmShop
+	waitstate
+	return
+
+PetalburgCity_EventScript_ScottText2::
+	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_PETALBURG_SCOTT
+	special OpenScottTmShop
+	waitstate
+	return
 
 PetalburgCity_EventScript_WallyTutorial::
 	lockall
@@ -647,7 +679,7 @@ PetalburgCity_EventScript_Scott::
 	applymovement LOCALID_PETALBURG_SCOTT, Common_Movement_WalkInPlaceFasterLeft
 	waitmovement 0
 	delay 30
-	msgbox PetalburgCity_Text_ImLookingForTalentedTrainers, MSGBOX_DEFAULT
+	msgbox PetalburgCity_Text_GiveSurf, MSGBOX_DEFAULT
 	closemessage
 	call_if_eq VAR_0x8008, 0, PetalburgCity_EventScript_ScottExit0
 	call_if_eq VAR_0x8008, 1, PetalburgCity_EventScript_ScottExit1
@@ -851,7 +883,7 @@ PetalburgCity_Text_WellMaybeNot:
 	.string "You're either a rookie TRAINER,\n"
 	.string "or maybe you're just an ordinary kid.$"
 
-PetalburgCity_Text_ImLookingForTalentedTrainers:
+PetalburgCity_Text_GiveSurf:
 	.string "Oh, what's this on the ground?\n"
 	.string "A gift!\p"
 	.string "There's a note attached to it:\p"

@@ -8,6 +8,55 @@ FortreeCity_OnTransition:
 	setflag FLAG_VISITED_FORTREE_CITY
 	end
 
+FortreeCity_EventScript_ScottEncounter::
+	lockall
+	clearflag FLAG_SCOTT_ENCOUNTER_PENDING
+	setvar VAR_LAST_TALKED, LOCALID_FORTREE_SCOTT
+	call Common_EventScript_ScottExclamation
+	applymovement LOCALID_FORTREE_SCOTT, Common_Movement_ScottApproachAlt
+	waitmovement 0
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceLeft
+	waitmovement 0
+	call_if_eq VAR_BADGE_COUNT, 6, FortreeCity_EventScript_ScottText3
+	call_if_eq VAR_BADGE_COUNT, 7, FortreeCity_EventScript_ScottText4
+	call_if_eq VAR_BADGE_COUNT, 8, FortreeCity_EventScript_ScottText5
+	setflag FLAG_HIDE_FORTREE_CITY_SCOTT
+	releaseall
+	end
+
+FortreeCity_EventScript_ScottText3::
+	msgbox gText_ScottPostGym3, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_FORTREE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence3, MSGBOX_DEFAULT
+	giveitem ITEM_HM_FLY
+	setflag FLAG_RECEIVED_HM_FLY
+	call Common_EventScript_ScottFlyAway
+	return
+
+FortreeCity_EventScript_ScottText4::
+	msgbox gText_ScottPostGym4, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_FORTREE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence3, MSGBOX_DEFAULT
+	giveitem ITEM_HM_FLY
+	setflag FLAG_RECEIVED_HM_FLY
+	call Common_EventScript_ScottFlyAway
+	return
+
+FortreeCity_EventScript_ScottText5::
+	msgbox gText_ScottPostGym5, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_FORTREE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence3, MSGBOX_DEFAULT
+	giveitem ITEM_HM_FLY
+	setflag FLAG_RECEIVED_HM_FLY
+	call Common_EventScript_ScottFlyAway
+	return
+
 FortreeCity_EventScript_GymDoor::
 	goto_if_eq VAR_FORTREE_LOCKED, 1, RandGym_EventScript_Locked
 	setrespawn HEAL_LOCATION_FORTREE_CITY
@@ -89,12 +138,18 @@ FortreeCity_OnFrame:
 
 FortreeCity_EventScript_WalkDown::
 	lockall
+	goto_if_set FLAG_SCOTT_ENCOUNTER_PENDING, FortreeCity_EventScript_CheckScottEncounter
 	setvar VAR_STEP_DOWN, 0
 	setvar VAR_FORTREE_CITY_STATE, 0
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkRight
 	waitmovement 0
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
+	releaseall
+	end
+
+FortreeCity_EventScript_CheckScottEncounter::
+	call_if_ge VAR_BADGE_COUNT, 4, FortreeCity_EventScript_ScottEncounter
 	releaseall
 	end
 

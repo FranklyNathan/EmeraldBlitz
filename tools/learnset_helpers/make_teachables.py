@@ -41,6 +41,75 @@ TEACHABLE_ARRAY_DECL_PAT = re.compile(r"(?P<decl>static const u16 s(?P<name>\w+)
 SNAKIFY_PAT = re.compile(r"(?!^)([A-Z]+)")
 TUTOR_ARRAY_ENABLED_PAT = re.compile(r"#define\s+P_TUTOR_MOVES_ARRAY\s+(?P<cfg_val>[^ ]*)")
 
+# Moves to exclude from teachable learnsets
+EXCLUDED_MOVES = {
+    "MOVE_CUT",
+    "MOVE_DIG",
+    "MOVE_TORMENT",
+    "MOVE_SECRET_POWER",
+    "MOVE_ATTRACT",
+    "MOVE_SKILL_SWAP",
+    "MOVE_FLASH",
+    "MOVE_BODY_SLAM",
+    "MOVE_COUNTER",
+    "MOVE_DEFENSE_CURL",
+    "MOVE_DREAM_EATER",
+    "MOVE_DYNAMIC_PUNCH",
+    "MOVE_ENDURE",
+    "MOVE_MEGA_KICK",
+    "MOVE_MEGA_PUNCH",
+    "MOVE_MIMIC",
+    "MOVE_MUD_SLAP",
+    "MOVE_PSYCH_UP",
+    "MOVE_SEISMIC_TOSS",
+    "MOVE_SLEEP_TALK",
+    "MOVE_SNORE",
+    "MOVE_SOFT_BOILED",
+    "MOVE_SWAGGER",
+    "MOVE_SWIFT",
+    "MOVE_SWORDS_DANCE",
+    "MOVE_THUNDER_WAVE",
+}
+
+# Special teachable rules: type -> moves to always add
+SPECIAL_TEACHABLE_BY_TYPE = {
+    "TYPE_ELECTRIC": ["MOVE_SHOCK_WAVE"],
+}
+
+# Special teachable rules: species -> moves to always add
+SPECIAL_TEACHABLE_BY_SPECIES = {
+    "SHUPPET": ["MOVE_POUNCE"],
+    "BANETTE": ["MOVE_POUNCE"],
+    "ELECTRIKE": ["MOVE_POUNCE"],
+    "MANECTRIC": ["MOVE_POUNCE"],
+    "LILLIPUP": ["MOVE_POUNCE"],
+    "HERDIER": ["MOVE_POUNCE"],
+    "STOUTLAND": ["MOVE_POUNCE"],
+    "BUNEARY": ["MOVE_POUNCE"],
+    "LOPUNNY": ["MOVE_POUNCE"],
+    "BEEDRILL": ["MOVE_POUNCE"],
+    "SCOLIPEDE": ["MOVE_POUNCE"],
+    "WHIRLIPEDE": ["MOVE_POUNCE"],
+    "VENIPEDE": ["MOVE_POUNCE"],
+    "EMOLGA": ["MOVE_POUNCE"],
+    "HELIOLISK": ["MOVE_POUNCE"],
+    "HELIOPTILE": ["MOVE_POUNCE"],
+    "CLAWITZER": ["MOVE_POUNCE"],
+    "CLAWNCER": ["MOVE_POUNCE"],
+    "SKORUPI": ["MOVE_POUNCE"],
+    "DRAPION": ["MOVE_POUNCE"],
+    "ZIGZAGOON": ["MOVE_POUNCE"],
+    "LINOONE": ["MOVE_POUNCE"],
+    "OBSTAGOON": ["MOVE_POUNCE"],
+    "BLIPBUG": ["MOVE_POUNCE"],
+    "DOTTLER": ["MOVE_POUNCE"],
+    "ORBEETLE": ["MOVE_POUNCE"],
+    "NICKIT": ["MOVE_POUNCE"],
+    "THIEVUL": ["MOVE_POUNCE"],
+    "YAMPER": ["MOVE_POUNCE"],
+    "BOLTUND": ["MOVE_POUNCE"],
+}
+
 
 def enabled() -> bool:
     """
@@ -92,7 +161,36 @@ def extract_repo_universals() -> list[str]:
         return list()
 
 
-def prepare_output(all_learnables: dict[str, set[str]], repo_teachables: set[str], header: str) -> str:
+def extract_species_types() -> dict[str, list[str]]:
+    """
+    Return a dictionary mapping species names to their types.
+    Parses the species_info files to extract type information.
+    """
+    species_types = {}
+    type_pattern = re.compile(r'\.types\s*=\s*MON_TYPES\(([^,]+),\s*([^)]+)\)')
+    
+    # Search in all species_info files
+    for fname in chain(glob.glob("./src/data/pokemon/species_info/*.h"), glob.glob("./src/data/pokemon/species_info/**/*.h")):
+        with open(fname, "r") as fp:
+            content = fp.read()
+            # Find all species definitions with their types
+            for match in type_pattern.finditer(content):
+                type1 = match.group(1).strip()
+                type2 = match.group(2).strip()
+                
+                # Try to find the species name from the context
+                # Look for [SPECIES_XXX] = pattern before the types
+                context_start = max(0, match.start() - 200)
+                context = content[context_start:match.start()]
+                species_match = re.search(r'\[SPECIES_(\w+)\]', context)
+                if species_match:
+                    species_name = species_match.group(1)
+                    species_types[species_name] = [type1, type2]
+    
+    return species_types
+
+
+def prepare_output(all_learnables: dict[str, set[str]], repo_teachables: set[str], header: str, species_types: dict[str, list[str]]) -> str:
     """
     Build the file content for teachable_learnsets.h.
     """
@@ -121,11 +219,22 @@ def prepare_output(all_learnables: dict[str, set[str]], repo_teachables: set[str
             continue
 
         repo_species_teachables = filter(lambda m: m in repo_teachables, all_learnables[species_upper])
+        
+        # Add special teachable moves based on species type
+        species_teachables_set = set(repo_species_teachables)
+        if species_upper in species_types:
+            for type_name in species_types[species_upper]:
+                if type_name in SPECIAL_TEACHABLE_BY_TYPE:
+                    species_teachables_set.update(SPECIAL_TEACHABLE_BY_TYPE[type_name])
+        
+        # Add special teachable moves based on species
+        if species_upper in SPECIAL_TEACHABLE_BY_SPECIES:
+            species_teachables_set.update(SPECIAL_TEACHABLE_BY_SPECIES[species_upper])
 
         new += old[cursor:match_b]
         new += "\n".join([
             f"{species.group('decl')} = {{",
-            f"    {joinpat.join(chain(repo_species_teachables, ('MOVE_UNAVAILABLE',)))},",
+            f"    {joinpat.join(chain(sorted(species_teachables_set), ('MOVE_UNAVAILABLE',)))},",
             "};\n",
         ])
         cursor = match_e + 1
@@ -213,9 +322,11 @@ def main():
     repo_tms = list(extract_repo_tms())
     repo_tutors = list(extract_repo_tutors())
     repo_teachables = set(filter(
-        lambda move: move not in set(repo_universals),
+        lambda move: move not in set(repo_universals) and move not in EXCLUDED_MOVES,
         chain(repo_tms, repo_tutors)
     ))
+
+    species_types = extract_species_types()
 
     create_tutor_moves_array(repo_tutors)
 
@@ -225,7 +336,7 @@ def main():
     with open(SOURCE_LEARNSETS_JSON, "r") as source_fp:
         all_learnables = json.load(source_fp)
 
-    content = prepare_output(all_learnables, repo_teachables, header)
+    content = prepare_output(all_learnables, repo_teachables, header, species_types)
     with open("./src/data/pokemon/teachable_learnsets.h", "w") as teachables_fp:
         teachables_fp.write(content)
 

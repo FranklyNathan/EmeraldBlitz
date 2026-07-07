@@ -80,6 +80,20 @@
       "flag": "FLAG_HIDE_MR_BRINEY_BOAT_DEWFORD_TOWN"
     },
     {
+      "local_id": "LOCALID_DEWFORD_SCOTT",
+      "graphics_id": "OBJ_EVENT_GFX_SCOTT",
+      "x": 4,
+      "y": 15,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "0x0",
+      "flag": "FLAG_HIDE_DEWFORD_TOWN_SCOTT"
+    },
+    {
       "graphics_id": "OBJ_EVENT_GFX_BOY_1",
       "x": 1,
       "y": 6,

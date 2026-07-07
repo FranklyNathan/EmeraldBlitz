@@ -783,7 +783,7 @@
 #define FLAG_HIDE_MOSSDEEP_CITY_STEVENS_HOUSE_INVISIBLE_NINJA_BOY   0x2D7
 #define FLAG_HIDE_PETALBURG_CITY_WALLYS_MOM                         0x2D8
 
-#define FLAG_UNUSED_0x2D9                                           0x2D9 // Unused Flag
+#define FLAG_HIDE_RUSTBORO_CITY_SCOTT                               0x2D9
 
 #define FLAG_HIDE_LILYCOVE_FAN_CLUB_INTERVIEWER                     0x2DA
 #define FLAG_HIDE_RUSTBORO_CITY_AQUA_GRUNT                          0x2DB
@@ -1251,15 +1251,15 @@
 #define FLAG_HIDE_TRUCK_KECLEON                                     0x4A6
 #define FLAG_HIDE_TRUCK_VIGOROTH                                    0x4A7
 #define FLAG_RECEIVED_BURMY_BINDER                                  0x4A8 
-#define FLAG_WALLY_IS_CHAMPION                                      0x4A9 // Unused Flag
-#define FLAG_SYS_SOLO_MODE                                          0x4AA // Unused Flag
+#define FLAG_WALLY_IS_CHAMPION                                      0x4A9 // U
+#define FLAG_SYS_SOLO_MODE                                          0x4AA // 
 #define FLAG_IN_BASEMENT                                            0x4AB
 #define FLAG_UNUSED_0x4AC                                           0x4AC // Unused Flag
-#define FLAG_UNUSED_0x4AD                                           0x4AD // Unused Flag
-#define FLAG_UNUSED_0x4AE                                           0x4AE // Unused Flag
-#define FLAG_UNUSED_0x4AF                                           0x4AF // Unused Flag
-#define FLAG_UNUSED_0x4B0                                           0x4B0 // Unused Flag
-#define FLAG_UNUSED_0x4B1                                           0x4B1 // Unused Flag
+#define FLAG_HIDE_DEWFORD_TOWN_SCOTT                                0x4AD
+#define FLAG_HIDE_LAVARIDGE_TOWN_SCOTT                              0x4AE
+#define FLAG_HIDE_FORTREE_CITY_SCOTT                                0x4AF
+#define FLAG_HIDE_SOOTOPOLIS_CITY_SCOTT                             0x4B0
+#define FLAG_SCOTT_ENCOUNTER_PENDING                                0x4B1
 #define FLAG_UNUSED_0x4B2                                           0x4B2 // Unused Flag
 #define FLAG_UNUSED_0x4B3                                           0x4B3 // Unused Flag
 #define FLAG_UNUSED_0x4B4                                           0x4B4 // Unused Flag

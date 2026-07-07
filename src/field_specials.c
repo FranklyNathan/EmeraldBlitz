@@ -43,6 +43,7 @@
 #include "caps.h"
 #include "rtc.h"
 #include "script.h"
+#include "shop.h"
 #include "script_menu.h"
 #include "sound.h"
 #include "starter_choose.h"
@@ -164,6 +165,12 @@ static const u8 sText_99TimesPlus[] = _("99 times +");
 static const u8 sText_1MinutePlus[] = _("1 minute +");
 static const u8 sText_SpaceSeconds[] = _(" seconds");
 static const u8 sText_SpaceTimes[] = _(" time(s)");
+
+void OpenScottTmShop(void)
+{
+    CreateScottTmShopMenu();
+    ScriptContext_Stop();
+}
 
 void Special_ShowDiploma(void)
 {

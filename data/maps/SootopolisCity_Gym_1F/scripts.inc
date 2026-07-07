@@ -244,6 +244,7 @@ SootopolisCity_Gym_1F_EventScript_DoRecord:
 	call SootopolisCity_Gym_1F_EventScript_GiveWaterPulse
 	closemessage
 	delay 30
+	call_if_ge VAR_BADGE_COUNT, 3, Common_EventScript_SetScottEncounterPending
 	//playfanfare MUS_REGISTER_MATCH_CALL
 	//msgbox SootopolisCity_Gym_1F_Text_RegisteredJuan, MSGBOX_DEFAULT
 	//waitfanfare

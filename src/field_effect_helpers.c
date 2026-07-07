@@ -3,6 +3,7 @@
 #include "field_camera.h"
 #include "field_effect.h"
 #include "field_effect_helpers.h"
+#include "field_player_avatar.h"
 #include "field_weather.h"
 #include "fieldmap.h"
 #include "gpu_regs.h"
@@ -380,6 +381,7 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
         struct Sprite *linkedSprite = &gSprites[objectEvent->spriteId];
+        bool8 isPlayerOnBike = (objectEvent->localId == OBJ_EVENT_ID_PLAYER && TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_BIKE));
         sprite->oam.priority = linkedSprite->oam.priority;
         sprite->x = linkedSprite->x;
         #if OW_LARGE_OW_SUPPORT
@@ -392,18 +394,26 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
         if (objectEvent->jumpDone)
         {
             //  Ugly signaling to disable shadows after a jump
-            objectEvent->noShadow = TRUE;
-            objectEvent->jumpDone = FALSE;
+            // Keep shadow when player is on bike
+            if (!isPlayerOnBike)
+            {
+                objectEvent->noShadow = TRUE;
+                objectEvent->jumpDone = FALSE;
+            }
+            else
+            {
+                objectEvent->jumpDone = FALSE;
+            }
         }
         if (!objectEvent->active
          || objectEvent->noShadow
          || objectEvent->inHotSprings
          || objectEvent->inSandPile
          || gWeatherPtr->noShadows
-         || MetatileBehavior_IsPokeGrass(objectEvent->currentMetatileBehavior)
-         || MetatileBehavior_IsPuddle(objectEvent->currentMetatileBehavior)
-         || MetatileBehavior_IsSurfableWaterOrUnderwater(objectEvent->currentMetatileBehavior)
-         || MetatileBehavior_IsSurfableWaterOrUnderwater(objectEvent->previousMetatileBehavior))
+         || (!isPlayerOnBike && MetatileBehavior_IsPokeGrass(objectEvent->currentMetatileBehavior))
+         || (!isPlayerOnBike && MetatileBehavior_IsPuddle(objectEvent->currentMetatileBehavior))
+         || (!isPlayerOnBike && (MetatileBehavior_IsSurfableWaterOrUnderwater(objectEvent->currentMetatileBehavior)
+         || MetatileBehavior_IsSurfableWaterOrUnderwater(objectEvent->previousMetatileBehavior))))
         {
             FieldEffectStop(sprite, FLDEFF_SHADOW);
         }

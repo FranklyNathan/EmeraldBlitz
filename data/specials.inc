@@ -116,6 +116,7 @@ gSpecials::
 	def_special GiveMonArtistRibbon
 	def_special TryContestGModeLinkup
 	def_special SaveGame
+	def_special OpenScottTmShop
 	def_special DoWateringBerryTreeAnim
 	def_special ShowEasyChatScreen
 	def_special Special_GetQuizAnswer
@@ -582,3 +583,4 @@ gSpecials::
 	def_special ObjectEventInteractionPickApricornTree
 	def_special Script_CheckPartyBelowLevelCap
 	def_special GetOffBike
+	def_special OpenScottTmShop

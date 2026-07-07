@@ -115,6 +115,7 @@ RustboroCity_OnFrame:
 
 RustboroCity_EventScript_WalkDown::
 	lockall
+	goto_if_set FLAG_SCOTT_ENCOUNTER_PENDING, RustboroCity_EventScript_CheckScottEncounter
 	setvar VAR_STEP_DOWN, 0
 	setvar VAR_RUSTBORO_CITY_STATE, 5
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkDown
@@ -123,6 +124,64 @@ RustboroCity_EventScript_WalkDown::
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall
 	end
+
+RustboroCity_EventScript_CheckScottEncounter::
+	call_if_ge VAR_BADGE_COUNT, 4, RustboroCity_EventScript_ScottEncounter
+	releaseall
+	end
+
+RustboroCity_EventScript_ScottEncounter::
+	lockall
+	clearflag FLAG_SCOTT_ENCOUNTER_PENDING
+	setvar VAR_LAST_TALKED, LOCALID_RUSTBORO_SCOTT
+	call Common_EventScript_ScottExclamation
+	applymovement LOCALID_RUSTBORO_SCOTT, RustboroCity_Movement_ScottApproach
+	waitmovement 0
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceLeft
+	waitmovement 0
+	call_if_eq VAR_BADGE_COUNT, 3, RustboroCity_EventScript_ScottText0
+	call_if_eq VAR_BADGE_COUNT, 4, RustboroCity_EventScript_ScottText1
+	setflag FLAG_HIDE_RUSTBORO_CITY_SCOTT
+	releaseall
+	end
+
+RustboroCity_Movement_ScottApproach:
+	walk_down
+	walk_left
+	walk_down
+	walk_down
+	walk_right
+	walk_right
+	walk_right
+	walk_right
+	step_end
+
+RustboroCity_EventScript_ScottText0::
+	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_RUSTBORO_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+RustboroCity_EventScript_ScottText1::
+	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_RUSTBORO_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+RustboroCity_EventScript_ScottText2::
+	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_RUSTBORO_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence2, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
 
 RustboroCity_EventScript_ScientistAddMatchCall::
 	lockall
@@ -227,6 +286,11 @@ RustboroCity_Movement_ScientistWalkAroundPlayer:
 
 RustboroCity_Movement_ScientistLeave:
 	walk_up
+	step_end
+
+Common_Movement_ScottApproachAlt:
+	walk_down
+	walk_right
 	step_end
 
 RustboroCity_EventScript_FatMan::

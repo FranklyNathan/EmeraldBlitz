@@ -13,6 +13,79 @@ LavaridgeTown_OnTransition:
 	call_if_eq VAR_LAVARIDGE_TOWN_STATE, 1, LavaridgeTown_EventScript_HideMapNamePopup
 	end
 
+LavaridgeTown_EventScript_ScottEncounter::
+	lockall
+	clearflag FLAG_SCOTT_ENCOUNTER_PENDING
+	setvar VAR_LAST_TALKED, LOCALID_LAVARIDGE_SCOTT
+	call Common_EventScript_ScottExclamation
+	applymovement LOCALID_LAVARIDGE_SCOTT, Common_Movement_ScottApproachAlt
+	waitmovement 0
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceLeft
+	waitmovement 0
+	call_if_eq VAR_BADGE_COUNT, 3, LavaridgeTown_EventScript_ScottText0
+	call_if_eq VAR_BADGE_COUNT, 4, LavaridgeTown_EventScript_ScottText1
+	call_if_eq VAR_BADGE_COUNT, 5, LavaridgeTown_EventScript_ScottText2
+	call_if_eq VAR_BADGE_COUNT, 6, LavaridgeTown_EventScript_ScottText3
+	call_if_eq VAR_BADGE_COUNT, 7, LavaridgeTown_EventScript_ScottText4
+	call_if_eq VAR_BADGE_COUNT, 8, LavaridgeTown_EventScript_ScottText5
+	setflag FLAG_HIDE_LAVARIDGE_TOWN_SCOTT
+	releaseall
+	end
+
+LavaridgeTown_EventScript_ScottText0::
+	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_LAVARIDGE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+LavaridgeTown_EventScript_ScottText1::
+	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_LAVARIDGE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+LavaridgeTown_EventScript_ScottText2::
+	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_LAVARIDGE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence2, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+LavaridgeTown_EventScript_ScottText3::
+	msgbox gText_ScottPostGym3, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_LAVARIDGE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence3, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+LavaridgeTown_EventScript_ScottText4::
+	msgbox gText_ScottPostGym4, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_LAVARIDGE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence4, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+LavaridgeTown_EventScript_ScottText5::
+	msgbox gText_ScottPostGym5, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_LAVARIDGE_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence5, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
 LavaridgeTown_EventScript_GymDoor::
 	goto_if_eq VAR_LAVARIDGE_LOCKED, 1, RandGym_EventScript_Locked
 	setrespawn HEAL_LOCATION_LAVARIDGE_TOWN

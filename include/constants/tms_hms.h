@@ -7,7 +7,7 @@
     F(WATER_PULSE) \
     F(CALM_MIND) \
     F(X_SCISSOR) \
-    F(SNARL) \
+    F(MUD_SHOT) \
     F(HAIL) \
     F(BULK_UP) \
     F(BULLET_SEED) \
@@ -21,7 +21,7 @@
     F(PROTECT) \
     F(RAIN_DANCE) \
     F(GIGA_DRAIN) \
-    F(SAFEGUARD) \
+    F(POUNCE) \
     F(DAZZLING_GLEAM) \
     F(SOLAR_BEAM) \
     F(IRON_TAIL) \
@@ -33,7 +33,7 @@
     F(PSYCHIC) \
     F(SHADOW_BALL) \
     F(BRICK_BREAK) \
-    F(DOUBLE_TEAM) \
+    F(ICY_WIND) \
     F(REFLECT) \
     F(SHOCK_WAVE) \
     F(FLAMETHROWER) \
@@ -42,7 +42,7 @@
     F(FIRE_BLAST) \
     F(ROCK_TOMB) \
     F(AERIAL_ACE) \
-    F(TORMENT) \
+    F(CRUNCH) \
     F(FACADE) \
     F(SECRET_POWER) \
     F(REST) \
@@ -52,6 +52,26 @@
     F(SKILL_SWAP) \
     F(TRICK_ROOM) \
     F(OVERHEAT) \
+    F(ICE_PUNCH) \
+    F(THUNDER_PUNCH) \
+    F(FIRE_PUNCH) \
+    F(HYPER_VOICE) \
+    F(SEED_BOMB) \
+    F(DARK_PULSE) \
+    F(BUG_BUZZ) \
+    F(ZEN_HEADBUTT) \
+    F(POISON_JAB) \
+    F(POWER_GEM) \
+    F(AIR_SLASH) \
+    F(SHADOW_CLAW) \
+    F(DRAGON_PULSE) \
+    F(FLASH_CANNON) \
+    F(FOCUS_BLAST) \
+    F(SCALD) \
+    F(PLAY_ROUGH) \
+    F(DUAL_WINGBEAT) \
+    F(FLIP_TURN) \
+    F(SCORCHING_SANDS) \
 
 #define FOREACH_HM(F) \
     F(CUT) \

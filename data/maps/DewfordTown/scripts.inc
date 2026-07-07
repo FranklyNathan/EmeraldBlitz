@@ -88,12 +88,37 @@ DewfordTown_OnFrame:
 
 DewfordTown_EventScript_WalkDown::
 	lockall
+	goto_if_set FLAG_SCOTT_ENCOUNTER_PENDING, DewfordTown_EventScript_CheckScottEncounter
 	setvar VAR_STEP_DOWN, 0
 	setvar VAR_DEWFORD_TOWN_STATE, 0
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkLeft
 	waitmovement 0
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
+	releaseall
+	end
+
+DewfordTown_EventScript_CheckScottEncounter::
+	call_if_ge VAR_BADGE_COUNT, 4, DewfordTown_EventScript_ScottEncounter
+	releaseall
+	end
+
+DewfordTown_EventScript_ScottEncounter::
+	lockall
+	clearflag FLAG_SCOTT_ENCOUNTER_PENDING
+	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
+	call Common_EventScript_ScottExclamation
+	applymovement LOCALID_DEWFORD_SCOTT, DewfordTown_Movement_ScottApproach
+	waitmovement 0
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceLeft
+	waitmovement 0
+	call_if_eq VAR_BADGE_COUNT, 3, LavaridgeTown_EventScript_ScottText0
+	call_if_eq VAR_BADGE_COUNT, 4, DewfordTown_EventScript_ScottText1
+	call_if_eq VAR_BADGE_COUNT, 5, DewfordTown_EventScript_ScottText2
+	call_if_eq VAR_BADGE_COUNT, 6, DewfordTown_EventScript_ScottText3
+	call_if_eq VAR_BADGE_COUNT, 7, DewfordTown_EventScript_ScottText4
+	call_if_eq VAR_BADGE_COUNT, 8, DewfordTown_EventScript_ScottText5
+	setflag FLAG_HIDE_DEWFORD_TOWN_SCOTT
 	releaseall
 	end
 
@@ -678,6 +703,69 @@ DewfordTown_Movement_BrineyExitBoat:
 	walk_up
 	walk_up
 	step_end
+
+DewfordTown_Movement_ScottApproach:
+	walk_down
+	walk_down
+	walk_down
+	walk_right
+	walk_right
+	walk_right
+	step_end
+
+DewfordTown_EventScript_ScottText0::
+	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+DewfordTown_EventScript_ScottText1::
+	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+DewfordTown_EventScript_ScottText2::
+	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence2, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+DewfordTown_EventScript_ScottText3::
+	msgbox gText_ScottPostGym3, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence3, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+DewfordTown_EventScript_ScottText4::
+	msgbox gText_ScottPostGym4, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence4, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
+
+DewfordTown_EventScript_ScottText5::
+	msgbox gText_ScottPostGym5, MSGBOX_DEFAULT
+	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
+	special OpenScottTmShop
+	waitstate
+	msgbox gText_ScottFinalSentence5, MSGBOX_DEFAULT
+	call Common_EventScript_ScottFlyAway
+	return
 
 DewfordTown_EventScript_TrendyPhraseBoy::
 	lock

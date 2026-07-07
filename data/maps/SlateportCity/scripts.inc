@@ -898,13 +898,14 @@ SlateportCity_EventScript_PowerTMClerk::
 	lock
 	setvar VAR_POWER_TM_CLERK, 1
 	faceplayer
-	goto_if_lt VAR_BADGE_COUNT, 1, SlateportCity_Pokemart_PowerTMs_NotYet
+	goto_if_lt VAR_BADGE_COUNT, 2, SlateportCity_Pokemart_PowerTMs_NotYet
 	message gText_HowMayIServeYou
 	waitmessage
-	goto_if_ge VAR_BADGE_COUNT, 4, SlateportCity_Pokemart_PowerTMs_Badge7TMs
-	goto_if_le VAR_BADGE_COUNT, 3, SlateportCity_Pokemart_PowerTMs_Badge2TMs
+	goto_if_ge VAR_BADGE_COUNT, 6, SlateportCity_Pokemart_PowerTMs_Badge6TMs
+	goto_if_ge VAR_BADGE_COUNT, 4, SlateportCity_Pokemart_PowerTMs_Badge4TMs
+	goto_if_le VAR_BADGE_COUNT, 4, SlateportCity_Pokemart_PowerTMs_Badge2TMs
 	@ goto_if_eq VAR_BADGE_COUNT, 4, SlateportCity_Pokemart_PowerTMs_Badge4TMs
-	pokemart SlateportCity_Pokemart_PowerTMs_Badge5TMsItems
+	pokemart SlateportCity_Pokemart_PowerTMs_Badge4TMs
 	setvar VAR_POWER_TM_CLERK, 0
 	msgbox gText_PleaseComeAgain, MSGBOX_DEFAULT
 	release
@@ -926,11 +927,12 @@ SlateportCity_Pokemart_PowerTMs_Badge2TMs::
 	.align 2
 SlateportCity_Pokemart_PowerTMs_Badge2TMsItems:
 	.2byte ITEM_TM_BULLET_SEED
-	.2byte ITEM_TM_SAFEGUARD
+	.2byte ITEM_TM_MUD_SHOT
+	.2byte ITEM_TM_ICY_WIND
+	.2byte ITEM_TM_POUNCE
 	.2byte ITEM_TM_STEEL_WING
 	.2byte ITEM_TM_TAUNT
 	.2byte ITEM_TM_THIEF
-	.2byte ITEM_TM_TRICK_ROOM
 	pokemartlistend
 
 SlateportCity_Pokemart_PowerTMs_Badge3TMs::
@@ -955,6 +957,21 @@ SlateportCity_Pokemart_PowerTMs_Badge4TMs::
 	.align 2
 SlateportCity_Pokemart_PowerTMs_Badge4TMsItems:
 	.2byte ITEM_TM_BULLET_SEED
+	.2byte ITEM_TM_MUD_SHOT
+	.2byte ITEM_TM_ICY_WIND
+	.2byte ITEM_TM_POUNCE
+	.2byte ITEM_TM_STEEL_WING
+	.2byte ITEM_TM_TAUNT
+	.2byte ITEM_TM_THIEF
+	.2byte ITEM_TM_HAIL
+	.2byte ITEM_TM_LIGHT_SCREEN
+	.2byte ITEM_TM_RAIN_DANCE
+	.2byte ITEM_TM_REFLECT
+	.2byte ITEM_TM_REST
+	.2byte ITEM_TM_SANDSTORM
+	.2byte ITEM_TM_SUNNY_DAY
+    .2byte ITEM_TM_TRICK_ROOM
+	.2byte ITEM_TM_PROTECT
 	pokemartlistend
 
 SlateportCity_Pokemart_PowerTMs_Badge5TMs::
@@ -978,7 +995,27 @@ SlateportCity_Pokemart_PowerTMs_Badge6TMs::
 
 	.align 2
 SlateportCity_Pokemart_PowerTMs_Badge6TMsItems:
+	.2byte ITEM_TM_BULLET_SEED
+	.2byte ITEM_TM_MUD_SHOT
+	.2byte ITEM_TM_ICY_WIND
+	.2byte ITEM_TM_POUNCE
+	.2byte ITEM_TM_STEEL_WING
+	.2byte ITEM_TM_TAUNT
 	.2byte ITEM_TM_THIEF
+	.2byte ITEM_TM_HAIL
+	.2byte ITEM_TM_LIGHT_SCREEN
+	.2byte ITEM_TM_RAIN_DANCE
+	.2byte ITEM_TM_REFLECT
+	.2byte ITEM_TM_REST
+	.2byte ITEM_TM_PROTECT
+	.2byte ITEM_TM_SANDSTORM
+	.2byte ITEM_TM_SUNNY_DAY
+    .2byte ITEM_TM_TRICK_ROOM
+	.2byte ITEM_TM_SOLAR_BEAM
+	.2byte ITEM_TM_BLIZZARD
+	.2byte ITEM_TM_FIRE_BLAST
+	.2byte ITEM_TM_THUNDER
+	.2byte ITEM_TM_HONE_CLAWS
 	pokemartlistend
 
 SlateportCity_Pokemart_PowerTMs_Badge7TMs::
@@ -990,43 +1027,6 @@ SlateportCity_Pokemart_PowerTMs_Badge7TMs::
 
 	.align 2
 SlateportCity_Pokemart_PowerTMs_Badge7TMsItems:
-	.2byte ITEM_TM_BULLET_SEED
-	.2byte ITEM_TM_SAFEGUARD
-	.2byte ITEM_TM_TAUNT
-	.2byte ITEM_TM_STEEL_WING
-	.2byte ITEM_TM_THIEF
-	.2byte ITEM_TM_TRICK_ROOM
-	.2byte ITEM_TM_DOUBLE_TEAM
-	.2byte ITEM_TM_HAIL
-	.2byte ITEM_TM_LIGHT_SCREEN
-	.2byte ITEM_TM_RAIN_DANCE
-	.2byte ITEM_TM_REFLECT
-	.2byte ITEM_TM_REST
-	.2byte ITEM_TM_SANDSTORM
-	.2byte ITEM_TM_SUNNY_DAY
-	.2byte ITEM_TM_BRICK_BREAK
-	.2byte ITEM_TM_DAZZLING_GLEAM
-	.2byte ITEM_TM_DIG
-	.2byte ITEM_TM_DRAGON_CLAW
-	.2byte ITEM_TM_GIGA_DRAIN
-	.2byte ITEM_TM_HYPER_BEAM
-	.2byte ITEM_TM_IRON_TAIL
-	.2byte ITEM_TM_RETURN
-	.2byte ITEM_TM_ROCK_SLIDE
-	.2byte ITEM_TM_SNARL
-	.2byte ITEM_TM_SOLAR_BEAM
-	.2byte ITEM_TM_SHADOW_BALL
-	.2byte ITEM_TM_X_SCISSOR
-	.2byte ITEM_TM_BLIZZARD
-	.2byte ITEM_TM_FIRE_BLAST
-	.2byte ITEM_TM_FLAMETHROWER
-	.2byte ITEM_TM_ICE_BEAM
-	.2byte ITEM_TM_SLUDGE_BOMB
-	.2byte ITEM_TM_THUNDER
-	.2byte ITEM_TM_THUNDERBOLT
-	.2byte ITEM_TM_PROTECT
-	.2byte ITEM_TM_PSYCHIC
-	.2byte ITEM_TM_EARTHQUAKE
 	.2byte ITEM_TM_HONE_CLAWS
 	pokemartlistend
 
@@ -2694,7 +2694,7 @@ SlateportCity_Text_MegaSalesmanIntro:
 SlateportCity_Text_NotSellingYet:
 	.string "Hello! I sell TMs to players\n"
 	.string "completing the gym challenge.\p"
-	.string "Come back once you have a badge!$"
+	.string "Come back once you have two badges!$"
 
 SlateportCity_EventScript_HiddenPowerNPC::
 	lock

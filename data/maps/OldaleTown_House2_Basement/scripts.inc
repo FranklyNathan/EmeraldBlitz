@@ -254,7 +254,7 @@ OldaleTown_House2_Basement_Text_MiltankDisable:
 	.string "debug mode?)$"
 
 OldaleTown_House2_Basement_Text_MiltankNo:
-	.string "Moo... (Debug mode disabled.)$"
+	.string "Moo… (Debug mode disabled.)$"
 
 OldaleTown_House2_Basement_EventScript_Shopkeeper::
 	lock
@@ -312,64 +312,80 @@ OldaleTown_House2_Basement_EventScript_Shopkeeper_Exit::
 
 	.align 2
 OldaleTown_House2_Basement_Mart_TMs:
-	.hword ITEM_TM_HONE_CLAWS
-	.hword ITEM_TM_DRAGON_CLAW
-	.hword ITEM_TM_WATER_PULSE
-	.hword ITEM_TM_CALM_MIND
-	.hword ITEM_TM_X_SCISSOR
-	.hword ITEM_TM_SNARL
-	.hword ITEM_TM_HAIL
+	.hword ITEM_TM_AERIAL_ACE
+	.hword ITEM_TM_AIR_SLASH
+	.hword ITEM_TM_BLIZZARD
+	.hword ITEM_TM_BRICK_BREAK
 	.hword ITEM_TM_BULK_UP
+	.hword ITEM_TM_BUG_BUZZ
 	.hword ITEM_TM_BULLET_SEED
+	.hword ITEM_TM_CALM_MIND
+	.hword ITEM_TM_CRUNCH
+	.hword ITEM_TM_DARK_PULSE
+	.hword ITEM_TM_DAZZLING_GLEAM
+	.hword ITEM_TM_DIG
+	.hword ITEM_TM_DRAGON_CLAW
+	.hword ITEM_TM_DRAGON_PULSE
+	.hword ITEM_TM_DUAL_WINGBEAT
+	.hword ITEM_TM_EARTHQUAKE
+	.hword ITEM_TM_FACADE
+	.hword ITEM_TM_FIRE_BLAST
+	.hword ITEM_TM_FIRE_PUNCH
+	.hword ITEM_TM_FLAMETHROWER
+	.hword ITEM_TM_FLASH_CANNON
+	.hword ITEM_TM_FLIP_TURN
+	.hword ITEM_TM_FOCUS_BLAST
+	.hword ITEM_TM_GIGA_DRAIN
+	.hword ITEM_TM_HAIL
+	.hword ITEM_TM_HONE_CLAWS
+	.hword ITEM_TM_HYPER_BEAM
+	.hword ITEM_TM_HYPER_VOICE
+	.hword ITEM_TM_ICE_BEAM
+	.hword ITEM_TM_ICE_PUNCH
+	.hword ITEM_TM_ICY_WIND
+	.hword ITEM_TM_IRON_TAIL
+	.hword ITEM_TM_LIGHT_SCREEN
+	.hword ITEM_TM_MUD_SHOT
+	.hword ITEM_TM_OVERHEAT
+	.hword ITEM_TM_PLAY_ROUGH
+	.hword ITEM_TM_POISON_JAB
+	.hword ITEM_TM_POUNCE
+	.hword ITEM_TM_POWER_GEM
+	.hword ITEM_TM_PROTECT
+	.hword ITEM_TM_PSYCHIC
+	.hword ITEM_TM_RAIN_DANCE
+	.hword ITEM_TM_REFLECT
+	.hword ITEM_TM_REST
+	.hword ITEM_TM_RETURN
 	.hword ITEM_TM_ROCK_SLIDE
+	.hword ITEM_TM_ROCK_TOMB
+	.hword ITEM_TM_SANDSTORM
+	.hword ITEM_TM_SCALD
+	.hword ITEM_TM_SCORCHING_SANDS
+	.hword ITEM_TM_SEED_BOMB
+	.hword ITEM_TM_SHADOW_BALL
+	.hword ITEM_TM_SHADOW_CLAW
+	.hword ITEM_TM_SHOCK_WAVE
+	.hword ITEM_TM_SLUDGE_BOMB
+	.hword ITEM_TM_SOLAR_BEAM
+	.hword ITEM_TM_STEEL_WING
 	.hword ITEM_TM_SUNNY_DAY
 	.hword ITEM_TM_TAUNT
-	.hword ITEM_TM_ICE_BEAM
-	.hword ITEM_TM_BLIZZARD
-	.hword ITEM_TM_HYPER_BEAM
-	.hword ITEM_TM_LIGHT_SCREEN
-	.hword ITEM_TM_PROTECT
-	.hword ITEM_TM_RAIN_DANCE
-	.hword ITEM_TM_GIGA_DRAIN
-	.hword ITEM_TM_SAFEGUARD
-	.hword ITEM_TM_DAZZLING_GLEAM
-	.hword ITEM_TM_SOLAR_BEAM
-	.hword ITEM_TM_IRON_TAIL
-	.hword ITEM_TM_THUNDERBOLT
-	.hword ITEM_TM_THUNDER
-	.hword ITEM_TM_EARTHQUAKE
-	.hword ITEM_TM_RETURN
-	.hword ITEM_TM_DIG
-	.hword ITEM_TM_PSYCHIC
-	.hword ITEM_TM_SHADOW_BALL
-	.hword ITEM_TM_BRICK_BREAK
-	.hword ITEM_TM_DOUBLE_TEAM
-	.hword ITEM_TM_REFLECT
-	.hword ITEM_TM_SHOCK_WAVE
-	.hword ITEM_TM_FLAMETHROWER
-	.hword ITEM_TM_SLUDGE_BOMB
-	.hword ITEM_TM_SANDSTORM
-	.hword ITEM_TM_FIRE_BLAST
-	.hword ITEM_TM_ROCK_TOMB
-	.hword ITEM_TM_AERIAL_ACE
-	.hword ITEM_TM_TORMENT
-	.hword ITEM_TM_FACADE
-	.hword ITEM_TM_SECRET_POWER
-	.hword ITEM_TM_REST
-	.hword ITEM_TM_ATTRACT
 	.hword ITEM_TM_THIEF
-	.hword ITEM_TM_STEEL_WING
-	.hword ITEM_TM_SKILL_SWAP
+	.hword ITEM_TM_THUNDER
+	.hword ITEM_TM_THUNDERBOLT
+	.hword ITEM_TM_THUNDER_PUNCH
 	.hword ITEM_TM_TRICK_ROOM
-	.hword ITEM_TM_OVERHEAT
+	.hword ITEM_TM_WATER_PULSE
+	.hword ITEM_TM_X_SCISSOR
+	.hword ITEM_TM_ZEN_HEADBUTT
 	.hword ITEM_HM_CUT
-	.hword ITEM_HM_FLY
-	.hword ITEM_HM_SURF
-	.hword ITEM_HM_STRENGTH
-	.hword ITEM_HM_FLASH
-	.hword ITEM_HM_ROCK_SMASH
-	.hword ITEM_HM_WATERFALL
 	.hword ITEM_HM_DIVE
+	.hword ITEM_HM_FLY
+	.hword ITEM_HM_ROCK_SMASH
+	.hword ITEM_HM_STRENGTH
+	.hword ITEM_HM_SURF
+	.hword ITEM_HM_WATERFALL
 	.hword ITEM_NONE
 
 OldaleTown_House2_Basement_EventScript_MegaStone_Clerk::

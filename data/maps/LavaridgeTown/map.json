@@ -127,6 +127,20 @@
       "flag": "FLAG_HIDE_LAVARIDGE_TOWN_RIVAL"
     },
     {
+      "local_id": "LOCALID_LAVARIDGE_SCOTT",
+      "graphics_id": "OBJ_EVENT_GFX_SCOTT",
+      "x": 3,
+      "y": 15,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_FACE_UP",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "0x0",
+      "flag": "FLAG_HIDE_LAVARIDGE_TOWN_SCOTT"
+    },
+    {
       "graphics_id": "OBJ_EVENT_GFX_EXPERT_F",
       "x": 4,
       "y": 7,
