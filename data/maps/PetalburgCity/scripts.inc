@@ -144,6 +144,7 @@ PetalburgCity_EventScript_ScottEncounter::
 	end
 
 PetalburgCity_EventScript_ScottText1::
+	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_PETALBURG_SCOTT
 	special OpenScottTmShop
@@ -151,11 +152,22 @@ PetalburgCity_EventScript_ScottText1::
 	return
 
 PetalburgCity_EventScript_ScottText2::
+	goto_if_set FLAG_SCOTT_DISAPPOINTED, PetalburgCity_EventScript_PitySurf
+	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_PETALBURG_SCOTT
 	special OpenScottTmShop
 	waitstate
 	return
+
+PetalburgCity_EventScript_PitySurf::
+	setflag FLAG_RECEIVED_HM_SURF
+	msgbox gText_ScottPityHM, MSGBOX_DEFAULT
+	playfanfare MUS_OBTAIN_ITEM
+	giveitem ITEM_HM_SURF
+	waitfanfare
+	releaseall
+	end
 
 PetalburgCity_EventScript_WallyTutorial::
 	lockall
@@ -679,8 +691,6 @@ PetalburgCity_EventScript_Scott::
 	applymovement LOCALID_PETALBURG_SCOTT, Common_Movement_WalkInPlaceFasterLeft
 	waitmovement 0
 	delay 30
-	msgbox PetalburgCity_Text_GiveSurf, MSGBOX_DEFAULT
-	closemessage
 	call_if_eq VAR_0x8008, 0, PetalburgCity_EventScript_ScottExit0
 	call_if_eq VAR_0x8008, 1, PetalburgCity_EventScript_ScottExit1
 	call_if_eq VAR_0x8008, 2, PetalburgCity_EventScript_ScottExit2
@@ -895,3 +905,4 @@ PetalburgCity_Text_GiveSurf:
 PetalburgCity_Text_FlygonLearnedSurf:
 	.string "BIRCH'S FLYGON overcame its\n"
 	.string "fear of rough waters!$"
+

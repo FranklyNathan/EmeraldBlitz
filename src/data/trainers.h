@@ -39132,7 +39132,7 @@ F_TRAINER_FEMALE |
 #line 15026
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 15028
-            .ability = ABILITY_INNER_FOCUS,
+            .ability = ABILITY_STEADFAST,
 #line 15025
             .lvl = 12,
 #line 15027
@@ -39247,7 +39247,7 @@ F_TRAINER_FEMALE |
 #line 15076
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 15078
-            .ability = ABILITY_INNER_FOCUS,
+            .ability = ABILITY_STEADFAST,
 #line 15075
             .lvl = 17,
 #line 15077
@@ -39362,7 +39362,7 @@ F_TRAINER_FEMALE |
 #line 15126
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 15128
-            .ability = ABILITY_INNER_FOCUS,
+            .ability = ABILITY_STEADFAST,
 #line 15125
             .lvl = 23,
 #line 15127
@@ -39477,7 +39477,7 @@ F_TRAINER_FEMALE |
 #line 15176
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 15178
-            .ability = ABILITY_INNER_FOCUS,
+            .ability = ABILITY_STEADFAST,
 #line 15175
             .lvl = 26,
 #line 15177

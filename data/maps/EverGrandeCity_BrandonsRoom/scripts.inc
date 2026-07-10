@@ -94,3 +94,4 @@ EverGrandeCity_BrandonsRoom_Text_Defeat:
 EverGrandeCity_BrandonsRoom_Text_PostBattleSpeech:
 	.string "The CHAMPION awaits you.\n"
 	.string "Step through that door and finish it!$"
+

@@ -87,7 +87,6 @@ static const struct GiftPokemon sGiftPokemonList[] = {
     {SPECIES_GASTLY, 8},
     {SPECIES_GEODUDE, 8},
     {SPECIES_GIBLE, 18},
-    {SPECIES_GLIGAR, 18},
     {SPECIES_GOOMY, 10},
     {SPECIES_GOSSIFLEUR, 10},
     {SPECIES_GOTHITA, 6},

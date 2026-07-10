@@ -1,0 +1,200 @@
+{
+  "STARAPTOR": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_BRICK_BREAK",
+      "MOVE_BULK_UP",
+      "MOVE_FOCUS_BLAST"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "EELEKTROSS": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_WATERFALL"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "TADBULB": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_SHOCK_WAVE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "BELLIBOLT": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_SHOCK_WAVE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "WATTREL": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_SHOCK_WAVE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "KILOWATTREL": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_SHOCK_WAVE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+
+
+  },
+  "PYROAR": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_SCORCHING_SANDS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "MALAMAR": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POISON_JAB",
+      "MOVE_ZEN_HEADBUTT"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "BARBARACLE": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_WATERFALL"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "DRAGALGE": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POISON_JAB"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "FALINKS": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_SEED_BOMB"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "HOUNDSTONE": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_ZEN_HEADBUTT"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "RAICHU": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_DAZZLING_GLEAM"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "RAICHU_ALOLA": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_DAZZLING_GLEAM"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "STARMIE": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_BULK_UP",
+      "MOVE_ZEN_HEADBUTT"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "HOUNDOOM": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_SCORCHING_SANDS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "BANETTE": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_ZEN_HEADBUTT"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "CHIMECHO": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_FLASH_CANNON"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "LIEPARD": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_CRUNCH"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "SIMISEAR": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_SCORCHING_SANDS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "GARBADOR": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POISON_JAB"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "GRENINJA": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_FLIP_TURN"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "AEGISLASH": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_ZEN_HEADBUTT"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "GOODRA": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_GIGA_DRAIN"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  }
+}

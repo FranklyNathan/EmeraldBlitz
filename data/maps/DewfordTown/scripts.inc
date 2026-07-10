@@ -114,10 +114,6 @@ DewfordTown_EventScript_ScottEncounter::
 	waitmovement 0
 	call_if_eq VAR_BADGE_COUNT, 3, LavaridgeTown_EventScript_ScottText0
 	call_if_eq VAR_BADGE_COUNT, 4, DewfordTown_EventScript_ScottText1
-	call_if_eq VAR_BADGE_COUNT, 5, DewfordTown_EventScript_ScottText2
-	call_if_eq VAR_BADGE_COUNT, 6, DewfordTown_EventScript_ScottText3
-	call_if_eq VAR_BADGE_COUNT, 7, DewfordTown_EventScript_ScottText4
-	call_if_eq VAR_BADGE_COUNT, 8, DewfordTown_EventScript_ScottText5
 	setflag FLAG_HIDE_DEWFORD_TOWN_SCOTT
 	releaseall
 	end
@@ -714,6 +710,7 @@ DewfordTown_Movement_ScottApproach:
 	step_end
 
 DewfordTown_EventScript_ScottText0::
+	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
 	special OpenScottTmShop
@@ -723,47 +720,12 @@ DewfordTown_EventScript_ScottText0::
 	return
 
 DewfordTown_EventScript_ScottText1::
+	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
 	special OpenScottTmShop
 	waitstate
 	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
-	call Common_EventScript_ScottFlyAway
-	return
-
-DewfordTown_EventScript_ScottText2::
-	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
-	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
-	special OpenScottTmShop
-	waitstate
-	msgbox gText_ScottFinalSentence2, MSGBOX_DEFAULT
-	call Common_EventScript_ScottFlyAway
-	return
-
-DewfordTown_EventScript_ScottText3::
-	msgbox gText_ScottPostGym3, MSGBOX_DEFAULT
-	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
-	special OpenScottTmShop
-	waitstate
-	msgbox gText_ScottFinalSentence3, MSGBOX_DEFAULT
-	call Common_EventScript_ScottFlyAway
-	return
-
-DewfordTown_EventScript_ScottText4::
-	msgbox gText_ScottPostGym4, MSGBOX_DEFAULT
-	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
-	special OpenScottTmShop
-	waitstate
-	msgbox gText_ScottFinalSentence4, MSGBOX_DEFAULT
-	call Common_EventScript_ScottFlyAway
-	return
-
-DewfordTown_EventScript_ScottText5::
-	msgbox gText_ScottPostGym5, MSGBOX_DEFAULT
-	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
-	special OpenScottTmShop
-	waitstate
-	msgbox gText_ScottFinalSentence5, MSGBOX_DEFAULT
 	call Common_EventScript_ScottFlyAway
 	return
 

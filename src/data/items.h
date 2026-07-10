@@ -11813,7 +11813,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_MUD_SHOT] =
     {
         .name = ITEM_NAME("Mud Shot"),
-        .price = 3000,
+        .price = 1000,
         .description = COMPOUND_STRING(
             "The user attacks by\n"
             "hurling a blob of mud\n"
@@ -12027,7 +12027,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_POUNCE] =
     {
         .name = ITEM_NAME("Pounce"),
-        .price = 3000,
+        .price = 1000,
         .description = COMPOUND_STRING(
             "The user lunges at\n"
             "the foe at a speed\n"
@@ -12197,7 +12197,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_ICY_WIND] =
     {
         .name = ITEM_NAME("Icy Wind"),
-        .price = 3000,
+        .price = 1000,
         .description = COMPOUND_STRING(
             "The user attacks with\n"
             "a gust of chilled\n"
@@ -12437,7 +12437,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_TRICK_ROOM] =
     {
         .name = ITEM_NAME("Trick Room"),
-        .price = 1000,
+        .price = 2000,
         .description = COMPOUND_STRING(
             "The user creates a\n"
             "bizarre area that\n"
@@ -12737,9 +12737,9 @@ const struct Item gItemsInfo[] =
         .name = ITEM_NAME("Flip Turn"),
         .price = 3000,
         .description = COMPOUND_STRING(
-            "The user attacks then\n"
-            "retreats. Switches out\n"
-            "the user."),
+            "The user attacks\n"
+            "then swaps out with\n"
+            "a party member."),
         .importance = I_REUSABLE_TMS,
         .pocket = POCKET_TM_HM,
         .type = ITEM_USE_PARTY_MENU,

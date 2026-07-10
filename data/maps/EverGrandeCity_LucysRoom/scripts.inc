@@ -93,3 +93,4 @@ EverGrandeCity_LucysRoom_Text_Defeat:
 EverGrandeCity_LucysRoom_Text_PostBattleSpeech:
 	.string "The next room holds your next trial.\n"
 	.string "Go forth.$"
+

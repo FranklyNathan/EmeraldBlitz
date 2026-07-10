@@ -1329,15 +1329,21 @@ const u8 gText_CannotSendMonToBoxPartner[] = _("Cannot send a mon that doesn't,\
 const u8 gText_GrandPrixMessage[] = _("Happy Saturday! Let's do our best\nand win some fights! Yahoo!");
 
 // Scott's generic dialogue for post-gym encounters
-const u8 gText_ScottPostGym1[] = _("Excuse me! I hope you don't mind,\nbut I caught the tail end of\lthat battle.\pNot bad! You've got quite a bit of potential.\pI like helping out trainers like you,\nso here, take a look at what\lI can offer.$");
+const u8 gText_ScottPostGym1[] = _("Excuse me! I hope you don't mind,\nbut I caught the tail end of\lthat battle.\pNot bad! You've got quite a bit of\npotential.\pI like helping out trainers like you,\nso here, take a look at what I can\loffer.$");
 const u8 gText_ScottPostGym2[] = _("I knew I recognized the lightning-\nfast style of the trainer in\lthat gym!\pMy name's Scott. You might have guessed,\nbut I'm roaming Hoenn looking for\lfast trainers.\pI'm going to keep an eye on you.\nIn the meantime, interested in\lany more moves?$");
-const u8 gText_ScottPostGym3[] = _("Hahahah! Way to go, <player>!\pYou're really cruising now!\pI'm sure you're in a rush to go buy\nsome Sitrus Berries, but before\lyou go, I've got a new selection\lI think you'll enjoy.$");
-const u8 gText_ScottPostGym4[] = _("Oh! You're on fire now!\pI knew it from the first time I watched you battle–\nyou're something special!\pLooking for any more moves?$");
-const u8 gText_ScottPostGym5[] = _("<Player>, you've clawed your way up\nto face the Pokémon League!\pI'm happy for you!\nYou made my cheering worthwhile!\pYou're almost at the finish line…\nlast chance to stock up!$");
+const u8 gText_ScottPostGym3[] = _("Hahahah! Way to go, {PLAYER}!\pYou're really cruising now!\pI'm sure you're in a rush to go buy\nsome Sitrus Berries, but before\lyou go, I've got a new selection that\lI think you'll enjoy.$");
+const u8 gText_ScottPostGym4[] = _("Oh! You're on fire now!\pI knew it from the first time I watched\nyou battle… you're something special!\pLooking for any more moves?$");
+const u8 gText_ScottPostGym5[] = _("{PLAYER}, you've clawed your way up to\nface the Pokémon League!\pI'm happy for you!\nYou made my cheering worthwhile!\pYou're almost at the finish line…\nlast chance to stock up!$");
 
 // Scott's final sentences before flying away
-const u8 gText_ScottFinalSentence1[] = _("Keep that pace up!\pI have a feeling I'll be\nseeing you again.$");
-const u8 gText_ScottFinalSentence2[] = _("Keep up the good work!\nI'm counting on you.\pOh, and before I go, I noticed you have\na pretty sweet ride.\pThis should help him overcome\nhis fear of water…$");
+const u8 gText_ScottFinalSentence1[] = _("Keep that pace up!\pI have a feeling I'll be seeing you\nagain.$");
+const u8 gText_ScottFinalSentence2[] = _("Keep up the good work!\nI'm counting on you.\pOh, and before I go, I noticed you have\na pretty sweet ride!\pThis should help him overcome his\nfear of water…$");
 const u8 gText_ScottFinalSentence3[] = _("Until next time!\pOh! And before I forget,\nthis should help you save some time…$");
 const u8 gText_ScottFinalSentence4[] = _("Just one gym to go.\pNo time to slow down now!$");
-const u8 gText_ScottFinalSentence5[] = _("Good luck, <Player>!\pNow go and make me proud!$");
+const u8 gText_ScottFinalSentence5[] = _("Good luck, {PLAYER}!\pNow go and make me proud!$");
+
+// Scott's dialogue when player has stolen a Pokemon
+const u8 gText_ScottStolenPokemon[] = _("Another incredible battle!\nBut… something seems off.\pAh, have you stolen a POKéMON!\pSorry, but I don't do business with thieves.$");
+
+// Scott's note to the player to make sure they still receive a TM even if they've disappointed him and stolen
+const u8 gText_ScottPityHM[] = _("Oh?\nThere's a note on the ground…\pDear {PLAYER},\nYou may be a thief, but I\pcan't help but root for you a\nlittle bit.\pTake this, and good luck!$");

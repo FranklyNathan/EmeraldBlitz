@@ -408,7 +408,7 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
         if (!objectEvent->active
          || objectEvent->noShadow
          || objectEvent->inHotSprings
-         || objectEvent->inSandPile
+         || (objectEvent->inSandPile && !isPlayerOnBike)
          || gWeatherPtr->noShadows
          || (!isPlayerOnBike && MetatileBehavior_IsPokeGrass(objectEvent->currentMetatileBehavior))
          || (!isPlayerOnBike && MetatileBehavior_IsPuddle(objectEvent->currentMetatileBehavior))

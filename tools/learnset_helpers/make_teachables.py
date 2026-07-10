@@ -71,11 +71,6 @@ EXCLUDED_MOVES = {
     "MOVE_THUNDER_WAVE",
 }
 
-# Special teachable rules: type -> moves to always add
-SPECIAL_TEACHABLE_BY_TYPE = {
-    "TYPE_ELECTRIC": ["MOVE_SHOCK_WAVE"],
-}
-
 # Special teachable rules: species -> moves to always add
 SPECIAL_TEACHABLE_BY_SPECIES = {
     "SHUPPET": ["MOVE_POUNCE"],
@@ -160,37 +155,7 @@ def extract_repo_universals() -> list[str]:
             return list(filter(lambda s: s, map(lambda s: s.strip(), match.group(1).split(','))))
         return list()
 
-
-def extract_species_types() -> dict[str, list[str]]:
-    """
-    Return a dictionary mapping species names to their types.
-    Parses the species_info files to extract type information.
-    """
-    species_types = {}
-    type_pattern = re.compile(r'\.types\s*=\s*MON_TYPES\(([^,]+),\s*([^)]+)\)')
-    
-    # Search in all species_info files
-    for fname in chain(glob.glob("./src/data/pokemon/species_info/*.h"), glob.glob("./src/data/pokemon/species_info/**/*.h")):
-        with open(fname, "r") as fp:
-            content = fp.read()
-            # Find all species definitions with their types
-            for match in type_pattern.finditer(content):
-                type1 = match.group(1).strip()
-                type2 = match.group(2).strip()
-                
-                # Try to find the species name from the context
-                # Look for [SPECIES_XXX] = pattern before the types
-                context_start = max(0, match.start() - 200)
-                context = content[context_start:match.start()]
-                species_match = re.search(r'\[SPECIES_(\w+)\]', context)
-                if species_match:
-                    species_name = species_match.group(1)
-                    species_types[species_name] = [type1, type2]
-    
-    return species_types
-
-
-def prepare_output(all_learnables: dict[str, set[str]], repo_teachables: set[str], header: str, species_types: dict[str, list[str]]) -> str:
+def prepare_output(all_learnables: dict[str, set[str]], repo_teachables: set[str], header: str) -> str:
     """
     Build the file content for teachable_learnsets.h.
     """
@@ -219,22 +184,11 @@ def prepare_output(all_learnables: dict[str, set[str]], repo_teachables: set[str
             continue
 
         repo_species_teachables = filter(lambda m: m in repo_teachables, all_learnables[species_upper])
-        
-        # Add special teachable moves based on species type
-        species_teachables_set = set(repo_species_teachables)
-        if species_upper in species_types:
-            for type_name in species_types[species_upper]:
-                if type_name in SPECIAL_TEACHABLE_BY_TYPE:
-                    species_teachables_set.update(SPECIAL_TEACHABLE_BY_TYPE[type_name])
-        
-        # Add special teachable moves based on species
-        if species_upper in SPECIAL_TEACHABLE_BY_SPECIES:
-            species_teachables_set.update(SPECIAL_TEACHABLE_BY_SPECIES[species_upper])
 
         new += old[cursor:match_b]
         new += "\n".join([
             f"{species.group('decl')} = {{",
-            f"    {joinpat.join(chain(sorted(species_teachables_set), ('MOVE_UNAVAILABLE',)))},",
+            f"    {joinpat.join(chain(repo_species_teachables, ('MOVE_UNAVAILABLE',)))},",
             "};\n",
         ])
         cursor = match_e + 1
@@ -326,8 +280,6 @@ def main():
         chain(repo_tms, repo_tutors)
     ))
 
-    species_types = extract_species_types()
-
     create_tutor_moves_array(repo_tutors)
 
     h_align = max(map(lambda move: len(move), chain(repo_universals, repo_teachables))) + 2
@@ -336,7 +288,7 @@ def main():
     with open(SOURCE_LEARNSETS_JSON, "r") as source_fp:
         all_learnables = json.load(source_fp)
 
-    content = prepare_output(all_learnables, repo_teachables, header, species_types)
+    content = prepare_output(all_learnables, repo_teachables, header)
     with open("./src/data/pokemon/teachable_learnsets.h", "w") as teachables_fp:
         teachables_fp.write(content)
 

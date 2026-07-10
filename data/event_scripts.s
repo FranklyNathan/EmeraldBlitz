@@ -1298,8 +1298,12 @@ EventScript_FlygonLearnedFly::
 	return
 
 Common_EventScript_SetScottEncounterPending::
-	setflag FLAG_SCOTT_ENCOUNTER_PENDING
+    goto_if_set FLAG_SCOTT_DISAPPOINTED, Common_EventScript_SetScottEncounterCancelled
+    setflag FLAG_SCOTT_ENCOUNTER_PENDING
 	return
+
+Common_EventScript_SetScottEncounterCancelled::
+    return
 
 	.include "data/scripts/pc_transfer.inc"
 	.include "data/scripts/questionnaire.inc"

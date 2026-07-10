@@ -157,6 +157,7 @@ RustboroCity_Movement_ScottApproach:
 	step_end
 
 RustboroCity_EventScript_ScottText0::
+	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_RUSTBORO_SCOTT
 	special OpenScottTmShop
@@ -164,22 +165,26 @@ RustboroCity_EventScript_ScottText0::
 	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
 	call Common_EventScript_ScottFlyAway
 	return
+
+Common_EventScript_CheckRentalFraudforScott::
+	copyvar VAR_0x8005, VAR_BADGE_COUNT
+	subvar VAR_0x8005, VAR_RENTAL_BADGE_COUNT
+	goto_if_gt VAR_0x8005, 1, Common_EventScript_ScottStolen
+	return
+
+Common_EventScript_ScottStolen::
+	msgbox gText_ScottStolenPokemon, MSGBOX_DEFAULT
+	setflag FLAG_SCOTT_DISAPPOINTED
+	call Common_EventScript_ScottFlyAway
+	end
 
 RustboroCity_EventScript_ScottText1::
+	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_RUSTBORO_SCOTT
 	special OpenScottTmShop
 	waitstate
 	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
-	call Common_EventScript_ScottFlyAway
-	return
-
-RustboroCity_EventScript_ScottText2::
-	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
-	setvar VAR_LAST_TALKED, LOCALID_RUSTBORO_SCOTT
-	special OpenScottTmShop
-	waitstate
-	msgbox gText_ScottFinalSentence2, MSGBOX_DEFAULT
 	call Common_EventScript_ScottFlyAway
 	return
 

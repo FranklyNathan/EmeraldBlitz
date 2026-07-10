@@ -763,3 +763,4 @@ LilycoveCity_EventScript_MauvilleMan::
 LilycoveCity_Text_MauvilleMan:
 	.string "Get lost kid. This place isn't for\n"
 	.string "amateur racers like you.$"
+

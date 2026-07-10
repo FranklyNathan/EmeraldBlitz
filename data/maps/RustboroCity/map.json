@@ -246,8 +246,8 @@
     },
     {
       "local_id": "LOCALID_RUSTBORO_SCOTT",
-      "graphics_id": "OBJ_EVENT_GFX_SCOTT",
-      "x": 23,
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 24,
       "y": 17,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",

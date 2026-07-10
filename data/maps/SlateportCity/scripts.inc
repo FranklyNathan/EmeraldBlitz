@@ -2692,8 +2692,8 @@ SlateportCity_Text_MegaSalesmanIntro:
 	.string "Psst… Kid. Looking for a good deal?$"
 
 SlateportCity_Text_NotSellingYet:
-	.string "Hello! I sell TMs to players\n"
-	.string "completing the gym challenge.\p"
+	.string "Hello! I sell TMs to players completing\n"
+	.string "the gym challenge.\p"
 	.string "Come back once you have two badges!$"
 
 SlateportCity_EventScript_HiddenPowerNPC::

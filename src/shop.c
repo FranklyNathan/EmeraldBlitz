@@ -119,8 +119,8 @@ struct ShopData
 
 static EWRAM_DATA struct MartInfo sMartInfo = {0};
 static EWRAM_DATA struct ShopData *sShopData = NULL;
-static u16 sScottTmItemList[10];
-static u16 sScottTmPriceList[10];
+static u16 sScottTmItemList[7]; // 5 TMs + INVERT + ITEM_NONE
+static u16 sScottTmPriceList[7]; // 5 TM prices + INVERT price + 0
 static const u16 sScottTmPool[] = {
     ITEM_TM_SEED_BOMB,
     ITEM_TM_GIGA_DRAIN,
@@ -162,13 +162,12 @@ static const u16 sScottTmPool[] = {
 };
 
 static bool8 sIsScottTmShop = FALSE;
-static bool8 sScottTmPurchased[6]; // Track which of the 6 current TMs are purchased
-static bool8 sScottTmRerollPurchased = FALSE; // Track if Reroll was purchased
+static bool8 sScottTmPurchased[5]; // Track which of the 5 current TMs are purchased
+static EWRAM_DATA u8 sScottTmPurchasedCount = 0; // Track total TMs purchased for price reduction
 static bool8 sScottTmInvertPurchased = FALSE; // Track if Invert was purchased
 static EWRAM_DATA struct ListMenuItem *sListMenuItems = NULL;
 
-// Special item IDs for Scott's TM shop options
-#define ITEM_SCOTT_TM_REROLL  0xFFFE
+// Special item ID for Scott's TM shop option
 #define ITEM_SCOTT_TM_INVERT  0xFFFD
 
 // Partner TM pairs for Invert option
@@ -204,7 +203,6 @@ static u16 GetMartItemPrice(u16 itemId);
 static void Task_GoToBuyOrSellMenu(u8 taskId);
 static void BuyMenuFreeMemory(void);
 static u16 GetScottTmPartner(u16 tmId);
-static void ScottTmReroll(u8 taskId);
 static void ScottTmInvert(u8 taskId);
 static void MapPostLoadHook_ReturnToShopMenu(void);
 static void Task_ReturnToShopMenu(u8 taskId);
@@ -492,8 +490,8 @@ static void PrepareScottTmShopInventory(void)
     for (i = 0; sScottTmPool[i] != ITEM_NONE; i++)
         poolItems[poolSize++] = sScottTmPool[i];
 
-    // Select 6 random TMs
-    for (i = 0; i < 6; i++)
+    // Select 5 random TMs
+    for (i = 0; i < 5; i++)
     {
         u16 chosenIndex = Random() % poolSize;
         u16 j;
@@ -502,39 +500,54 @@ static void PrepareScottTmShopInventory(void)
             poolItems[j] = poolItems[j + 1];
         poolSize--;
     }
-    // Assign prices in sorted order: 2000, 2000, 4000, 4000, 6000, 6000
-    sScottTmPriceList[0] = 2000;
-    sScottTmPriceList[1] = 2000;
-    sScottTmPriceList[2] = 4000;
-    sScottTmPriceList[3] = 4000;
-    sScottTmPriceList[4] = 6000;
-    sScottTmPriceList[5] = 6000;
+    // Assign initial prices for TMs (all 4000). These are effectively dummy values for TMs
+    // because GetMartItemPrice will calculate the actual dynamic price.
+    for (i = 0; i < 5; i++)
+        sScottTmPriceList[i] = 4000;
 
-    // Add Reroll and Invert options after the 6 TMs
-    sScottTmItemList[6] = ITEM_SCOTT_TM_REROLL;
-    sScottTmItemList[7] = ITEM_SCOTT_TM_INVERT;
-    sScottTmItemList[8] = ITEM_NONE;
-    sScottTmPriceList[6] = 6000;
-    sScottTmPriceList[7] = 6000;
-    sScottTmPriceList[8] = 0;
+    // Add Invert option after the 5 TMs
+    sScottTmItemList[5] = ITEM_SCOTT_TM_INVERT;
+    sScottTmItemList[6] = ITEM_NONE;
+    sScottTmPriceList[5] = 4000; // Invert fixed price
+    sScottTmPriceList[6] = 0;
 }
 
 static u16 GetMartItemPrice(u16 itemId)
 {
     u16 i;
 
-    // If this is Scott's TM shop, prefer the dedicated price table so
-    // shuffled TMs keep their custom prices regardless of other pointer
-    // manipulations to sMartInfo.priceList.
+    // If this is Scott's TM shop, calculate dynamic prices
     if (sIsScottTmShop)
     {
-        for (i = 0; i < ARRAY_COUNT(sScottTmPriceList); i++)
+        // Handle special options first
+        if (itemId == ITEM_SCOTT_TM_INVERT)
+            return 4000; // Fixed price for Invert
+
+        // Handle TMs
+        for (i = 0; i < 5; i++) // Iterate over the 5 TM slots
         {
             if (sScottTmItemList[i] == itemId)
-                return sScottTmPriceList[i];
+            {
+                // If TM is already purchased, it effectively costs 0 (will show as Sold Out)
+                if (sScottTmPurchased[i])
+                    return 0;
+
+                // Calculate dynamic price based on number of TMs already purchased
+                switch (sScottTmPurchasedCount)
+                {
+                    case 0: return 4000;
+                    case 1: return 2000;
+                    case 2: return 1000;
+                    case 3: return 500;
+                    case 4: return 250;
+                    case 5:
+                    default: return 4000; // Should not happen, but a safe default
+                }
+            }
         }
     }
 
+    // Original logic for non-Scott's shop items or items not found in Scott's list
     if (sMartInfo.priceList != NULL)
     {
         for (i = 0; i < sMartInfo.itemCount; i++)
@@ -560,59 +573,6 @@ static u16 GetScottTmPartner(u16 tmId)
     return ITEM_NONE;
 }
 
-static void ScottTmReroll(u8 taskId)
-{
-    u16 i;
-    // Subtract money
-    RemoveMoney(&gSaveBlock1Ptr->money, sShopData->totalCost);
-    PlaySE(SE_SHOP);
-    PrintMoneyAmountInMoneyBox(WIN_MONEY, GetMoney(&gSaveBlock1Ptr->money), 0);
-
-    // Re-randomize the 6 TMs
-    u16 poolItems[ARRAY_COUNT(sScottTmPool)] = {0};
-    u16 poolSize = 0;
-
-    for (i = 0; sScottTmPool[i] != ITEM_NONE; i++)
-        poolItems[poolSize++] = sScottTmPool[i];
-
-    for (i = 0; i < 6; i++)
-    {
-        u16 chosenIndex = Random() % poolSize;
-        u16 j;
-        sScottTmItemList[i] = poolItems[chosenIndex];
-        for (j = chosenIndex; j < poolSize - 1; j++)
-            poolItems[j] = poolItems[j + 1];
-        poolSize--;
-    }
-
-    // Update the shop's item list pointer to reflect changes
-    SetShopItemsForSale(sScottTmItemList);
-    // Restore the Scott TM price table so the custom prices remain in the shop
-    sMartInfo.priceList = sScottTmPriceList;
-
-    // If the buy menu's list arrays exist, update their entries so the
-    // displayed list reflects the new shuffled items immediately.
-    if (sListMenuItems != NULL && sItemNames != NULL)
-    {
-        u16 k;
-        for (k = 0; k < sMartInfo.itemCount; k++)
-            BuyMenuSetListEntry(&sListMenuItems[k], sMartInfo.itemList[k], sItemNames[k]);
-        StringCopy(sItemNames[k], gText_Cancel2);
-        sListMenuItems[k].name = sItemNames[k];
-        sListMenuItems[k].id = LIST_CANCEL;
-    }
-
-    // Reset purchase tracking for TMs
-    for (i = 0; i < 6; i++)
-        sScottTmPurchased[i] = FALSE;
-
-    // Mark Reroll as purchased
-    sScottTmRerollPurchased = TRUE;
-
-    // Return to item list
-    BuyMenuReturnToItemList(taskId);
-}
-
 static void ScottTmInvert(u8 taskId)
 {
     u16 i;
@@ -622,7 +582,7 @@ static void ScottTmInvert(u8 taskId)
     PrintMoneyAmountInMoneyBox(WIN_MONEY, GetMoney(&gSaveBlock1Ptr->money), 0);
 
     // Swap each TM with its partner
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < 5; i++)
     {
         u16 partner = GetScottTmPartner(sScottTmItemList[i]);
         if (partner != ITEM_NONE)
@@ -645,11 +605,9 @@ static void ScottTmInvert(u8 taskId)
         sListMenuItems[k].name = sItemNames[k];
         sListMenuItems[k].id = LIST_CANCEL;
     }
-    // Reset purchase tracking for TMs
-    for (i = 0; i < 6; i++)
-        sScottTmPurchased[i] = FALSE;
 
-    // Mark Invert as purchased
+    // sScottTmPurchasedCount (price tier) is NOT reset as per requirements.
+    // Mark Invert as purchased for this session.
     sScottTmInvertPurchased = TRUE;
 
     // Return to item list
@@ -849,9 +807,7 @@ static void BuyMenuSetListEntry(struct ListMenuItem *menuItem, u16 item, u8 *nam
 {
     if (sMartInfo.martType == MART_TYPE_NORMAL)
     {
-        if (item == ITEM_SCOTT_TM_REROLL)
-            StringCopy(name, gText_Reroll);
-        else if (item == ITEM_SCOTT_TM_INVERT)
+        if (item == ITEM_SCOTT_TM_INVERT)
             StringCopy(name, gText_Invert);
         else
             CopyItemName(item, name);
@@ -880,9 +836,7 @@ static void BuyMenuPrintItemDescriptionAndShowItemIcon(s32 item, bool8 onInit, s
     {
         if (sMartInfo.martType == MART_TYPE_NORMAL)
         {
-            if (item == ITEM_SCOTT_TM_REROLL)
-                description = gText_RerollDescription;
-            else if (item == ITEM_SCOTT_TM_INVERT)
+            if (item == ITEM_SCOTT_TM_INVERT)
                 description = gText_InvertDescription;
             else
                 description = GetItemDescription(item);
@@ -906,11 +860,11 @@ static void BuyMenuPrintItemDescriptionAndShowItemIcon(s32 item, bool8 onInit, s
 
     FillWindowPixelBuffer(WIN_ITEM_DESCRIPTION, PIXEL_FILL(0));
     // If the TM clerk feature is enabled, clear any existing mini icons when
-    // hovering non-pokemon-item entries (Reroll/Invert/Cancel) so the
+    // hovering non-pokemon-item entries (Invert/Cancel) so the
     // description text doesn't overlap leftover sprites.
     if (VarGet(VAR_POWER_TM_CLERK) == 1)
     {
-        if (item == LIST_CANCEL || item == ITEM_SCOTT_TM_REROLL || item == ITEM_SCOTT_TM_INVERT)
+        if (item == LIST_CANCEL || item == ITEM_SCOTT_TM_INVERT)
         {
             u8 i;
             for (i = 0; i < 10; i++)
@@ -921,7 +875,7 @@ static void BuyMenuPrintItemDescriptionAndShowItemIcon(s32 item, bool8 onInit, s
             }
         }
     }
-    if (VarGet(VAR_POWER_TM_CLERK) == 1 && item != LIST_CANCEL && item != ITEM_SCOTT_TM_REROLL && item != ITEM_SCOTT_TM_INVERT)
+    if (VarGet(VAR_POWER_TM_CLERK) == 1 && item != LIST_CANCEL && item != ITEM_SCOTT_TM_INVERT)
     {
         CreateShopPokemonIconSprites(item);
         CopyWindowToVram(WIN_ITEM_DESCRIPTION, COPYWIN_GFX);
@@ -965,7 +919,8 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
         if (sIsScottTmShop)
         {
             u16 i;
-            for (i = 0; i < 6; i++)
+            // Check for purchased TMs
+            for (i = 0; i < 5; i++)
             {
                 if (sScottTmItemList[i] == itemId && sScottTmPurchased[i])
                 {
@@ -974,14 +929,6 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
                     AddTextPrinterParameterized4(windowId, FONT_NARROW, x, y, 0, 0, sShopBuyMenuTextColors[COLORID_ITEM_LIST], TEXT_SKIP_DRAW, gStringVar4);
                     return;
                 }
-            }
-            // Check if Reroll has been purchased
-            if (itemId == ITEM_SCOTT_TM_REROLL && sScottTmRerollPurchased)
-            {
-                StringCopy(gStringVar4, gText_Purchased);
-                x = GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 120);
-                AddTextPrinterParameterized4(windowId, FONT_NARROW, x, y, 0, 0, sShopBuyMenuTextColors[COLORID_ITEM_LIST], TEXT_SKIP_DRAW, gStringVar4);
-                return;
             }
             // Check if Invert has been purchased
             if (itemId == ITEM_SCOTT_TM_INVERT && sScottTmInvertPurchased)
@@ -1100,9 +1047,7 @@ static void BuyMenuAddItemIcon(u16 item, u8 iconSlot)
     {
         u16 iconItem = item;
         // Map special Scott TM shop options to actual items for icons
-        if (item == ITEM_SCOTT_TM_REROLL)
-            iconItem = ITEM_LOADED_DICE;
-        else if (item == ITEM_SCOTT_TM_INVERT)
+        if (item == ITEM_SCOTT_TM_INVERT)
             iconItem = ITEM_GIMMIGHOUL_COIN;
 
         spriteId = AddItemIconSprite(iconSlot + TAG_ITEM_ICON_BASE, iconSlot + TAG_ITEM_ICON_BASE, iconItem);
@@ -1455,20 +1400,7 @@ static void Task_BuyMenu(u8 taskId)
                 sShopData->totalCost = gDecorations[itemId].price;
 
             // Handle special Scott TM shop options
-            if (sIsScottTmShop && itemId == ITEM_SCOTT_TM_REROLL)
-            {
-                if (sScottTmRerollPurchased)
-                    BuyMenuDisplayMessage(taskId, gText_ThatItemIsSoldOut, BuyMenuReturnToItemList);
-                else if (!IsEnoughMoney(&gSaveBlock1Ptr->money, sShopData->totalCost))
-                    BuyMenuDisplayMessage(taskId, gText_YouDontHaveMoney, BuyMenuReturnToItemList);
-                else
-                {
-                    ConvertIntToDecimalStringN(gStringVar2, sShopData->totalCost, STR_CONV_MODE_LEFT_ALIGN, 6);
-                    StringExpandPlaceholders(gStringVar4, gText_YouWantedVar1ThatllBeVar2);
-                    BuyMenuDisplayMessage(taskId, gStringVar4, ScottTmReroll);
-                }
-            }
-            else if (sIsScottTmShop && itemId == ITEM_SCOTT_TM_INVERT)
+            if (sIsScottTmShop && itemId == ITEM_SCOTT_TM_INVERT)
             {
                 if (sScottTmInvertPurchased)
                     BuyMenuDisplayMessage(taskId, gText_ThatItemIsSoldOut, BuyMenuReturnToItemList);
@@ -1478,15 +1410,17 @@ static void Task_BuyMenu(u8 taskId)
                 {
                     ConvertIntToDecimalStringN(gStringVar2, sShopData->totalCost, STR_CONV_MODE_LEFT_ALIGN, 6);
                     StringExpandPlaceholders(gStringVar4, gText_YouWantedVar1ThatllBeVar2);
+                    tItemCount = 1; // Invert is always a single purchase
                     BuyMenuDisplayMessage(taskId, gStringVar4, ScottTmInvert);
                 }
             }
+            // For TMs and other normal items in Scott's shop
             else if (GetItemImportance(itemId) && (CheckBagHasItem(itemId, 1) || CheckPCHasItem(itemId, 1)))
                 BuyMenuDisplayMessage(taskId, gText_ThatItemIsSoldOut, BuyMenuReturnToItemList);
-            else if (sIsScottTmShop)
+            else if (sIsScottTmShop) // Check for TMs in Scott's shop (not Invert, not "important" item already checked)
             {
                 u16 i;
-                for (i = 0; i < 6; i++)
+                for (i = 0; i < 5; i++)
                 {
                     if (sScottTmItemList[i] == itemId && sScottTmPurchased[i])
                     {
@@ -1494,48 +1428,25 @@ static void Task_BuyMenu(u8 taskId)
                         break;
                     }
                 }
-                if (i == 6 && !IsEnoughMoney(&gSaveBlock1Ptr->money, sShopData->totalCost))
-                    BuyMenuDisplayMessage(taskId, gText_YouDontHaveMoney, BuyMenuReturnToItemList);
-                else if (i == 6)
+                if (i < 5) { // Item was found and sold out
+                    // Message already displayed, just return.
+                } else if (!IsEnoughMoney(&gSaveBlock1Ptr->money, sShopData->totalCost))
                 {
-                    if (sMartInfo.martType == MART_TYPE_NORMAL)
-                    {
-                        CopyItemName(itemId, gStringVar1);
-                        if (GetItemImportance(itemId))
-                        {
-                            ConvertIntToDecimalStringN(gStringVar2, sShopData->totalCost, STR_CONV_MODE_LEFT_ALIGN, 6);
-                            StringExpandPlaceholders(gStringVar4, gText_YouWantedVar1ThatllBeVar2);
-                            tItemCount = 1;
-                        if (FlagGet(FLAG_FREE_SHOP))
-                            sShopData->totalCost = 0;
-                        else
-                            sShopData->totalCost = GetMartItemPrice(tItemId) * tItemCount;
-                            BuyMenuDisplayMessage(taskId, gStringVar4, BuyMenuConfirmPurchase);
-                        }
-                        else if (GetItemPocket(itemId) == POCKET_TM_HM)
-                        {
-                            StringCopy(gStringVar2, GetMoveName(ItemIdToBattleMoveId(itemId)));
-                            BuyMenuDisplayMessage(taskId, gText_Var1CertainlyHowMany2, Task_BuyHowManyDialogueInit);
-                        }
-                        else
-                        {
-                            BuyMenuDisplayMessage(taskId, gText_Var1CertainlyHowMany, Task_BuyHowManyDialogueInit);
-                        }
-                    }
-                    else
-                    {
-                        StringCopy(gStringVar1, gDecorations[itemId].name);
-                        ConvertIntToDecimalStringN(gStringVar2, sShopData->totalCost, STR_CONV_MODE_LEFT_ALIGN, MAX_MONEY_DIGITS);
-
-                        if (sMartInfo.martType == MART_TYPE_DECOR)
-                            StringExpandPlaceholders(gStringVar4, gText_Var1IsItThatllBeVar2);
-                        else // MART_TYPE_DECOR2
-                            StringExpandPlaceholders(gStringVar4, gText_YouWantedVar1ThatllBeVar2);
-
-                        BuyMenuDisplayMessage(taskId, gStringVar4, BuyMenuConfirmPurchase);
-                    }
+                    BuyMenuDisplayMessage(taskId, gText_YouDontHaveMoney, BuyMenuReturnToItemList);
+                }
+                else // If not sold out and has money (it's a purchasable TM)
+                {
+                    // For Scott's TMs, always assume quantity 1 and go to confirm purchase
+                    CopyItemName(itemId, gStringVar1);
+                    ConvertIntToDecimalStringN(gStringVar2, sShopData->totalCost, STR_CONV_MODE_LEFT_ALIGN, 6);
+                    StringExpandPlaceholders(gStringVar4, gText_YouWantedVar1ThatllBeVar2);
+                    tItemCount = 1; // Always buy 1 TM
+                    if (FlagGet(FLAG_FREE_SHOP))
+                        sShopData->totalCost = 0;
+                    BuyMenuDisplayMessage(taskId, gStringVar4, BuyMenuConfirmPurchase);
                 }
             }
+            // Original logic for normal item marts (not Scott's)
             else if (!IsEnoughMoney(&gSaveBlock1Ptr->money, sShopData->totalCost))
             {
                 BuyMenuDisplayMessage(taskId, gText_YouDontHaveMoney, BuyMenuReturnToItemList);
@@ -1669,15 +1580,19 @@ static void BuyMenuTryMakePurchase(u8 taskId)
         if (AddBagItem(tItemId, tItemCount) == TRUE)
         {
             GetSetItemObtained(tItemId, FLAG_SET_ITEM_OBTAINED);
-            // Mark TM as purchased in Scott's shop if applicable
+            // Mark TM as purchased in Scott's shop and update purchase count
             if (sIsScottTmShop)
             {
                 u16 i;
-                for (i = 0; i < 6; i++)
+                for (i = 0; i < 6; i++) // Only for the 6 TMs
                 {
                     if (sScottTmItemList[i] == tItemId)
                     {
-                        sScottTmPurchased[i] = TRUE;
+                        if (!sScottTmPurchased[i]) // Only increment if not already purchased
+                        {
+                            sScottTmPurchased[i] = TRUE;
+                            sScottTmPurchasedCount++; // Increment count of TMs bought
+                        }
                         break;
                     }
                 }
@@ -1781,17 +1696,29 @@ static void BuyMenuPrintItemQuantityAndPrice(u8 taskId)
     s16 *data = gTasks[taskId].data;
 
     FillWindowPixelBuffer(WIN_QUANTITY_PRICE, PIXEL_FILL(1));
-    // Check if this is Scott's TM shop and if the TM has been purchased
+    // Check if this is Scott's TM shop and if the item has been purchased
     if (sIsScottTmShop)
     {
         u16 i;
-        for (i = 0; i < 6; i++)
+        bool8 itemIsPurchased = FALSE;
+
+        // Check for TMs
+        for (i = 0; i < 5; i++)
         {
             if (sScottTmItemList[i] == tItemId && sScottTmPurchased[i])
             {
-                BuyMenuPrint(WIN_QUANTITY_PRICE, gText_Purchased, 0, 1, 0, COLORID_NORMAL);
-                return;
+                itemIsPurchased = TRUE;
+                break;
             }
+        }
+        // Check for Invert
+        if (tItemId == ITEM_SCOTT_TM_INVERT && sScottTmInvertPurchased)
+            itemIsPurchased = TRUE;
+
+        if (itemIsPurchased)
+        {
+            BuyMenuPrint(WIN_QUANTITY_PRICE, gText_Purchased, 0, 1, 0, COLORID_NORMAL);
+            return;
         }
     }
     PrintMoneyAmount(WIN_QUANTITY_PRICE, CalculateMoneyTextHorizontalPosition(sShopData->totalCost), 1, sShopData->totalCost, TEXT_SKIP_DRAW);
@@ -1883,9 +1810,9 @@ void CreateScottTmShopMenu(void)
     sMartInfo.martType = MART_TYPE_NORMAL;
     sIsScottTmShop = TRUE;
     // Initialize purchase tracking for this session
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < 5; i++)
         sScottTmPurchased[i] = FALSE;
-    sScottTmRerollPurchased = FALSE;
+    sScottTmPurchasedCount = 0; // Initialize new counter
     sScottTmInvertPurchased = FALSE;
     VarSet(VAR_POWER_TM_CLERK, 1);
     CreateTask(Task_HandleShopMenuBuy, 8);
