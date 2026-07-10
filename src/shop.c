@@ -485,20 +485,41 @@ static void PrepareScottTmShopInventory(void)
 {
     u16 poolItems[ARRAY_COUNT(sScottTmPool)] = {0};
     u16 poolSize = 0;
-    u16 i;
+    u16 i, j;
 
     for (i = 0; sScottTmPool[i] != ITEM_NONE; i++)
         poolItems[poolSize++] = sScottTmPool[i];
 
-    // Select 5 random TMs
+    // Select 5 random TMs ensuring no partners
     for (i = 0; i < 5; i++)
     {
-        u16 chosenIndex = Random() % poolSize;
-        u16 j;
-        sScottTmItemList[i] = poolItems[chosenIndex];
-        for (j = chosenIndex; j < poolSize - 1; j++)
-            poolItems[j] = poolItems[j + 1];
-        poolSize--;
+        bool8 validItemFound = FALSE;
+        while (!validItemFound)
+        {
+            u16 chosenIndex = Random() % poolSize;
+            u16 chosenItem = poolItems[chosenIndex];
+            bool8 isPartnerPresent = FALSE;
+
+            // Check if partner is already in our list (sScottTmItemList 0 to i-1)
+            for (j = 0; j < i; j++)
+            {
+                if (sScottTmItemList[j] == GetScottTmPartner(chosenItem))
+                {
+                    isPartnerPresent = TRUE;
+                    break;
+                }
+            }
+
+            if (!isPartnerPresent)
+            {
+                sScottTmItemList[i] = chosenItem;
+                // Remove from pool so we don't pick it again
+                for (j = chosenIndex; j < poolSize - 1; j++)
+                    poolItems[j] = poolItems[j + 1];
+                poolSize--;
+                validItemFound = TRUE;
+            }
+        }
     }
     // Assign initial prices for TMs (all 4000). These are effectively dummy values for TMs
     // because GetMartItemPrice will calculate the actual dynamic price.
@@ -540,7 +561,6 @@ static u16 GetMartItemPrice(u16 itemId)
                     case 2: return 1000;
                     case 3: return 500;
                     case 4: return 250;
-                    case 5:
                     default: return 4000; // Should not happen, but a safe default
                 }
             }
