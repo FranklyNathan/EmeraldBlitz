@@ -161,15 +161,6 @@ static const u16 sScottTmPool[] = {
     ITEM_NONE
 };
 
-static bool8 sIsScottTmShop = FALSE;
-static bool8 sScottTmPurchased[5]; // Track which of the 5 current TMs are purchased
-static EWRAM_DATA u8 sScottTmPurchasedCount = 0; // Track total TMs purchased for price reduction
-static bool8 sScottTmInvertPurchased = FALSE; // Track if Invert was purchased
-static EWRAM_DATA struct ListMenuItem *sListMenuItems = NULL;
-
-// Special item ID for Scott's TM shop option
-#define ITEM_SCOTT_TM_INVERT  0xFFFD
-
 // Partner TM pairs for Invert option
 static const u16 sScottTmPartners[][2] = {
     {ITEM_TM_SEED_BOMB, ITEM_TM_GIGA_DRAIN},
@@ -191,6 +182,18 @@ static const u16 sScottTmPartners[][2] = {
     {ITEM_TM_FLIP_TURN, ITEM_TM_SCALD},
     {ITEM_TM_DUAL_WINGBEAT, ITEM_TM_AIR_SLASH},
 };
+
+static bool8 sIsScottTmShop = FALSE;
+static bool8 sScottTmPurchased[5]; // Track which of the 5 current TMs are purchased
+static EWRAM_DATA u8 sScottTmPurchasedCount = 0; // Track total TMs purchased for price reduction
+static bool8 sScottTmInvertPurchased = FALSE; // Track if Invert was purchased
+static EWRAM_DATA struct ListMenuItem *sListMenuItems = NULL;
+static EWRAM_DATA u16 sSeenScottTmPairs[ARRAY_COUNT(sScottTmPartners)] = {0}; // Track which partner pairs have been seen
+static EWRAM_DATA u8 sScottShopLoadCount = 0; // Track how many times the shop has been loaded
+
+// Special item ID for Scott's TM shop option
+#define ITEM_SCOTT_TM_INVERT  0xFFFD
+
 static EWRAM_DATA u8 (*sItemNames)[ITEM_NAME_LENGTH + 2] = {0};
 static EWRAM_DATA u8 sPurchaseHistoryId = 0;
 EWRAM_DATA struct ItemSlot gMartPurchaseHistory[SMARTSHOPPER_NUM_ITEMS] = {0};
@@ -487,37 +490,114 @@ static void PrepareScottTmShopInventory(void)
     u16 poolSize = 0;
     u16 i, j;
 
-    for (i = 0; sScottTmPool[i] != ITEM_NONE; i++)
-        poolItems[poolSize++] = sScottTmPool[i];
-
-    // Select 5 random TMs ensuring no partners
-    for (i = 0; i < 5; i++)
+    // If 5th load, prioritize unseen pairs
+    if (sScottShopLoadCount >= 4)
     {
-        bool8 validItemFound = FALSE;
-        while (!validItemFound)
-        {
-            u16 chosenIndex = Random() % poolSize;
-            u16 chosenItem = poolItems[chosenIndex];
-            bool8 isPartnerPresent = FALSE;
+        u16 unseenPairs[ARRAY_COUNT(sScottTmPartners)];
+        u16 numUnseen = 0;
+    for (i = 0; i < ARRAY_COUNT(sScottTmPartners); i++)
+    {
+            if (!sSeenScottTmPairs[i])
+                unseenPairs[numUnseen++] = i;
+    }
 
-            // Check if partner is already in our list (sScottTmItemList 0 to i-1)
-            for (j = 0; j < i; j++)
-            {
-                if (sScottTmItemList[j] == GetScottTmPartner(chosenItem))
+        // Shuffle or pick from unseenPairs...
+        for (i = 0; i < 5 && i < numUnseen; i++)
+{
+            u16 pairIdx = unseenPairs[i];
+            sScottTmItemList[i] = sScottTmPartners[pairIdx][Random() % 2];
+            sSeenScottTmPairs[pairIdx] = 1; // Mark as seen
+        }
+        // Fill remainder if any
+        for (; i < 5; i++)
+    {
+             // Fallback to random if not enough unseen
+             // Refill pool for random selection
+            poolSize = 0;
+            for (j = 0; sScottTmPool[j] != ITEM_NONE; j++)
+                poolItems[poolSize++] = sScottTmPool[j];
+
+            bool8 validItemFound = FALSE;
+            while (!validItemFound)
+    {
+                u16 chosenIndex = Random() % poolSize;
+                u16 chosenItem = poolItems[chosenIndex];
+                bool8 isPartnerPresent = FALSE;
+
+                // Check if partner is already in our list (sScottTmItemList 0 to i-1)
+                for (j = 0; j < i; j++)
                 {
-                    isPartnerPresent = TRUE;
-                    break;
+                    if (sScottTmItemList[j] == GetScottTmPartner(chosenItem))
+{
+                        isPartnerPresent = TRUE;
+        break;
+                    }
+                }
+
+                if (!isPartnerPresent)
+{
+                    sScottTmItemList[i] = chosenItem;
+                    // Mark this pair as seen
+                    for (j = 0; j < ARRAY_COUNT(sScottTmPartners); j++)
+{
+                        if (sScottTmPartners[j][0] == chosenItem || sScottTmPartners[j][1] == chosenItem)
+{
+                            sSeenScottTmPairs[j] = 1;
+        break;
+                        }
+                    }
+                    // Remove from pool so we don't pick it again
+                    for (j = chosenIndex; j < poolSize - 1; j++)
+                        poolItems[j] = poolItems[j + 1];
+                    poolSize--;
+                    validItemFound = TRUE;
                 }
             }
+        }
+    }
+    else
+{
+        for (i = 0; sScottTmPool[i] != ITEM_NONE; i++)
+            poolItems[poolSize++] = sScottTmPool[i];
 
-            if (!isPartnerPresent)
+        // Select 5 random TMs ensuring no partners
+            for (i = 0; i < 5; i++)
             {
-                sScottTmItemList[i] = chosenItem;
-                // Remove from pool so we don't pick it again
-                for (j = chosenIndex; j < poolSize - 1; j++)
-                    poolItems[j] = poolItems[j + 1];
-                poolSize--;
-                validItemFound = TRUE;
+            bool8 validItemFound = FALSE;
+            while (!validItemFound)
+                {
+                u16 chosenIndex = Random() % poolSize;
+                u16 chosenItem = poolItems[chosenIndex];
+                bool8 isPartnerPresent = FALSE;
+
+                // Check if partner is already in our list (sScottTmItemList 0 to i-1)
+                for (j = 0; j < i; j++)
+                {
+                    if (sScottTmItemList[j] == GetScottTmPartner(chosenItem))
+                    {
+                        isPartnerPresent = TRUE;
+        break;
+                    }
+                }
+
+                if (!isPartnerPresent)
+{
+                    sScottTmItemList[i] = chosenItem;
+                    // Mark this pair as seen
+                    for (j = 0; j < ARRAY_COUNT(sScottTmPartners); j++)
+{
+                        if (sScottTmPartners[j][0] == chosenItem || sScottTmPartners[j][1] == chosenItem)
+    {
+                            sSeenScottTmPairs[j] = 1;
+                    break;
+                        }
+                    }
+                    // Remove from pool so we don't pick it again
+                    for (j = chosenIndex; j < poolSize - 1; j++)
+                        poolItems[j] = poolItems[j + 1];
+                    poolSize--;
+                    validItemFound = TRUE;
+                }
             }
         }
     }
@@ -534,8 +614,8 @@ static void PrepareScottTmShopInventory(void)
 }
 
 static u16 GetMartItemPrice(u16 itemId)
-{
-    u16 i;
+                {
+                u16 i;
 
     // If this is Scott's TM shop, calculate dynamic prices
     if (sIsScottTmShop)
@@ -574,8 +654,8 @@ static u16 GetMartItemPrice(u16 itemId)
         {
             if (sMartInfo.itemList[i] == itemId)
                 return sMartInfo.priceList[i];
-        }
     }
+}
 
     return GetItemPrice(itemId) >> IsPokeNewsActive(POKENEWS_SLATEPORT);
 }
@@ -1822,6 +1902,7 @@ void CreateScottTmShopMenu(void)
 {
     u8 i;
     PrepareScottTmShopInventory();
+    sScottShopLoadCount++;
     SetShopItemsForSale(sScottTmItemList);
     sMartInfo.priceList = sScottTmPriceList;
     ClearItemPurchases();

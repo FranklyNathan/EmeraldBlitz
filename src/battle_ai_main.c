@@ -1943,6 +1943,7 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
                     if (gBattleHistory->moveHistory[battlerDef][i] == MOVE_DEFENSE_CURL
                       || gBattleHistory->moveHistory[battlerDef][i] == MOVE_FURY_CUTTER
                       || gBattleHistory->moveHistory[battlerDef][i] == MOVE_ECHOED_VOICE
+                      || gBattleHistory->moveHistory[battlerDef][i] == MOVE_SUBSTITUTE
                       || gBattleHistory->moveHistory[battlerDef][i] == MOVE_INGRAIN
                       || gBattleHistory->moveHistory[battlerDef][i] == MOVE_ROLLOUT)
                     {

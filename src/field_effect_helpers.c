@@ -373,12 +373,23 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
 {
     u8 objectEventId;
 
+    // Update shadow's map coordinates when player changes maps
+    if (gCamera.active && (gSaveBlock1Ptr->location.mapNum != sprite->sMapNum || gSaveBlock1Ptr->location.mapGroup != sprite->sMapGroup))
+    {
+        sprite->sMapNum = gSaveBlock1Ptr->location.mapNum;
+        sprite->sMapGroup = gSaveBlock1Ptr->location.mapGroup;
+    }
+
     if (TryGetObjectEventIdByLocalIdAndMap(sprite->sLocalId, sprite->sMapNum, sprite->sMapGroup, &objectEventId))
     {
-        FieldEffectStop(sprite, FLDEFF_SHADOW);
+        // Don't stop the shadow if this is the player on a bike during map transition
+        bool8 isPlayerOnBike = (sprite->sLocalId == OBJ_EVENT_ID_PLAYER && TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_BIKE));
+        if (!isPlayerOnBike)
+            FieldEffectStop(sprite, FLDEFF_SHADOW);
     }
     else
     {
+        // Object event found, proceed with shadow update
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
         struct Sprite *linkedSprite = &gSprites[objectEvent->spriteId];
         bool8 isPlayerOnBike = (objectEvent->localId == OBJ_EVENT_ID_PLAYER && TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_BIKE));
@@ -405,14 +416,16 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
                 objectEvent->jumpDone = FALSE;
             }
         }
-        if (!objectEvent->active
+        // Skip metatile checks for player on bike to prevent shadow removal during map transition
+        if (!isPlayerOnBike && (
+            !objectEvent->active
          || objectEvent->noShadow
          || objectEvent->inHotSprings
-         || (objectEvent->inSandPile && !isPlayerOnBike)
+         || objectEvent->inSandPile
          || gWeatherPtr->noShadows
-         || (!isPlayerOnBike && MetatileBehavior_IsPokeGrass(objectEvent->currentMetatileBehavior))
-         || (!isPlayerOnBike && MetatileBehavior_IsPuddle(objectEvent->currentMetatileBehavior))
-         || (!isPlayerOnBike && (MetatileBehavior_IsSurfableWaterOrUnderwater(objectEvent->currentMetatileBehavior)
+         || MetatileBehavior_IsPokeGrass(objectEvent->currentMetatileBehavior)
+         || MetatileBehavior_IsPuddle(objectEvent->currentMetatileBehavior)
+         || (MetatileBehavior_IsSurfableWaterOrUnderwater(objectEvent->currentMetatileBehavior)
          || MetatileBehavior_IsSurfableWaterOrUnderwater(objectEvent->previousMetatileBehavior))))
         {
             FieldEffectStop(sprite, FLDEFF_SHADOW);

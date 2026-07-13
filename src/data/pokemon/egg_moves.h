@@ -1348,7 +1348,7 @@ static const u16 sCorsolaGalarEggMoveLearnset[] = {
 
 #if P_FAMILY_REMORAID
 static const u16 sRemoraidEggMoveLearnset[] = {
-    MOVE_MUD_SHOT,
+    MOVE_ACID_SPRAY,
     MOVE_UNAVAILABLE,
 };
 #endif //P_FAMILY_REMORAID
