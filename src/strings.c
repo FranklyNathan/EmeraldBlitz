@@ -1343,7 +1343,7 @@ const u8 gText_ScottFinalSentence4[] = _("Just one gym to go.\pNo time to slow d
 const u8 gText_ScottFinalSentence5[] = _("Good luck, {PLAYER}!\pNow go and make me proud!$");
 
 // Scott's dialogue when player has stolen a Pokemon
-const u8 gText_ScottStolenPokemon[] = _("Another incredible battle!\nBut… something seems off.\pAh, have you stolen a POKéMON!\pSorry, but I don't do business with thieves.$");
+const u8 gText_ScottStolenPokemon[] = _("Another incredible battle! But… \nSomething seems off.\pAh, have you stolen a POKéMON!\pSorry, but I don't do business with\nthieves.$");
 
 // Scott's note to the player to make sure they still receive a TM even if they've disappointed him and stolen
 const u8 gText_ScottPityHM[] = _("Oh?\nThere's a note on the ground…\pDear {PLAYER},\nYou may be a thief, but I\pcan't help but root for you a\nlittle bit.\pTake this, and good luck!$");

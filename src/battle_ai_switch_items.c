@@ -31,6 +31,7 @@ static u32 GetSwitchinHazardsDamage(u32 battler, struct BattlePokemon *battleMon
 static bool32 CanAbilityTrapOpponent(enum Ability ability, u32 opponent);
 static u32 GetHPHealAmount(u8 itemEffectParam, struct Pokemon *mon);
 static u32 GetBattleMonTypeMatchup(struct BattlePokemon opposingBattleMon, struct BattlePokemon battleMon);
+static bool32 MonKnowsFakeOutOrProtect(struct Pokemon *mon);
 
 static u8 sAiHealedMons;
 
@@ -1125,7 +1126,7 @@ bool32 ShouldSwitch(u32 battler)
         return FALSE;
 
     // Some Pokemon should never switch out if their SpAtk is -1 or worse
-    if ((gBattleMons[battler].species == SPECIES_TORKOAL || gBattleMons[battler].species == SPECIES_TROPIUS || gBattleMons[battler].species == SPECIES_NUMEL || gBattleMons[battler].species == SPECIES_SLUGMA || gBattleMons[battler].species == SPECIES_CAMERUPT || gBattleMons[battler].species == SPECIES_VULPIX || gBattleMons[battler].species == SPECIES_NINETALES || gBattleMons[battler].species == SPECIES_MAGCARGO)
+    if ((gBattleMons[battler].species == SPECIES_TORKOAL || gBattleMons[battler].species == SPECIES_TROPIUS || gBattleMons[battler].species == SPECIES_NUMEL || gBattleMons[battler].species == SPECIES_SLUGMA || gBattleMons[battler].species == SPECIES_CAMERUPT || gBattleMons[battler].species == SPECIES_VULPIX || gBattleMons[battler].species == SPECIES_NINETALES || gBattleMons[battler].species == SPECIES_MAGCARGO || gBattleMons[battler].species == SPECIES_EXEGGUTOR_ALOLA)
         && gBattleMons[battler].statStages[STAT_SPATK] <= (DEFAULT_STAT_STAGE - 1))
         return FALSE;
 
@@ -1547,6 +1548,29 @@ static u32 GetFirstNonInvalidMon(u32 firstId, u32 lastId, u32 invalidMons)
         }
     }
     return chosenMonId;
+}
+
+static bool32 MonKnowsFakeOutOrProtect(struct Pokemon *mon)
+{
+    u32 i, move;
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        move = GetMonData(mon, MON_DATA_MOVE1 + i, NULL);
+        if (move == MOVE_FAKE_OUT || GetMoveEffect(move) == EFFECT_PROTECT)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static u32 GetBestMonWithFakeOutOrProtect(struct Pokemon *party, int firstId, int lastId, u8 invalidMons)
+{
+    int i;
+    for (i = firstId; i < lastId; i++)
+    {
+        if (!((1u << i) & invalidMons) && MonKnowsFakeOutOrProtect(&party[i]))
+            return i;
+    }
+    return PARTY_SIZE;
 }
 
 bool32 IsMonGrounded(enum HoldEffect heldItemEffect, enum Ability ability, enum Type type1, enum Type type2)
@@ -2543,6 +2567,14 @@ u32 GetMostSuitableMonToSwitchInto(u32 battler, enum SwitchType switchType)
 
         if (aceMonId != PARTY_SIZE && aliveCount == 0)
             return aceMonId;
+
+        // If player's Pokémon is Mega Evolved, prioritize sending out a mon with Fake Out or Protect
+        if (IsBattlerMegaEvolved(opposingBattler))
+        {
+            bestMonId = GetBestMonWithFakeOutOrProtect(party, firstId, lastId, invalidMons);
+            if (bestMonId != PARTY_SIZE)
+                return bestMonId;
+        }
 
         bestMonId = GetBestMonTypeMatchup(party, firstId, lastId, invalidMons, battler, opposingBattler);
         if (bestMonId != PARTY_SIZE)

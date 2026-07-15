@@ -1208,17 +1208,7 @@ static const u16 sGirafarigEggMoveLearnset[] = {
 
 #if P_FAMILY_PINECO
 static const u16 sPinecoEggMoveLearnset[] = {
-    MOVE_PIN_MISSILE,
-    MOVE_FLAIL,
-    MOVE_SWIFT,
-    MOVE_COUNTER,
     MOVE_SAND_TOMB,
-    MOVE_REVENGE,
-    MOVE_DOUBLE_EDGE,
-    MOVE_TOXIC_SPIKES,
-    MOVE_POWER_TRICK,
-    MOVE_ENDURE,
-    MOVE_STEALTH_ROCK,
     MOVE_UNAVAILABLE,
 };
 #endif //P_FAMILY_PINECO
@@ -1830,14 +1820,6 @@ static const u16 sLileepEggMoveLearnset[] = {
 
 #if P_FAMILY_ANORITH
 static const u16 sAnorithEggMoveLearnset[] = {
-    MOVE_RAPID_SPIN,
-    MOVE_KNOCK_OFF,
-    MOVE_SCREECH,
-    MOVE_SAND_ATTACK,
-    MOVE_CROSS_POISON,
-    MOVE_CURSE,
-    MOVE_IRON_DEFENSE,
-    MOVE_WATER_PULSE,
     MOVE_AQUA_JET,
     MOVE_UNAVAILABLE,
 };

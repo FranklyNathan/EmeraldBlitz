@@ -112,6 +112,7 @@ PetalburgCity_EventScript_WalkDown::
 	setvar VAR_PETALBURG_CITY_STATE, 5
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkDown
 	waitmovement 0
+	call_if_set FLAG_SCOTT_DISAPPOINTED, PetalburgCity_EventScript_FlygonOvercame
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall
@@ -152,7 +153,6 @@ PetalburgCity_EventScript_ScottText1::
 	return
 
 PetalburgCity_EventScript_ScottText2::
-	goto_if_set FLAG_SCOTT_DISAPPOINTED, PetalburgCity_EventScript_PitySurf
 	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_PETALBURG_SCOTT
@@ -901,6 +901,11 @@ PetalburgCity_Text_GiveSurf:
 	.string "I knew you could do it.\p"
 	.string "Please take this as a gift from me.\p"
 	.string "-WALLY'S UNCLE$"
+
+PetalburgCity_EventScript_FlygonOvercame:
+	msgbox PetalburgCity_Text_FlygonLearnedSurf, MSGBOX_DEFAULT
+	closemessage
+	return
 
 PetalburgCity_Text_FlygonLearnedSurf:
 	.string "BIRCH'S FLYGON overcame its\n"

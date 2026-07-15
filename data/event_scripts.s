@@ -1236,12 +1236,16 @@ EventScript_WarpHomePetalburg::
     setvar VAR_PETALBURG_LOCKED, 1
 	setvar VAR_PETALBURG_CITY_STATE, 7
 	setvar VAR_STEP_DOWN, 1
-	clearflag FLAG_HIDE_PETALBURG_CITY_SCOTT
+	call_if_unset FLAG_SCOTT_DISAPPOINTED, EventScript_WarpHomePetalburg_ClearScott
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_PETALBURG_CITY, 15, 8
 	waitstate
 	releaseall
 	end
+
+EventScript_WarpHomePetalburg_ClearScott::
+	clearflag FLAG_HIDE_PETALBURG_CITY_SCOTT
+	return
 
 EventScript_WarpHomeFortree::
 	lockall
@@ -1255,12 +1259,16 @@ EventScript_WarpHomeFortree::
 	setflag FLAG_VISITED_SOOTOPOLIS_CITY
 	setvar VAR_FORTREE_CITY_STATE, 2
     setvar VAR_FORTREE_LOCKED, 1
-	clearflag FLAG_HIDE_FORTREE_CITY_SCOTT
+	call_if_unset FLAG_SCOTT_DISAPPOINTED, EventScript_WarpHomeFortree_ClearScott
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_FORTREE_CITY, 22, 11
 	waitstate
 	releaseall
 	end
+
+EventScript_WarpHomeFortree_ClearScott::
+	clearflag FLAG_HIDE_FORTREE_CITY_SCOTT
+	return
 
 EventScript_WarpHomeMossdeep::
 	lockall
@@ -1268,12 +1276,16 @@ EventScript_WarpHomeMossdeep::
 	call_if_eq VAR_BADGE_COUNT, 8, EventScript_SetEverGrandeVisited
 	setvar VAR_MOSSDEEP_CITY_STATE, 8
     setvar VAR_MOSSDEEP_LOCKED, 1
-	clearflag FLAG_HIDE_MOSSDEEP_CITY_SCOTT
+	call_if_unset FLAG_SCOTT_DISAPPOINTED, EventScript_WarpHomeMossdeep_ClearScott
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_MOSSDEEP_CITY, 38, 9
 	waitstate
 	releaseall
 	end
+
+EventScript_WarpHomeMossdeep_ClearScott::
+	clearflag FLAG_HIDE_MOSSDEEP_CITY_SCOTT
+	return
 
 EventScript_WarpHomeSootopolis::
 	lockall
@@ -1281,12 +1293,16 @@ EventScript_WarpHomeSootopolis::
 	call_if_eq VAR_BADGE_COUNT, 8, EventScript_SetEverGrandeVisited
 	setvar VAR_SOOTOPOLIS_CITY_STATE, 7
     setvar VAR_SOOTOPOLIS_LOCKED, 1
-	clearflag FLAG_HIDE_SOOTOPOLIS_CITY_SCOTT
+	call_if_unset FLAG_SCOTT_DISAPPOINTED, EventScript_WarpHomeSootopolis_ClearScott
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	warp MAP_SOOTOPOLIS_CITY, 31, 32
 	waitstate
 	releaseall
 	end
+
+EventScript_WarpHomeSootopolis_ClearScott::
+	clearflag FLAG_HIDE_SOOTOPOLIS_CITY_SCOTT
+	return
 
 EventScript_SetEverGrandeVisited::
 	setflag FLAG_VISITED_EVER_GRANDE_CITY

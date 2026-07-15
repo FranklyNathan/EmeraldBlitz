@@ -48,8 +48,6 @@
     ],
     "TutorMoves": [],
     "EggMoves": []
-
-
   },
   "PYROAR": {
     "LevelMoves": [],
@@ -193,6 +191,94 @@
     "LevelMoves": [],
     "TMMoves": [
       "MOVE_GIGA_DRAIN"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "SKORUPI": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "DRAPION": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "ANORITH": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "ARMALDO": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "NINCADA": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "NINJASK": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "SHEDINJA": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "PARAS": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "PARASECT": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "SIZZLIPEDE": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "CENTISKORCH": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
     ],
     "TutorMoves": [],
     "EggMoves": []

@@ -14175,7 +14175,7 @@ Geodude (F)
 Level: 12
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Rock Head
+Ability: Sturdy
 - Tackle
 - Defense Curl
 - Rock Throw
@@ -14215,7 +14215,7 @@ Geodude (F)
 Level: 16
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Rock Head
+Ability: Sturdy
 - Magnitude
 - Defense Curl
 - Rock Throw
@@ -14265,7 +14265,7 @@ Graveler (F)
 Level: 21
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Rock Head
+Ability: Sturdy
 - Bulldoze
 - Stealth Rock
 - Defense Curl
@@ -14315,7 +14315,7 @@ Graveler (F)
 Level: 26
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Rock Head
+Ability: Sturdy
 - Bulldoze
 - Stealth Rock
 - Defense Curl
@@ -14365,7 +14365,7 @@ Graveler (F)
 Level: 28
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Rock Head
+Ability: Sturdy
 - Bulldoze
 - Stealth Rock
 - Self Destruct
@@ -14415,7 +14415,7 @@ Graveler (F)
 Level: 32
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Rock Head
+Ability: Sturdy
 - Bulldoze
 - Stealth Rock
 - Self Destruct
@@ -14475,10 +14475,10 @@ Golem (F)
 Level: 40
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Rock Head
+Ability: Sturdy
 - Earthquake
 - Stealth Rock
-- Self Destruct
+- Roar
 - Rock Tomb
 
 Relicanth (F)
@@ -14535,10 +14535,10 @@ Golem (F)
 Level: 44
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Rock Head
+Ability: Sturdy
 - Earthquake
 - Stealth Rock
-- Explosion
+- Roar
 - Rock Tomb
 
 Relicanth (F)
@@ -14897,7 +14897,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Intimidate
 - Hydro Pump
-- Quiver Dance
+- Whirlwind
 - Bug Buzz
 - Air Cutter
 
@@ -14957,7 +14957,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Intimidate
 - Hydro Pump
-- Quiver Dance
+- Whirlwind
 - Bug Buzz
 - Air Cutter
 
@@ -16098,7 +16098,7 @@ Nature: Serious
 Ability: Cursed Body
 - Overheat
 - Shadow Bone
-- Thrash
+- Perish Song
 - Sunny Day
 
 Magcargo (F)
@@ -16158,7 +16158,7 @@ Nature: Serious
 Ability: Cursed Body
 - Overheat
 - Shadow Bone
-- Stomping Tantrum
+- Perish Song
 - Sunny Day
 
 Magcargo (F)
@@ -16218,7 +16218,7 @@ Nature: Serious
 Ability: Cursed Body
 - Overheat
 - Shadow Bone
-- Stomping Tantrum
+- Perish Song
 - Bone Rush
 
 Magcargo (F)
@@ -17905,7 +17905,7 @@ Crobat (M)
 Level: 47
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Inner Focus
+Ability: Infiltrator
 - Poison Fang
 - Acrobatics
 - Steel Wing
@@ -17919,7 +17919,7 @@ Ability: Water Absorb
 - Surf
 - Thunderbolt
 - Charge
-- Take Down
+- Protect
 
 Walrein (M)
 Level: 47
@@ -17965,7 +17965,7 @@ Crobat (M)
 Level: 47
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Inner Focus
+Ability: Infiltrator
 - Poison Fang
 - Acrobatics
 - Steel Wing
@@ -18079,7 +18079,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Chlorophyll
 - Leaf Tornado
-- Double Team
+- Whirlwind
 - Swagger
 - Hurricane
 
@@ -18140,7 +18140,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Pressure
 - Shadow Punch
-- Confuse Ray
+- Perish Song
 - Will O Wisp
 - Earthquake
 
@@ -18160,7 +18160,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Keen Eye
 - Shadow Ball
-- Double Team
+- Fake Out
 - Foul Play
 - Thief
 
@@ -18199,8 +18199,8 @@ Seviper (F) @ Salac Berry
 Level: 52
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Shed Skin
-- Coil
+Ability: Infiltrator
+- Dragon Tail
 - Belch
 - Giga Drain
 - Crunch
@@ -18239,7 +18239,7 @@ Crobat (F) @ Sitrus Berry
 Level: 55
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Inner Focus
+Ability: Infiltrator
 - Cross Poison
 - Aerial Ace
 - Leech Life
@@ -18291,10 +18291,10 @@ Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Inner Focus
-- Crunch
-- Headbutt
-- Hail
 - Freeze Dry
+- Crunch
+- Hail
+- Protect
 
 Walrein (F) @ Sitrus Berry
 Level: 55
@@ -18505,10 +18505,10 @@ Level: 57
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Sturdy
-- Drill Peck
-- Rock Slide
 - Spikes
+- Drill Peck
 - Steel Wing
+- Whirlwind
 
 Goodra-Hisui (M)
 Level: 55
@@ -18548,7 +18548,7 @@ Ability: Swift Swim
 - Aqua Jet
 - Rock Blast
 - X Scissor
-- Crush Claw
+- Protect
 
 Metagross @ Metagrossite
 Level: 58
@@ -18557,8 +18557,8 @@ Nature: Serious
 Ability: Clear Body
 - Meteor Mash
 - Hammer Arm
-- Psychic
-- Hyper Beam
+- Zen Headbutt
+- Psychic Noise
 
 === TRAINER_WALLY ===
 Name: WALLY

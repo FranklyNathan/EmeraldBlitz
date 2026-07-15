@@ -411,6 +411,7 @@ OldaleTown_House2_Basement_Mart_MegaStones:
 	.hword ITEM_CLEFABLITE
 	.hword ITEM_DELPHOXITE
 	.hword ITEM_DRAGALGITE
+	.hword ITEM_DRAGONINITE
 	.hword ITEM_DRAMPANITE
 	.hword ITEM_EELEKTROSSITE
 	.hword ITEM_EXCADRITE
@@ -1365,8 +1366,8 @@ OldaleTown_House2_Basement_EventScript_EnergyGuru::
 	goto SlateportCity_EventScript_EnergyGuru
 	goto_if_lt VAR_BADGE_COUNT, 2, OldaleTown_House2_Basement_EventScript_EnergyGuruNotEnoughBadges
 
-OldaleTown_House2_Basement_EventScript_EffortRibbonWoman::
-	goto SlateportCity_EventScript_EffortRibbonWoman
+OldaleTown_House2_Basement_EventScript_EnergyOracle::
+	goto SlateportCity_EventScript_EnergyOracle
 
 OldaleTown_House2_Basement_EventScript_EnergyGuruNotEnoughBadges::
 	msgbox OldaleTown_House2_Basement_Text_EnergyGuruNotEnoughBadges, MSGBOX_DEFAULT

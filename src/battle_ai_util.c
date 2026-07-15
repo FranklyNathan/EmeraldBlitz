@@ -395,6 +395,20 @@ static bool32 ShouldFailForIllusion(u32 illusionSpecies, u32 battlerId)
 
     return TRUE;
 }
+void AI_SimulateIllusion(u32 battlerId)
+{
+    u32 illusionSpecies = GetIllusionMonSpecies(battlerId);
+    if (illusionSpecies != SPECIES_NONE && ShouldFailForIllusion(illusionSpecies, battlerId))
+    {
+        if (gBattleMons[battlerId].types[0] == GetSpeciesType(gBattleMons[battlerId].species, 0)
+            && gBattleMons[battlerId].types[1] == GetSpeciesType(gBattleMons[battlerId].species, 1))
+        {
+            gBattleMons[battlerId].types[0] = GetSpeciesType(illusionSpecies, 0);
+            gBattleMons[battlerId].types[1] = GetSpeciesType(illusionSpecies, 1);
+        }
+        gBattleMons[battlerId].species = illusionSpecies;
+    }
+}
 
 void SetBattlerData(u32 battlerId)
 {
@@ -2152,6 +2166,14 @@ s32 ProtectChecks(u32 battlerAtk, u32 battlerDef, u32 move, u32 predictedMove)
     if (IsBattlerDamagedByStatus(battlerDef))
     {
         score += DECENT_EFFECT;
+    }
+
+    // If player's Pokémon is Mega Evolved and AI didn't use a Protect move last turn, boost Protect incentive
+    // This encourages stalling Mega Evolutions which only last 3 turns
+    // Add +15 to offset the universal -10 penalty for MOVE_PROTECT and provide net incentive
+    if (IsBattlerMegaEvolved(battlerDef) && GetMoveEffect(gAiLogicData->lastUsedMove[battlerAtk]) != EFFECT_PROTECT)
+    {
+        score += 15;
     }
 
     return score;

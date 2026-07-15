@@ -25,7 +25,6 @@ FortreeCity_EventScript_ScottEncounter::
 	end
 
 FortreeCity_EventScript_ScottText3::
-	goto_if_set FLAG_SCOTT_DISAPPOINTED, Common_EventScript_PityFly
 	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym3, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_FORTREE_SCOTT
@@ -158,6 +157,7 @@ FortreeCity_EventScript_WalkDown::
 	setvar VAR_FORTREE_CITY_STATE, 0
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkRight
 	waitmovement 0
+	call_if_set FLAG_SCOTT_DISAPPOINTED, FortreeCity_EventScript_FlygonOvercame
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall
@@ -314,3 +314,12 @@ FortreeCity_Text_GymSign:
 	.string "LEADER: WINONA\p"
 	.string "“The bird user taking flight into\n"
 	.string "the world.”$"
+
+FortreeCity_EventScript_FlygonOvercame:
+	msgbox FortreeCity_Text_FlygonLearnedFly, MSGBOX_DEFAULT
+	closemessage
+	return
+
+FortreeCity_Text_FlygonLearnedFly:
+	.string "BIRCH'S FLYGON is feeling great!\n"
+	.string "It can fly to new heights!$"

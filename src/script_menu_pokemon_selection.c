@@ -21,6 +21,7 @@ struct GiftPokemon
 
 static const struct GiftPokemon sGiftPokemonList[] = {
     {SPECIES_AMAURA, 6},
+    {SPECIES_ANORITH, 10},
     {SPECIES_APPLIN, 14},
     {SPECIES_ARCHEN, 18},
     {SPECIES_ARON, 10},
@@ -63,6 +64,7 @@ static const struct GiftPokemon sGiftPokemonList[] = {
     {SPECIES_DEERLING, 6},
     {SPECIES_DEWPIDER, 10},
     {SPECIES_DIGLETT, 6},
+    {SPECIES_DRATINI, 10},
     {SPECIES_DRIFLOON, 8},
     {SPECIES_DRILBUR, 18},
     {SPECIES_DUCKLETT, 6},
@@ -147,6 +149,7 @@ static const struct GiftPokemon sGiftPokemonList[] = {
     {SPECIES_PLUSLE, 8},
     {SPECIES_PICHU, 10},
     {SPECIES_PIKIPEK, 8},
+    {SPECIES_PINECO, 8},
     {SPECIES_PIPLUP, 14},
     {SPECIES_POLIWAG, 12},
     {SPECIES_PONYTA, 10},

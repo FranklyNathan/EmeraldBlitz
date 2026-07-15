@@ -9447,6 +9447,8 @@ bool32 TryBattleFormChange(u32 battler, enum FormChanges method)
         SetMonData(&party[monId], MON_DATA_SPECIES, &targetSpecies);
         gBattleMons[battler].species = targetSpecies;
         RecalcBattlerStats(battler, &party[monId], method == FORM_CHANGE_BATTLE_GIGANTAMAX);
+        // Reset Protean/Libero when species changes (e.g., Mega Evolution)
+        gDisableStructs[battler].usedProteanLibero = FALSE;
         return TRUE;
     }
     else if (GetBattlerPartyState(battler)->changedSpecies != SPECIES_NONE)
@@ -9482,6 +9484,8 @@ bool32 TryBattleFormChange(u32 battler, enum FormChanges method)
             // Battler data is not updated with regular form's ability, not doing so could cause wrong ability activation.
             if (method == FORM_CHANGE_FAINT)
                 gBattleMons[battler].ability = abilityForm;
+            // Reset Protean/Libero when species is restored (e.g., de-Mega Evolution)
+            gDisableStructs[battler].usedProteanLibero = FALSE;
             return TRUE;
         }
     }

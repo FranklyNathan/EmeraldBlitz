@@ -703,6 +703,10 @@ extern const u8 EventScript_WarpHomeDewford_ClearScott[];
 extern const u8 EventScript_WarpHomeRustboro_ClearScott[];
 extern const u8 EventScript_WarpHomeMauville_ClearScott[];
 extern const u8 EventScript_WarpHomeLavaridge_ClearScott[];
+extern const u8 EventScript_WarpHomePetalburg_ClearScott[];
+extern const u8 EventScript_WarpHomeFortree_ClearScott[];
+extern const u8 EventScript_WarpHomeMossdeep_ClearScott[];
+extern const u8 EventScript_WarpHomeSootopolis_ClearScott[];
 
 
 #endif // GUARD_EVENT_SCRIPTS_H

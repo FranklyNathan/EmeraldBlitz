@@ -123,7 +123,7 @@ SlateportCity_EventScript_EnergyGuru::
 	goto_if_lt VAR_BADGE_COUNT, 2, SlateportCity_EventScript_EnergyGuruNotEnoughBadges
 	callnative CheckPartyForEnergyGuruMon
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyGuru_NoMon
-	msgbox SlateportCity_Text_EnergyGuru_HaveMon, MSGBOX_YESNO
+	msgbox SlateportCity_Text_EnergyNPC_HaveMon, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_EnergyGuru_Decline
 	msgbox SlateportCity_Text_EnergyGuru_ChooseMon, MSGBOX_DEFAULT
 	special ChoosePartyMon
@@ -131,6 +131,11 @@ SlateportCity_EventScript_EnergyGuru::
 	goto_if_ge VAR_0x8004, PARTY_SIZE, SlateportCity_EventScript_EnergyGuru_Decline
 	callnative CheckSelectedMonForEnergyGuru
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyGuru_InvalidMon
+	msgbox SlateportCity_Text_EnergyNPC_Confirm, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_EnergyNPC_DeclineConfirm
+	checkmoney 1000
+	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_HiddenPowerNPC_NotEnoughMoney
+	removemoney 1000
 	callnative TriggerEnergyGuruEvolution
 	waitstate
 	goto SlateportCity_EventScript_EnergyGuru_Decline
@@ -156,42 +161,52 @@ SlateportCity_EventScript_EnergyGuru_Decline::
 	release
 	end
 
-SlateportCity_EventScript_EffortRibbonWoman::
-	lock
-	faceplayer
-	goto_if_lt VAR_BADGE_COUNT, 4, SlateportCity_EventScript_EffortRibbonWomanNotEnoughBadges
-	callnative CheckPartyForEffortRibbonMon
-	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EffortRibbonWoman_NoMon
-	msgbox SlateportCity_Text_EffortRibbonWoman_HaveMon, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_EffortRibbonWoman_Decline
-	msgbox SlateportCity_Text_EffortRibbonWoman_ChooseMon, MSGBOX_DEFAULT
-	special ChoosePartyMon
-	waitstate
-	goto_if_ge VAR_0x8004, PARTY_SIZE, SlateportCity_EventScript_EffortRibbonWoman_Decline
-	callnative CheckSelectedMonForEffortRibbon
-	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EffortRibbonWoman_InvalidMon
-	callnative TriggerEffortRibbonEvolution
-	waitstate
-	goto SlateportCity_EventScript_EffortRibbonWoman_Decline
-	end
-
-SlateportCity_EventScript_EffortRibbonWoman_NoMon::
-	msgbox SlateportCity_Text_EffortRibbonWoman_Explain, MSGBOX_DEFAULT
-	goto SlateportCity_EventScript_EffortRibbonWoman_Decline
-	end
-
-SlateportCity_EventScript_EffortRibbonWoman_InvalidMon::
-	msgbox SlateportCity_Text_EffortRibbonWoman_InvalidMon, MSGBOX_DEFAULT
-	goto SlateportCity_EventScript_EffortRibbonWoman_Decline
-	end
-
-SlateportCity_EventScript_EffortRibbonWoman_Decline::
-	msgbox SlateportCity_Text_EffortRibbonWoman_Decline, MSGBOX_DEFAULT
+SlateportCity_EventScript_EnergyNPC_DeclineConfirm::
+	msgbox SlateportCity_Text_EnergyNPC_DeclineConfirm, MSGBOX_DEFAULT
 	release
 	end
 
-SlateportCity_EventScript_EffortRibbonWomanNotEnoughBadges::
-	msgbox SlateportCity_Text_EffortRibbonWomanNotEnoughBadges, MSGBOX_DEFAULT
+SlateportCity_EventScript_EnergyOracle::
+	lock
+	faceplayer
+	goto_if_lt VAR_BADGE_COUNT, 4, SlateportCity_EventScript_EnergyOracleNotEnoughBadges
+	callnative CheckPartyForEffortRibbonMon
+	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyOracle_NoMon
+	msgbox SlateportCity_Text_EnergyNPC_HaveMon, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_EnergyOracle_Decline
+	msgbox SlateportCity_Text_EnergyOracle_ChooseMon, MSGBOX_DEFAULT
+	special ChoosePartyMon
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, SlateportCity_EventScript_EnergyOracle_Decline
+	callnative CheckSelectedMonForEffortRibbon
+	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyOracle_InvalidMon
+	msgbox SlateportCity_Text_EnergyNPC_Confirm, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_EnergyNPC_DeclineConfirm
+	checkmoney 1000
+	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_HiddenPowerNPC_NotEnoughMoney
+	removemoney 1000
+	callnative TriggerEffortRibbonEvolution
+	waitstate
+	goto SlateportCity_EventScript_EnergyOracle_Decline
+	end
+
+SlateportCity_EventScript_EnergyOracle_NoMon::
+	msgbox SlateportCity_Text_EnergyOracle_Explain, MSGBOX_DEFAULT
+	goto SlateportCity_EventScript_EnergyOracle_Decline
+	end
+
+SlateportCity_EventScript_EnergyOracle_InvalidMon::
+	msgbox SlateportCity_Text_EnergyOracle_InvalidMon, MSGBOX_DEFAULT
+	goto SlateportCity_EventScript_EnergyOracle_Decline
+	end
+
+SlateportCity_EventScript_EnergyOracle_Decline::
+	msgbox SlateportCity_Text_EnergyOracle_Decline, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_EventScript_EnergyOracleNotEnoughBadges::
+	msgbox SlateportCity_Text_EnergyOracleNotEnoughBadges, MSGBOX_DEFAULT
 	release
 	end
 
@@ -1153,6 +1168,7 @@ SlateportCity_Pokemart_StageThreeMegas:
 	.2byte ITEM_CLEFABLITE
 	.2byte ITEM_DELPHOXITE
 	.2byte ITEM_DRAGALGITE
+	.2byte ITEM_DRAGONINITE
 	.2byte ITEM_EELEKTROSSITE
 	.2byte ITEM_EXCADRITE
 	.2byte ITEM_FERALIGITE
@@ -2198,9 +2214,9 @@ SlateportCity_Text_EnergyGuru_Explain:
 	.string "that evolve at high levels reach their\l"
 	.string "potential early!$"
 
-SlateportCity_Text_EnergyGuru_HaveMon:
-	.string "Oh! Would you like me to help your\n"
-	.string "POKéMON evolve?$"
+SlateportCity_Text_EnergyNPC_HaveMon:
+	.string "Oh! Would you like me to see if you\n"
+	.string "have any POKéMON I can help evolve?$"
 
 SlateportCity_Text_EnergyGuru_ChooseMon:
 	.string "Which POKéMON needs my help?$"
@@ -2214,23 +2230,31 @@ SlateportCity_Text_EnergyGuru_Hooplah:
 	.string "POKéMON that evolves to a middle\l"
 	.string "stage after level 30!$"
 
-SlateportCity_Text_EffortRibbonWoman_Explain:
-	.string "I'm the ENERGY ORACLE! I can help POKéMON\n"
-	.string "that evolve late reach their final form\l"
-	.string "early if they haven't evolved before!$"
+SlateportCity_Text_EnergyNPC_Confirm:
+	.string "Excellent choice! This POKéMON is just\n"
+	.string "teeming with untapped Energy.\p"
+	.string "Would you like me to help this POKéMON\n"
+	.string "evolve for ¥1000?$"
 
-SlateportCity_Text_EffortRibbonWoman_HaveMon:
-	.string "Oh! Would you like me to help your\n"
-	.string "POKéMON evolve?$"
+SlateportCity_Text_EnergyNPC_DeclineConfirm:
+	.string "That's quite alright!\p"
+	.string "I'm sure it will evolve all by itself\n"
+	.string "given time.\p"
+	.string "Come back if you change your mind!$"
 
-SlateportCity_Text_EffortRibbonWoman_ChooseMon:
+SlateportCity_Text_EnergyOracle_Explain:
+	.string "I'm the ENERGY ORACLE! I can help\n"
+	.string "base form POKéMON that evolve late\l"
+	.string "reach their final form!$"
+
+SlateportCity_Text_EnergyOracle_ChooseMon:
 	.string "Which POKéMON needs my help?$"
 
-SlateportCity_Text_EffortRibbonWoman_InvalidMon:
+SlateportCity_Text_EnergyOracle_InvalidMon:
 	.string "Hrm… No, that POKéMON doesn't meet\n"
 	.string "my criteria.$"
 
-SlateportCity_Text_EffortRibbonWoman_Decline:
+SlateportCity_Text_EnergyOracle_Decline:
 	.string "Come back if you have a base form\n"
 	.string "POKéMON that evolves to a final\l"
 	.string "stage after level 36!$"
@@ -2898,7 +2922,7 @@ SlateportCity_Text_GetLost:
 	.string "What's this? You have no POKéMON left?\n"
 	.string "How pathetic. Take this and get lost!$"
 
-SlateportCity_Text_EffortRibbonWomanNotEnoughBadges:
+SlateportCity_Text_EnergyOracleNotEnoughBadges:
 	.string "I'm sorry, but I only help experienced\n"
 	.string "TRAINERS with their POKéMON.\p"
 	.string "Come back once you have at least\n"

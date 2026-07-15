@@ -931,6 +931,12 @@ static inline bool32 ShouldConsiderMoveForBattler(u32 battlerAi, u32 battlerDef,
 
 static inline void BattleAI_DoAIProcessing(struct AiThinkingStruct *aiThink, u32 battlerAtk, u32 battlerDef)
 {
+    struct BattlePokemon savedAtk = gBattleMons[battlerAtk];
+    struct BattlePokemon savedDef = gBattleMons[battlerDef];
+
+    AI_SimulateIllusion(battlerAtk);
+    AI_SimulateIllusion(battlerDef);
+
     do
     {
         if (gBattleMons[battlerAtk].pp[aiThink->movesetIndex] == 0)
@@ -961,6 +967,8 @@ static inline void BattleAI_DoAIProcessing(struct AiThinkingStruct *aiThink, u32
         aiThink->movesetIndex++;
     } while (aiThink->movesetIndex < MAX_MON_MOVES && !(aiThink->aiAction & AI_ACTION_DO_NOT_ATTACK));
 
+    gBattleMons[battlerAtk] = savedAtk;
+    gBattleMons[battlerDef] = savedDef;
     aiThink->movesetIndex = 0;
 }
 
@@ -994,6 +1002,9 @@ void BattleAI_DoAIProcessing_PredictedSwitchin(struct AiThinkingStruct *aiThink,
     SetBattlerAiData(battlerDef, aiData);
     CalcBattlerAiMovesData(aiData, battlerAtk, battlerDef, AI_GetWeather());
 
+    struct BattlePokemon savedAtk = gBattleMons[battlerAtk];
+    AI_SimulateIllusion(battlerAtk);
+
     // Regular processing with new battler
     do
     {
@@ -1016,6 +1027,7 @@ void BattleAI_DoAIProcessing_PredictedSwitchin(struct AiThinkingStruct *aiThink,
 
                 // Restore old switchout data
                 gBattleMons[battlerDef] = switchoutCandidate;
+                AI_SimulateIllusion(battlerDef);
                 SetBattlerAiData(battlerDef, aiData);
                 aiData->simulatedDmg[battlerAtk][battlerDef][aiThink->movesetIndex] = simulatedDamageSwitchout[aiThink->movesetIndex];
                 aiData->effectiveness[battlerAtk][battlerDef][aiThink->movesetIndex] = effectivenessSwitchout[aiThink->movesetIndex];
@@ -1061,6 +1073,7 @@ void BattleAI_DoAIProcessing_PredictedSwitchin(struct AiThinkingStruct *aiThink,
         aiThink->movesetIndex++;
     } while (aiThink->movesetIndex < MAX_MON_MOVES && !(aiThink->aiAction & AI_ACTION_DO_NOT_ATTACK));
 
+    gBattleMons[battlerAtk] = savedAtk;
     aiThink->movesetIndex = 0;
 
     // Restore original battler data and moves
@@ -1154,6 +1167,9 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
     case MOVE_SMOKESCREEN:
         if (Random() % 2 == 0)
             ADJUST_SCORE(-10);
+        break;
+    case MOVE_PROTECT:
+        ADJUST_SCORE(-10);
         break;
     }
 
@@ -1742,6 +1758,8 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
                 ADJUST_SCORE(-10);
             else if (GetActiveGimmick(battlerDef) == GIMMICK_DYNAMAX)
                 ADJUST_SCORE(-10);
+            else if (gBattleMons[battlerDef].volatiles.substitute)
+                ADJUST_SCORE(20);
             break;
         case EFFECT_TOXIC_THREAD:
             if (!CanLowerStat(battlerAtk, battlerDef, aiData, STAT_SPEED))
@@ -2221,6 +2239,8 @@ static s32 AI_CheckBadMove(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
                 ADJUST_SCORE(-10);    // don't blow away mon that will faint soon
             else if (gBattleMons[battlerDef].volatiles.perishSong)
                 ADJUST_SCORE(-10);
+            else if (aiData->abilities[battlerAtk] == ABILITY_INFILTRATOR && gBattleMons[battlerDef].volatiles.substitute)
+                ADJUST_SCORE(20);
             break;
         case EFFECT_CONVERSION:
             //Check first move type

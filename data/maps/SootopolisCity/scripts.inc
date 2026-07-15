@@ -66,7 +66,6 @@ SootopolisCity_EventScript_ScottEncounter::
 	end
 
 SootopolisCity_EventScript_ScottText3::
-	goto_if_set FLAG_SCOTT_DISAPPOINTED, Common_EventScript_PityFly
 	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym3, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_SOOTOPOLIS_SCOTT
