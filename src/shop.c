@@ -223,7 +223,7 @@ static void BuyMenuRemoveItemIcon(u16, u8);
 static void BuyMenuPrint(u8 windowId, const u8 *text, u8 x, u8 y, s8 speed, u8 colorSet);
 static void BuyMenuDrawMapGraphics(void);
 static void BuyMenuCopyMenuBgToBg1TilemapBuffer(void);
-static void CreateShopPokemonIconSprites(u16 itemId);
+void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds);
 static void BuyMenuCollectObjectEventData(void);
 static void BuyMenuDrawObjectEvents(void);
 static void BuyMenuDrawMapBg(void);
@@ -977,7 +977,7 @@ static void BuyMenuPrintItemDescriptionAndShowItemIcon(s32 item, bool8 onInit, s
     }
     if (VarGet(VAR_POWER_TM_CLERK) == 1 && item != LIST_CANCEL && item != ITEM_SCOTT_TM_INVERT)
     {
-        CreateShopPokemonIconSprites(item);
+        CreateShopPokemonIconSprites(item, sShopData->pokemonIconSpriteIds);
         CopyWindowToVram(WIN_ITEM_DESCRIPTION, COPYWIN_GFX);
     }
     else
@@ -1048,24 +1048,23 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
     }
 }
 
-static void CreateShopPokemonIconSprites(u16 itemId)
+void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds)
 {
     LoadMonIconPalettes();
 
     u32 i, j;
     u8 spriteId;
     u8 count = 0;
-    u16 move = ItemIdToBattleMoveId(itemId); // This is correct
+    u16 move = ItemIdToBattleMoveId(itemId);
     struct Pokemon tempMon;
 
     for (i = 0; i < 10; i++)
     {
-        if (sShopData->pokemonIconSpriteIds[i] != SPRITE_NONE)
-            FreeAndDestroyMonIconSprite(&gSprites[sShopData->pokemonIconSpriteIds[i]]);
-        sShopData->pokemonIconSpriteIds[i] = SPRITE_NONE;
+        if (spriteIds[i] != SPRITE_NONE)
+            FreeAndDestroyMonIconSprite(&gSprites[spriteIds[i]]);
+        spriteIds[i] = SPRITE_NONE;
     }
 
-    // Check party Pokemon first
     for (i = 0; i < gPlayerPartyCount && count < 10; i++)
     {
         u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
@@ -1076,12 +1075,11 @@ static void CreateShopPokemonIconSprites(u16 itemId)
             u16 y = 112 + (count / 4) * 24;
             u32 personality = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
             spriteId = CreateMonIcon(species, SpriteCallbackDummy, x, y, 4, personality);
-            sShopData->pokemonIconSpriteIds[count] = spriteId;
+            spriteIds[count] = spriteId;
             count++;
         }
     }
 
-    // Check PC boxes if we haven't reached 10 yet
     for (i = 0; i < TOTAL_BOXES_COUNT && count < 10; i++)
     {
         for (j = 0; j < IN_BOX_COUNT && count < 10; j++)
@@ -1097,7 +1095,7 @@ static void CreateShopPokemonIconSprites(u16 itemId)
                     u16 y = 112 + (count / 4) * 24;
                     u32 personality = GetMonData(&tempMon, MON_DATA_PERSONALITY);
                     spriteId = CreateMonIcon(species, SpriteCallbackDummy, x, y, 4, personality);
-                    sShopData->pokemonIconSpriteIds[count] = spriteId;
+                    spriteIds[count] = spriteId;
                     count++;
                 }
             }

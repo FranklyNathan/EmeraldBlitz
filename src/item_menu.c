@@ -33,6 +33,7 @@
 #include "party_menu.h"
 #include "player_pc.h"
 #include "pokemon.h"
+#include "pokemon_icon.h"
 #include "pokemon_summary_screen.h"
 #include "scanline_effect.h"
 #include "script.h"
@@ -53,6 +54,8 @@
 
 #define TAG_POCKET_SCROLL_ARROW 110
 #define TAG_BAG_SCROLL_ARROW    111
+
+static u8 sBagPokemonIconSpriteIds[10];
 
 // The buffer for the bag item list needs to be large enough to hold the maximum
 // number of item slots that could fit in a single pocket, + 1 for Cancel.
@@ -677,6 +680,7 @@ void GoToBagMenu(u8 location, u8 pocket, MainCallback exitCallback)
         gBagMenu->pocketSwitchArrowsTask = TASK_NONE;
         memset(gBagMenu->spriteIds, SPRITE_NONE, sizeof(gBagMenu->spriteIds));
         memset(gBagMenu->windowIds, WINDOW_NONE, sizeof(gBagMenu->windowIds));
+        memset(sBagPokemonIconSpriteIds, SPRITE_NONE, sizeof(sBagPokemonIconSpriteIds));
         SetMainCallback2(CB2_Bag);
     }
 }
@@ -982,6 +986,25 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
         else
            AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
         gBagMenu->itemIconSlot ^= 1;
+        {
+            bool8 shouldShowIcons = FALSE;
+            if (gBagPosition.pocket == POCKET_TM_HM && itemIndex != LIST_CANCEL)
+            {
+                u16 itemId = GetBagItemId(gBagPosition.pocket, itemIndex);
+                if (GetItemTMHMIndex(itemId) <= NUM_TECHNICAL_MACHINES)
+                    shouldShowIcons = TRUE;
+            }
+            if (!shouldShowIcons)
+            {
+                u8 i;
+                for (i = 0; i < 10; i++)
+                {
+                    if (sBagPokemonIconSpriteIds[i] != SPRITE_NONE)
+                        FreeAndDestroyMonIconSprite(&gSprites[sBagPokemonIconSpriteIds[i]]);
+                    sBagPokemonIconSpriteIds[i] = SPRITE_NONE;
+                }
+            }
+        }
         if (!gBagMenu->inhibitItemDescriptionPrint)
             PrintItemDescription(itemIndex);
     }
@@ -1040,6 +1063,25 @@ static void PrintItemDescription(int itemIndex)
         str = gStringVar4;
     }
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
+    if (gBagPosition.pocket == POCKET_TM_HM && itemIndex != LIST_CANCEL)
+    {
+        u16 itemId = GetBagItemId(gBagPosition.pocket, itemIndex);
+        if (GetItemTMHMIndex(itemId) <= NUM_TECHNICAL_MACHINES)
+        {
+            CreateShopPokemonIconSprites(itemId, sBagPokemonIconSpriteIds);
+            CopyWindowToVram(WIN_DESCRIPTION, COPYWIN_GFX);
+            return;
+        }
+    }
+    {
+        u8 i;
+        for (i = 0; i < 10; i++)
+        {
+            if (sBagPokemonIconSpriteIds[i] != SPRITE_NONE)
+                FreeAndDestroyMonIconSprite(&gSprites[sBagPokemonIconSpriteIds[i]]);
+            sBagPokemonIconSpriteIds[i] = SPRITE_NONE;
+        }
+    }
     BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, str, 3, 1, 0, 0, 0, COLORID_NORMAL);
 }
 
@@ -1098,6 +1140,13 @@ static void DestroyPocketSwitchArrowPair(void)
 
 static void FreeBagMenu(void)
 {
+    u8 i;
+    for (i = 0; i < 10; i++)
+    {
+        if (sBagPokemonIconSpriteIds[i] != SPRITE_NONE)
+            FreeAndDestroyMonIconSprite(&gSprites[sBagPokemonIconSpriteIds[i]]);
+        sBagPokemonIconSpriteIds[i] = SPRITE_NONE;
+    }
     Free(sListBuffer2);
     Free(sListBuffer1);
     FreeAllWindowBuffers();
@@ -1728,6 +1777,13 @@ static void OpenContextMenu(u8 taskId)
     }
     if (gBagPosition.pocket == POCKET_TM_HM)
     {
+        u8 i;
+        for (i = 0; i < 10; i++)
+        {
+            if (sBagPokemonIconSpriteIds[i] != SPRITE_NONE)
+                FreeAndDestroyMonIconSprite(&gSprites[sBagPokemonIconSpriteIds[i]]);
+            sBagPokemonIconSpriteIds[i] = SPRITE_NONE;
+        }
         ClearWindowTilemap(WIN_DESCRIPTION);
         PrintTMHMMoveData(gSpecialVar_ItemId);
         PutWindowTilemap(WIN_TMHM_INFO_ICONS);

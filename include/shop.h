@@ -8,5 +8,6 @@ void CreateDecorationShop1Menu(const u16 *itemsForSale);
 void CreateDecorationShop2Menu(const u16 *itemsForSale);
 void CreateScottTmShopMenu(void);
 void CB2_ExitSellMenu(void);
+void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds);
 
 #endif // GUARD_SHOP_H
