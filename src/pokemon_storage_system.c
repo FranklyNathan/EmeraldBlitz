@@ -4451,6 +4451,8 @@ static void InitBoxMonSprites(u8 boxId)
             {
                 personality = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_PERSONALITY);
                 sStorage->boxMonsSprites[count] = CreateMonIconSprite(species, personality, 8 * (3 * j) + 100, 8 * (3 * i) + 44, 2, 19 - j);
+                if (GetBoxMonDataAt(boxId, boxPosition, MON_DATA_HP) == 0 && sStorage->boxMonsSprites[count] != NULL)
+                    MakeMonIconSpriteFainted(sStorage->boxMonsSprites[count]);
             }
             else
             {
@@ -4485,6 +4487,8 @@ static void CreateBoxMonIconAtPos(u8 boxPosition)
         sStorage->boxMonsSprites[boxPosition] = CreateMonIconSprite(species, personality, x, y, 2, 19 - (boxPosition % IN_BOX_COLUMNS));
         if (sStorage->boxOption == OPTION_MOVE_ITEMS)
             sStorage->boxMonsSprites[boxPosition]->oam.objMode = ST_OAM_OBJ_BLEND;
+        if (GetCurrentBoxMonData(boxPosition, MON_DATA_HP) == 0 && sStorage->boxMonsSprites[boxPosition] != NULL)
+            MakeMonIconSpriteFainted(sStorage->boxMonsSprites[boxPosition]);
     }
 }
 
@@ -4588,6 +4592,8 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                     sStorage->boxMonsSprites[boxPosition]->sSpeed = speed;
                     sStorage->boxMonsSprites[boxPosition]->sScrollInDestX = xDest;
                     sStorage->boxMonsSprites[boxPosition]->callback = SpriteCB_BoxMonIconScrollIn;
+                    if (GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_HP) == 0)
+                        MakeMonIconSpriteFainted(sStorage->boxMonsSprites[boxPosition]);
                     iconsCreated++;
                 }
             }
@@ -4614,6 +4620,8 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                     sStorage->boxMonsSprites[boxPosition]->callback = SpriteCB_BoxMonIconScrollIn;
                     if (GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_HELD_ITEM) == ITEM_NONE)
                         sStorage->boxMonsSprites[boxPosition]->oam.objMode = ST_OAM_OBJ_BLEND;
+                    if (GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_HP) == 0)
+                        MakeMonIconSpriteFainted(sStorage->boxMonsSprites[boxPosition]);
                     iconsCreated++;
                 }
             }
@@ -4739,6 +4747,8 @@ static void CreatePartyMonsSprites(bool8 visible)
     u32 personality = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
 
     sStorage->partySprites[0] = CreateMonIconSprite(species, personality, 104, 64, 1, 12);
+    if (GetMonData(&gPlayerParty[0], MON_DATA_HP) == 0 && sStorage->partySprites[0] != NULL)
+        MakeMonIconSpriteFainted(sStorage->partySprites[0]);
     count = 1;
     for (i = 1; i < PARTY_SIZE; i++)
     {
@@ -4747,6 +4757,8 @@ static void CreatePartyMonsSprites(bool8 visible)
         {
             personality = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
             sStorage->partySprites[i] = CreateMonIconSprite(species, personality, 152,  8 * (3 * (i - 1)) + 16, 1, 12);
+            if (GetMonData(&gPlayerParty[i], MON_DATA_HP) == 0 && sStorage->partySprites[i] != NULL)
+                MakeMonIconSpriteFainted(sStorage->partySprites[i]);
             count++;
         }
         else
@@ -5187,6 +5199,7 @@ static struct Sprite *CreateMonIconSprite(u16 species, u32 personality, s16 x, s
 
 static void DestroyBoxMonIcon(struct Sprite *sprite)
 {
+    FreeMonIconSpriteFaintedPalette(sprite);
     RemoveSpeciesFromIconList(sprite->data[0]);
     DestroySprite(sprite);
 }

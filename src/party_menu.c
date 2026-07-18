@@ -4795,6 +4795,8 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
     species2 = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
     CreatePartyMonIconSpriteParameterized(species2, GetMonData(mon, MON_DATA_PERSONALITY), menuBox, 1);
     UpdatePartyMonHPBar(menuBox->monSpriteId, mon);
+    if (GetMonData(mon, MON_DATA_HP) == 0 && species2 != SPECIES_NONE && species2 != SPECIES_EGG)
+        MakeMonIconSpriteFainted(&gSprites[menuBox->monSpriteId]);
 }
 
 static void CreatePartyMonIconSpriteParameterized(u16 species, u32 pid, struct PartyMenuBox *menuBox, u8 priority)

@@ -393,6 +393,7 @@ static u8 CreateMonIconSprite(struct MonIconSpriteTemplate *iconTemplate, s16 x,
 
 static void FreeAndDestroyMonIconSprite_(struct Sprite *sprite)
 {
+    FreeMonIconSpriteFaintedPalette(sprite);
     struct SpriteFrameImage image = { NULL, sSpriteImageSizes[sprite->oam.shape][sprite->oam.size] };
     sprite->images = &image;
     DestroySprite(sprite);
@@ -403,4 +404,31 @@ void SetPartyHPBarSprite(struct Sprite *sprite, u8 animNum)
     sprite->animNum = animNum;
     sprite->animDelayCounter = 0;
     sprite->animCmdIndex = 0;
+}
+
+void MakeMonIconSpriteFainted(struct Sprite *sprite)
+{
+    u8 origPalNum = sprite->oam.paletteNum;
+    u16 newTag = POKE_ICON_BASE_PAL_TAG + 200 + (sprite - gSprites);
+    u8 newPalNum = AllocSpritePalette(newTag);
+    if (newPalNum == 0xFF)
+        return;
+
+    u16 origOffset = OBJ_PLTT_ID(origPalNum);
+    u16 newOffset = OBJ_PLTT_ID(newPalNum);
+    CpuCopy16(&gPlttBufferUnfaded[origOffset], &gPlttBufferUnfaded[newOffset], PLTT_SIZE_4BPP);
+    TintPalette_GrayScale(&gPlttBufferUnfaded[newOffset], 16);
+    CpuCopy16(&gPlttBufferUnfaded[newOffset], &gPlttBufferFaded[newOffset], PLTT_SIZE_4BPP);
+
+    sprite->data[7] = newTag;
+    sprite->oam.paletteNum = newPalNum;
+}
+
+void FreeMonIconSpriteFaintedPalette(struct Sprite *sprite)
+{
+    if (sprite->data[7] != 0)
+    {
+        FreeSpritePaletteByTag(sprite->data[7]);
+        sprite->data[7] = 0;
+    }
 }
