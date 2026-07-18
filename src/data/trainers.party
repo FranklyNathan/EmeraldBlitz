@@ -15288,7 +15288,7 @@ Nature: Serious
 Ability: Steadfast
 - Brutal Swing
 - Fury Cutter
-- Rock Smash
+- Revenge
 - Iron Defense
 
 Hariyama (M) @ Sitrus Berry
@@ -15346,9 +15346,9 @@ Level: 41
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Steadfast
-- Brutal Swing
+- Sucker Punch
 - Fury Cutter
-- Brick Break
+- Revenge
 - Iron Defense
 
 Hariyama (M) @ Sitrus Berry
@@ -15356,7 +15356,7 @@ Level: 42
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Guts
-- Close Combat
+- Brick Break
 - Strength
 - Knock Off
 - Bulk Up
@@ -15406,9 +15406,9 @@ Level: 46
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Steadfast
-- Brutal Swing
+- Sucker Punch
 - Fury Cutter
-- Brick Break
+- Revenge
 - Leaf Blade
 
 Hariyama (M) @ Sitrus Berry
@@ -15416,7 +15416,7 @@ Level: 48
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Guts
-- Close Combat
+- Brick Break
 - Strength
 - Knock Off
 - Bulk Up
@@ -16017,7 +16017,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Magma Armor
 - Overheat
-- Earth Power
+- Scorching Sands
 - Sunny Day
 - Amnesia
 
@@ -16067,7 +16067,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Magma Armor
 - Overheat
-- Earth Power
+- Scorching Sands
 - Sunny Day
 - Take Down
 

@@ -39743,7 +39743,7 @@ F_TRAINER_FEMALE |
 #line 15289
                 MOVE_BRUTAL_SWING,
                 MOVE_FURY_CUTTER,
-                MOVE_ROCK_SMASH,
+                MOVE_REVENGE,
                 MOVE_IRON_DEFENSE,
             },
             },
@@ -39880,9 +39880,9 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15349
-                MOVE_BRUTAL_SWING,
+                MOVE_SUCKER_PUNCH,
                 MOVE_FURY_CUTTER,
-                MOVE_BRICK_BREAK,
+                MOVE_REVENGE,
                 MOVE_IRON_DEFENSE,
             },
             },
@@ -39904,7 +39904,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15359
-                MOVE_CLOSE_COMBAT,
+                MOVE_BRICK_BREAK,
                 MOVE_STRENGTH,
                 MOVE_KNOCK_OFF,
                 MOVE_BULK_UP,
@@ -40019,9 +40019,9 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15409
-                MOVE_BRUTAL_SWING,
+                MOVE_SUCKER_PUNCH,
                 MOVE_FURY_CUTTER,
-                MOVE_BRICK_BREAK,
+                MOVE_REVENGE,
                 MOVE_LEAF_BLADE,
             },
             },
@@ -40043,7 +40043,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15419
-                MOVE_CLOSE_COMBAT,
+                MOVE_BRICK_BREAK,
                 MOVE_STRENGTH,
                 MOVE_KNOCK_OFF,
                 MOVE_BULK_UP,
@@ -41414,7 +41414,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 16019
                 MOVE_OVERHEAT,
-                MOVE_EARTH_POWER,
+                MOVE_SCORCHING_SANDS,
                 MOVE_SUNNY_DAY,
                 MOVE_AMNESIA,
             },
@@ -41533,7 +41533,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 16069
                 MOVE_OVERHEAT,
-                MOVE_EARTH_POWER,
+                MOVE_SCORCHING_SANDS,
                 MOVE_SUNNY_DAY,
                 MOVE_TAKE_DOWN,
             },

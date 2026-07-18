@@ -36,7 +36,8 @@
   "WATTREL": {
     "LevelMoves": [],
     "TMMoves": [
-      "MOVE_SHOCK_WAVE"
+      "MOVE_SHOCK_WAVE",
+      "MOVE_STEEL_WING"
     ],
     "TutorMoves": [],
     "EggMoves": []
@@ -44,7 +45,8 @@
   "KILOWATTREL": {
     "LevelMoves": [],
     "TMMoves": [
-      "MOVE_SHOCK_WAVE"
+      "MOVE_SHOCK_WAVE",
+      "MOVE_STEEL_WING"
     ],
     "TutorMoves": [],
     "EggMoves": []
@@ -279,6 +281,14 @@
     "LevelMoves": [],
     "TMMoves": [
       "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "BOMBIRDIER": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_STEEL_WING"
     ],
     "TutorMoves": [],
     "EggMoves": []

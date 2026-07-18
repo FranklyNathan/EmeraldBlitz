@@ -1329,8 +1329,8 @@ const u8 gText_CannotSendMonToBoxPartner[] = _("Cannot send a mon that doesn't,\
 const u8 gText_GrandPrixMessage[] = _("Happy Saturday! Let's do our best\nand win some fights! Yahoo!");
 
 // Scott's generic dialogue for post-gym encounters
-const u8 gText_ScottPostGym1[] = _("Excuse me! I hope you don't mind,\nbut I caught the tail end of\lthat battle.\pNot bad! You've got quite a bit of\npotential.\pI like helping out trainers like you,\nso here, take a look at what I can\loffer.$");
-const u8 gText_ScottPostGym2[] = _("I knew I recognized the lightning-\nfast style of the trainer in\lthat gym!\pMy name's Scott. You might have guessed,\nbut I'm roaming Hoenn looking for\lfast trainers.\pI'm going to keep an eye on you.\nIn the meantime, interested in\lany more moves?$");
+const u8 gText_ScottPostGym1[] = _("Excuse me! I hope you don't mind, but\nI caught the tail end of that battle.\pNot bad! You've got quite a bit of\npotential.\pI like helping out trainers like you,\nso here, take a look at what I can\loffer.$");
+const u8 gText_ScottPostGym2[] = _("I knew I recognized the lightning-\nfast style of the trainer in\lthat gym!\pMy name's Scott. You might have guessed,\nbut I'm roaming Hoenn looking for\lfast trainers.\pI'm going to keep an eye on you.\nIn the meantime, interested in any\lmore moves?$");
 const u8 gText_ScottPostGym3[] = _("Hahahah! Way to go, {PLAYER}!\pYou're really cruising now!\pI'm sure you're in a rush to go buy\nsome Sitrus Berries, but before\lyou go, I've got a new selection that\lI think you'll enjoy.$");
 const u8 gText_ScottPostGym4[] = _("Oh! You're on fire now!\pI knew it from the first time I watched\nyou battle… you're something special!\pLooking for any more moves?$");
 const u8 gText_ScottPostGym5[] = _("{PLAYER}, you've clawed your way up to\nface the Pokémon League!\pI'm happy for you!\nYou made my cheering worthwhile!\pYou're almost at the finish line…\nlast chance to stock up!$");

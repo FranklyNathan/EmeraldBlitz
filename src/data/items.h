@@ -11937,7 +11937,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_BLIZZARD] =
     {
         .name = ITEM_NAME("Blizzard"),
-        .price = 5000,
+        .price = 4000,
         .description = COMPOUND_STRING(
         #if B_USE_FROSTBITE == TRUE
             "A snow-and-wind\n"
@@ -11957,7 +11957,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_HYPER_BEAM] =
     {
         .name = ITEM_NAME("Hyper Beam"),
-        .price = 5000,
+        .price = 4000,
         .description = COMPOUND_STRING(
             "Powerful, but needs\n"
             "recharging the\n"
@@ -11985,7 +11985,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_PROTECT] =
     {
         .name = ITEM_NAME("Protect"),
-        .price = 5000,
+        .price = 4000,
         .description = COMPOUND_STRING(
             "Negates all damage,\n"
             "but may fail if used\n"
@@ -12057,7 +12057,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_SOLAR_BEAM] =
     {
         .name = ITEM_NAME("Solar Beam"),
-        .price = 5000,
+        .price = 4000,
         .description = COMPOUND_STRING(
             "Absorbs sunlight in\n"
             "the 1st turn, then\n"
@@ -12099,7 +12099,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_THUNDER] =
     {
         .name = ITEM_NAME("Thunder"),
-        .price = 5000,
+        .price = 4000,
         .description = COMPOUND_STRING(
             "Strikes the foe\n"
             "with a thunderbolt.\n"
@@ -12240,7 +12240,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_FLAMETHROWER] =
     {
         .name = ITEM_NAME("Flamethrower"),
-        .price = 5000,
+        .price = 4000,
         .description = COMPOUND_STRING(
             "Looses a stream of\n"
             "fire that may burn\n"
@@ -12254,7 +12254,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_SLUDGE_BOMB] =
     {
         .name = ITEM_NAME("Sludge Bomb"),
-        .price = 5000,
+        .price = 4000,
         .description = COMPOUND_STRING(
             "Hurls sludge at the\n"
             "foe. It may poison\n"
@@ -12282,7 +12282,7 @@ const struct Item gItemsInfo[] =
     [ITEM_TM_FIRE_BLAST] =
     {
         .name = ITEM_NAME("Fire Blast"),
-        .price = 5000,
+        .price = 4000,
         .description = COMPOUND_STRING(
             "A powerful fire\n"
             "attack that may\n"

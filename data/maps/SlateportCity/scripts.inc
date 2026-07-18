@@ -913,7 +913,7 @@ SlateportCity_EventScript_PowerTMClerk::
 	lock
 	setvar VAR_POWER_TM_CLERK, 1
 	faceplayer
-	goto_if_lt VAR_BADGE_COUNT, 2, SlateportCity_Pokemart_PowerTMs_NotYet
+	goto_if_lt VAR_BADGE_COUNT, 1, SlateportCity_Pokemart_PowerTMs_NotYet
 	message gText_HowMayIServeYou
 	waitmessage
 	goto_if_ge VAR_BADGE_COUNT, 6, SlateportCity_Pokemart_PowerTMs_Badge6TMs
@@ -2718,7 +2718,7 @@ SlateportCity_Text_MegaSalesmanIntro:
 SlateportCity_Text_NotSellingYet:
 	.string "Hello! I sell TMs to players completing\n"
 	.string "the gym challenge.\p"
-	.string "Come back once you have two badges!$"
+	.string "Come back once you have a badge!$"
 
 SlateportCity_EventScript_HiddenPowerNPC::
 	lock
