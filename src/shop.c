@@ -1830,7 +1830,7 @@ static void ExitBuyMenu(u8 taskId)
     if (FlagGet(FLAG_IN_BASEMENT))
         gFieldCallback = FieldCB_ContinueScriptHandleMusic;
     else if (sIsScottTmShop)
-        gFieldCallback = ScriptContext_Enable; // Skip "Anything else?" for Scott's shop
+        gFieldCallback = FieldCB_ContinueScript; // Fade back in with time-of-day tinting, then enable scripts
     else
         gFieldCallback = MapPostLoadHook_ReturnToShopMenu;
 
