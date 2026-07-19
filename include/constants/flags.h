@@ -672,6 +672,7 @@
 #define FLAG_DISABLE_CRITICAL_HITS    0x26A // Disables critical hits in the Oldale Basement
 #define FLAG_SYS_OPPONENT_LEVEL_1     0x26B // Sets all enemy Pokemon to level 1
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
+#define FLAG_DISABLE_ACCURACY_CHECKS 0x26D // Moves bypass accuracy checks in the Oldale Basement
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
 #define FLAG_UNUSED_0x26E  0x26E // Unused Flag
 #define FLAG_UNUSED_0x26F  0x26F // Unused Flag

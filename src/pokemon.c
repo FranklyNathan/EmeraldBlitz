@@ -2740,6 +2740,30 @@ u32 GetBoxMonData3(struct BoxPokemon *boxMon, s32 field, u8 *data)
         case MON_DATA_STATUS:
             retVal = UncompressStatus(boxMon->compressedStatus);
             break;
+        case MON_DATA_HP:
+        {
+            u16 species = GetBoxMonData(boxMon, MON_DATA_SPECIES, NULL);
+            if (species != SPECIES_NONE && species != SPECIES_EGG)
+            {
+                s32 level = GetLevelFromBoxMonExp(boxMon);
+                s32 hpIV = GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL);
+                s32 hpEV = GetBoxMonData(boxMon, MON_DATA_HP_EV, NULL);
+                s32 maxHP;
+                if (species == SPECIES_SHEDINJA)
+                {
+                    maxHP = 1;
+                }
+                else
+                {
+                    s32 n = 2 * GetSpeciesBaseHP(species) + hpIV;
+                    maxHP = (((n + hpEV / 4) * level) / 100) + level + 10;
+                }
+                retVal = maxHP - boxMon->hpLost;
+                if (retVal < 0)
+                    retVal = 0;
+            }
+            break;
+        }
         case MON_DATA_HP_LOST:
             retVal = boxMon->hpLost;
             break;

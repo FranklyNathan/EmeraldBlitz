@@ -1569,6 +1569,49 @@ OldaleTown_House2_Basement_Text_Slowbro_Enable:
 OldaleTown_House2_Basement_Text_Slowbro_EnabledMsg:
     .string "Critical hits have been enabled.$"
 
+OldaleTown_House2_Basement_EventScript_Hawlucha::
+    lock
+    faceplayer
+    goto_if_set FLAG_DISABLE_ACCURACY_CHECKS, OldaleTown_House2_Basement_EventScript_Hawlucha_Enabled
+    msgbox OldaleTown_House2_Basement_Text_Hawlucha_Disable, MSGBOX_YESNO
+    goto_if_eq VAR_RESULT, YES, OldaleTown_House2_Basement_EventScript_Hawlucha_DoDisable
+    release
+    end
+
+OldaleTown_House2_Basement_EventScript_Hawlucha_DoDisable::
+    setflag FLAG_DISABLE_ACCURACY_CHECKS
+    msgbox OldaleTown_House2_Basement_Text_Hawlucha_Disabled, MSGBOX_DEFAULT
+    release
+    end
+
+OldaleTown_House2_Basement_EventScript_Hawlucha_Enabled::
+    msgbox OldaleTown_House2_Basement_Text_Hawlucha_Enable, MSGBOX_YESNO
+    goto_if_eq VAR_RESULT, YES, OldaleTown_House2_Basement_EventScript_Hawlucha_DoEnable
+    release
+    end
+
+OldaleTown_House2_Basement_EventScript_Hawlucha_DoEnable::
+    clearflag FLAG_DISABLE_ACCURACY_CHECKS
+    msgbox OldaleTown_House2_Basement_Text_Hawlucha_EnabledMsg, MSGBOX_DEFAULT
+    release
+    end
+
+OldaleTown_House2_Basement_Text_Hawlucha_Disable:
+    .string "MEGA PIDGEOT strikes a pose.\n"
+    .string "Moves will always hit. Enable?$"
+
+OldaleTown_House2_Basement_Text_Hawlucha_Disabled:
+    .string "Moves will now bypass accuracy\n"
+    .string "checks and always hit.$"
+
+OldaleTown_House2_Basement_Text_Hawlucha_Enable:
+    .string "Moves are currently bypassing\n"
+    .string "accuracy checks. Disable?$"
+
+OldaleTown_House2_Basement_Text_Hawlucha_EnabledMsg:
+    .string "Moves will now use normal\n"
+    .string "accuracy checks.$"
+
 OldaleTown_House2_Basement_EventScript_Hypno::
     lock
     faceplayer

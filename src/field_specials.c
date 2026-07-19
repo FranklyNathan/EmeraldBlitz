@@ -117,7 +117,7 @@ static void Task_PetalburgGymSlideOpenRoomDoors(u8);
 static void PetalburgGymSetDoorMetatiles(u8, u16);
 static void Task_PCTurnOnEffect(u8);
 static void PCTurnOnEffect(struct Task *);
-static void PCTurnOnEffect_SetMetatile(s16, s8, s8);
+static void PCTurnOnEffect_SetMetatile(s16, s16, s16, s8, s8);
 static void PCTurnOffEffect(void);
 static void Task_LotteryCornerComputerEffect(u8);
 static void LotteryCornerComputerEffect(struct Task *);
@@ -1022,11 +1022,14 @@ static bool8 IsPlayerInFrontOfPC(void)
 }
 
 // Task data for Task_PCTurnOnEffect and Task_LotteryCornerComputerEffect
-#define tPaused       data[0] // Never set
-#define tTaskId       data[1]
-#define tFlickerCount data[2]
-#define tTimer        data[3]
-#define tIsScreenOn   data[4]
+#define tPaused            data[0] // Never set
+#define tTaskId            data[1]
+#define tFlickerCount      data[2]
+#define tTimer             data[3]
+#define tIsScreenOn        data[4]
+#define tCachedPlayerX     data[5]
+#define tCachedPlayerY     data[6]
+#define tCachedDirection   data[7]
 
 // For this special, gSpecialVar_0x8004 is expected to be some PC_LOCATION_* value.
 void DoPCTurnOnEffect(void)
@@ -1039,6 +1042,9 @@ void DoPCTurnOnEffect(void)
         gTasks[taskId].tFlickerCount = 0;
         gTasks[taskId].tTimer = 0;
         gTasks[taskId].tIsScreenOn = FALSE;
+        gTasks[taskId].tCachedPlayerX = gSaveBlock1Ptr->pos.x;
+        gTasks[taskId].tCachedPlayerY = gSaveBlock1Ptr->pos.y;
+        gTasks[taskId].tCachedDirection = GetPlayerFacingDirection();
     }
 }
 
@@ -1051,16 +1057,15 @@ static void Task_PCTurnOnEffect(u8 taskId)
 
 static void PCTurnOnEffect(struct Task *task)
 {
-    u8 playerDirection;
     s8 dx = 0;
     s8 dy = 0;
     if (task->tTimer == 6)
     {
         task->tTimer = 0;
 
-        // Get where the PC should be, depending on where the player is looking.
-        playerDirection = GetPlayerFacingDirection();
-        switch (playerDirection)
+        // Use cached position and direction so the animation always
+        // targets the correct tile even if the player moves.
+        switch (task->tCachedDirection)
         {
         case DIR_NORTH:
             dx = 0;
@@ -1077,7 +1082,7 @@ static void PCTurnOnEffect(struct Task *task)
         }
 
         // Update map
-        PCTurnOnEffect_SetMetatile(task->tIsScreenOn, dx, dy);
+        PCTurnOnEffect_SetMetatile(task->tIsScreenOn, task->tCachedPlayerX, task->tCachedPlayerY, dx, dy);
         DrawWholeMapView();
 
         // Screen flickers 5 times. Odd number and starting with the
@@ -1089,7 +1094,7 @@ static void PCTurnOnEffect(struct Task *task)
     task->tTimer++;
 }
 
-static void PCTurnOnEffect_SetMetatile(s16 isScreenOn, s8 dx, s8 dy)
+static void PCTurnOnEffect_SetMetatile(s16 isScreenOn, s16 playerX, s16 playerY, s8 dx, s8 dy)
 {
     u16 metatileId = 0;
     if (isScreenOn)
@@ -1112,12 +1117,16 @@ static void PCTurnOnEffect_SetMetatile(s16 isScreenOn, s8 dx, s8 dy)
         else if (gSpecialVar_0x8004 == PC_LOCATION_MAYS_HOUSE)
             metatileId = METATILE_BrendansMaysHouse_MayPC_On;
     }
-    MapGridSetMetatileIdAt(gSaveBlock1Ptr->pos.x + dx + MAP_OFFSET, gSaveBlock1Ptr->pos.y + dy + MAP_OFFSET, metatileId | MAPGRID_IMPASSABLE);
+    MapGridSetMetatileIdAt(playerX + dx + MAP_OFFSET, playerY + dy + MAP_OFFSET, metatileId | MAPGRID_IMPASSABLE);
 }
 
 // For this special, gSpecialVar_0x8004 is expected to be some PC_LOCATION_* value.
 void DoPCTurnOffEffect(void)
 {
+    // Destroy any active flicker task so it doesn't keep stamping metatiles
+    // at stale positions after the player is released.
+    if (FuncIsActiveTask(Task_PCTurnOnEffect) == TRUE)
+        DestroyTask(FindTaskIdByFunc(Task_PCTurnOnEffect));
     PCTurnOffEffect();
 }
 
