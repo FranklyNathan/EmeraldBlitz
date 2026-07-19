@@ -584,3 +584,4 @@ gSpecials::
 	def_special Script_CheckPartyBelowLevelCap
 	def_special GetOffBike
 	def_special OpenScottTmShop
+	def_special Special_ReadScriptMail

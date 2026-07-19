@@ -823,6 +823,12 @@ static const struct MenuAction MultichoiceList_LevelCaps[] =
     {gText_Exit},
 };
 
+static const struct MenuAction MultichoiceList_MailSelect[] =
+{
+    {COMPOUND_STRING("Orange Mail")},
+    {gText_Exit},
+};
+
 static const struct MenuAction MultichoiceList_Exit[] =
 {
     {gText_Exit},
@@ -955,6 +961,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_STATUS_EFFECTS]             = MULTICHOICE(MultichoiceList_StatusEffects),
     [MULTI_WALLY_STEVEN]               = MULTICHOICE(MultichoiceList_WallySteven),
     [MULTI_LEVEL_CAPS]                 = {MultichoiceList_LevelCaps, ARRAY_COUNT(MultichoiceList_LevelCaps), 5},
+    [MULTI_MAIL_SELECT]                = MULTICHOICE(MultichoiceList_MailSelect),
 };
 
 const u8 *const gStdStrings[] =

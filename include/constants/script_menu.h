@@ -126,6 +126,7 @@
 #define MULTI_STATUS_EFFECTS               115
 #define MULTI_WALLY_STEVEN                 116
 #define MULTI_LEVEL_CAPS                   117
+#define MULTI_MAIL_SELECT                  118
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

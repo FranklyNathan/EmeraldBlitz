@@ -386,6 +386,23 @@ PlayersHouse_2F_EventScript_Receive_Fossil::
 	releaseall
 	end
 
+LittlerootTown_BrendansHouse_2F_EventScript_MailBox::
+	lock
+	faceplayer
+	msgbox LittlerootTown_BrendansHouse_2F_Text_MailBoxIntro, MSGBOX_DEFAULT
+EventScript_MailBoxMenu:
+	msgbox LittlerootTown_BrendansHouse_2F_Text_SelectMail, MSGBOX_DEFAULT
+	multichoice 0, 0, MULTI_MAIL_SELECT, FALSE
+	compare VAR_RESULT, 1
+	goto_if_eq EventScript_MailBoxCancel
+	setvar VAR_0x8004, ITEM_TROPIC_MAIL
+	special Special_ReadScriptMail
+	waitstate
+	goto EventScript_MailBoxMenu
+EventScript_MailBoxCancel:
+	release
+	end
+
 PlayersHouse_2F_Text_HowDoYouLikeYourRoom:
 	.string "MOM: {PLAYER}, how do you like your\n"
 	.string "new room?\p"
@@ -461,6 +478,14 @@ LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedForest:
 
 LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedSkyBlue:
 	.string "Palette set to Sky.$"
+
+LittlerootTown_BrendansHouse_2F_Text_MailBoxIntro:
+	.string "{PLAYER} peered into the box.\n"
+	.string "It looks to be an assortment\n"
+	.string "of letters...$"
+
+LittlerootTown_BrendansHouse_2F_Text_SelectMail:
+	.string "Which letter would you like to read?$"
 
 PlayersHouse_1F_Text_ReceivedEgg:
 	.string "{PLAYER} received an egg!$"

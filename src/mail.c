@@ -77,6 +77,31 @@ struct MailRead
 
 static EWRAM_DATA struct MailRead *sMailRead = NULL;
 
+static bool8 sUseCustomMailText;
+
+void Mail_SetCustomText(const u8 *lines[], u8 numLines)
+{
+    u8 i, j;
+    sUseCustomMailText = TRUE;
+    for (i = 0; i < numLines && i < 8; i++)
+    {
+        const u8 *src = lines[i];
+        u8 *dest = sMailRead->message[i];
+        j = 0;
+        while (src[j] != EOS && j < 63)
+        {
+            dest[j] = src[j];
+            j++;
+        }
+        dest[j] = EOS;
+    }
+}
+
+void Mail_ClearCustomText(void)
+{
+    sUseCustomMailText = FALSE;
+}
+
 static void CB2_InitMailRead(void);
 static void BufferMailText(void);
 static void PrintMailText(void);
@@ -642,12 +667,15 @@ static void BufferMailText(void)
     u8 numWords;
     u8 *ptr;
 
-    // Convert the easy chat words to strings line by line and buffer them to message
-    numWords = 0;
-    for (i = 0; i < sMailRead->layout->numLines; i ++)
+    if (!sUseCustomMailText)
     {
-        ConvertEasyChatWordsToString(sMailRead->message[i], &sMailRead->mail->words[numWords], sMailRead->layout->lines[i].numEasyChatWords, 1);
-        numWords += sMailRead->layout->lines[i].numEasyChatWords;
+        // Convert the easy chat words to strings line by line and buffer them to message
+        numWords = 0;
+        for (i = 0; i < sMailRead->layout->numLines; i ++)
+        {
+            ConvertEasyChatWordsToString(sMailRead->message[i], &sMailRead->mail->words[numWords], sMailRead->layout->lines[i].numEasyChatWords, 1);
+            numWords += sMailRead->layout->lines[i].numEasyChatWords;
+        }
     }
 
     // Buffer the signature

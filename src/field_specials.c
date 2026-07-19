@@ -77,6 +77,8 @@
 #include "palette.h"
 #include "battle_util.h"
 #include "naming_screen.h"
+#include "mail.h"
+#include "constants/easy_chat.h"
 
 #define TAG_ITEM_ICON 5500
 
@@ -4578,4 +4580,39 @@ void SetObjectGfx(void)
         gSprites[objectEvent->spriteId].images = info->images;
         StartSpriteAnim(&gSprites[objectEvent->spriteId], 0);
     }
+}
+
+static struct Mail sScriptMail;
+
+void Special_ReadScriptMail(void)
+{
+    u8 playerName[PLAYER_NAME_LENGTH + 1];
+    int i;
+    // "Energy Guru"
+    static const u8 sLine0[] = {0xBF,0xE2,0xD9,0xE6,0xDB,0xED,0x00,0xC1,0xE9,0xE6,0xE9,0xFF};
+    // "Waiting calm in the market"
+    static const u8 sLine1[] = {0xD1,0xD5,0xDD,0xE8,0xDD,0xE2,0xDB,0x00,0xD7,0xD5,0xE0,0xE1,0x00,0xDD,0xE2,0x00,0xE8,0xDC,0xD9,0x00,0xE1,0xD5,0xE6,0xDF,0xD9,0xE8,0xFF};
+    // "I'm coming in hot"
+    static const u8 sLine2[] = {0xC3,0xB4,0xE1,0x00,0xD7,0xE3,0xE1,0xDD,0xE2,0xDB,0x00,0xDD,0xE2,0x00,0xDC,0xE3,0xE8,0xFF};
+    const u8 *customLines[] = { sLine0, sLine1, sLine2 };
+
+    CpuFill16(0, &sScriptMail, sizeof(sScriptMail));
+    sScriptMail.itemId = gSpecialVar_0x8004;
+
+    sScriptMail.words[0] = EC_EMPTY_WORD;
+    sScriptMail.words[1] = EC_EMPTY_WORD;
+    sScriptMail.words[2] = EC_EMPTY_WORD;
+    sScriptMail.words[3] = EC_EMPTY_WORD;
+    sScriptMail.words[4] = EC_EMPTY_WORD;
+    sScriptMail.words[5] = EC_EMPTY_WORD;
+    sScriptMail.words[6] = EC_EMPTY_WORD;
+    sScriptMail.words[7] = EC_EMPTY_WORD;
+    sScriptMail.words[8] = EC_EMPTY_WORD;
+
+    StringCopy(playerName, gSaveBlock2Ptr->playerName);
+    for (i = 0; i < PLAYER_NAME_LENGTH; i++)
+        sScriptMail.playerName[i] = playerName[i];
+
+    ReadMail(&sScriptMail, CB2_ReturnToFieldContinueScriptPlayMapMusic, TRUE);
+    Mail_SetCustomText(customLines, ARRAY_COUNT(customLines));
 }
