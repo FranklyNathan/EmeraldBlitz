@@ -403,9 +403,32 @@ LittlerootTown_BrendansHouse_2F_EventScript_MailBox::
 EventScript_MailBoxMenu:
 	msgbox LittlerootTown_BrendansHouse_2F_Text_SelectMail, MSGBOX_DEFAULT
 	multichoice 0, 0, MULTI_MAIL_SELECT, FALSE
+	compare VAR_RESULT, 0
+	goto_if_eq EventScript_MailBoxReadOrange
 	compare VAR_RESULT, 1
-	goto_if_eq EventScript_MailBoxCancel
-	setvar VAR_0x8004, ITEM_TROPIC_MAIL
+	goto_if_eq EventScript_MailBoxReadHarbor
+	compare VAR_RESULT, 2
+	goto_if_eq EventScript_MailBoxReadFab
+	compare VAR_RESULT, 3
+	goto_if_eq EventScript_MailBoxReadPro
+	goto EventScript_MailBoxCancel
+EventScript_MailBoxReadOrange:
+	setvar VAR_0x8004, ITEM_ORANGE_MAIL
+	special Special_ReadScriptMail
+	waitstate
+	goto EventScript_MailBoxMenu
+EventScript_MailBoxReadHarbor:
+	setvar VAR_0x8004, ITEM_HARBOR_MAIL
+	special Special_ReadScriptMail
+	waitstate
+	goto EventScript_MailBoxMenu
+EventScript_MailBoxReadFab:
+	setvar VAR_0x8004, ITEM_FAB_MAIL
+	special Special_ReadScriptMail
+	waitstate
+	goto EventScript_MailBoxMenu
+EventScript_MailBoxReadPro:
+	setvar VAR_0x8004, ITEM_NONE
 	special Special_ReadScriptMail
 	waitstate
 	goto EventScript_MailBoxMenu
@@ -491,8 +514,8 @@ LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedSkyBlue:
 
 LittlerootTown_BrendansHouse_2F_Text_MailBoxIntro:
 	.string "{PLAYER} peered into the box.\n"
-	.string "It looks to be an assortment\n"
-	.string "of letters...$"
+	.string "It looks to be an assortment\l"
+	.string "of letters…$"
 
 LittlerootTown_BrendansHouse_2F_Text_SelectMail:
 	.string "Which letter would you like to read?$"

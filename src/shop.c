@@ -73,6 +73,7 @@ enum {
     COLORID_NORMAL,      // Item descriptions, quantity in bag, and quantity/price
     COLORID_ITEM_LIST,   // The text in the item list, and the cursor normally
     COLORID_GRAY_CURSOR, // When the cursor has selected an item to purchase
+    COLORID_BLUE,        // Blue text for Scott TM shop preview mode
 };
 
 enum {
@@ -187,6 +188,9 @@ static bool8 sIsScottTmShop = FALSE;
 static bool8 sScottTmPurchased[5]; // Track which of the 5 current TMs are purchased
 static EWRAM_DATA u8 sScottTmPurchasedCount = 0; // Track total TMs purchased for price reduction
 static bool8 sScottTmInvertPurchased = FALSE; // Track if Invert was purchased
+static bool8 sScottTmPreviewMode = FALSE; // Temporary inversion for previewing TM partners
+static u16 sScottTmSavedPal2; // Saved palette entry 2 for preview restore
+static u16 sScottTmSavedPal3; // Saved palette entry 3 for preview restore
 static EWRAM_DATA struct ListMenuItem *sListMenuItems = NULL;
 static EWRAM_DATA u16 sSeenScottTmPairs[ARRAY_COUNT(sScottTmPartners)] = {0}; // Track which partner pairs have been seen
 static EWRAM_DATA u8 sScottShopLoadCount = 0; // Track how many times the shop has been loaded
@@ -207,6 +211,11 @@ static void Task_GoToBuyOrSellMenu(u8 taskId);
 static void BuyMenuFreeMemory(void);
 static u16 GetScottTmPartner(u16 tmId);
 static void ScottTmInvert(u8 taskId);
+static void ScottTmTogglePreview(void);
+static void ScottTmApplyPreview(void);
+static void ScottTmRestorePreview(void);
+static void ScottTmSetBluePalette(void);
+static void ScottTmRestorePalette(void);
 static void MapPostLoadHook_ReturnToShopMenu(void);
 static void Task_ReturnToShopMenu(u8 taskId);
 static void ShowShopMenuAfterExitingBuyOrSellMenu(u8 taskId);
@@ -428,6 +437,7 @@ static const u8 sShopBuyMenuTextColors[][3] =
     [COLORID_NORMAL]      = {1, 2, 3},
     [COLORID_ITEM_LIST]   = {0, 2, 3},
     [COLORID_GRAY_CURSOR] = {0, 3, 2},
+    [COLORID_BLUE]        = {TEXT_COLOR_WHITE, TEXT_COLOR_BLUE, TEXT_COLOR_LIGHT_BLUE},
 };
 
 static u8 CreateShopMenu(u8 martType)
@@ -712,6 +722,88 @@ static void ScottTmInvert(u8 taskId)
 
     // Return to item list
     BuyMenuReturnToItemList(taskId);
+}
+
+static void ScottTmSetBluePalette(void)
+{
+    u16 pal[2];
+    sScottTmSavedPal2 = gPlttBufferUnfaded[BG_PLTT_ID(15) + 2];
+    sScottTmSavedPal3 = gPlttBufferUnfaded[BG_PLTT_ID(15) + 3];
+    pal[0] = gPlttBufferUnfaded[BG_PLTT_ID(15) + 0x9]; // TEXT_COLOR_LIGHT_BLUE
+    pal[1] = gPlttBufferUnfaded[BG_PLTT_ID(15) + 0x2]; // TEXT_COLOR_DARK_GRAY
+    LoadPalette(pal, BG_PLTT_ID(15) + 2, sizeof(pal));
+}
+
+static void ScottTmRestorePalette(void)
+{
+    u16 pal[2];
+    pal[0] = sScottTmSavedPal2;
+    pal[1] = sScottTmSavedPal3;
+    LoadPalette(pal, BG_PLTT_ID(15) + 2, sizeof(pal));
+}
+
+static void ScottTmApplyPreview(void)
+{
+    u16 i;
+    // Swap each TM with its partner for preview
+    for (i = 0; i < 5; i++)
+    {
+        u16 partner = GetScottTmPartner(sScottTmItemList[i]);
+        if (partner != ITEM_NONE)
+            sScottTmItemList[i] = partner;
+    }
+    SetShopItemsForSale(sScottTmItemList);
+    sMartInfo.priceList = sScottTmPriceList;
+    if (sListMenuItems != NULL && sItemNames != NULL)
+    {
+        u16 k;
+        for (k = 0; k < sMartInfo.itemCount; k++)
+            BuyMenuSetListEntry(&sListMenuItems[k], sMartInfo.itemList[k], sItemNames[k]);
+        StringCopy(sItemNames[k], gText_Cancel2);
+        sListMenuItems[k].name = sItemNames[k];
+        sListMenuItems[k].id = LIST_CANCEL;
+    }
+    // Set blue palette for preview mode
+    ScottTmSetBluePalette();
+}
+
+static void ScottTmRestorePreview(void)
+{
+    u16 i;
+    // Swap each TM back to its original
+    for (i = 0; i < 5; i++)
+    {
+        u16 partner = GetScottTmPartner(sScottTmItemList[i]);
+        if (partner != ITEM_NONE)
+            sScottTmItemList[i] = partner;
+    }
+    SetShopItemsForSale(sScottTmItemList);
+    sMartInfo.priceList = sScottTmPriceList;
+    if (sListMenuItems != NULL && sItemNames != NULL)
+    {
+        u16 k;
+        for (k = 0; k < sMartInfo.itemCount; k++)
+            BuyMenuSetListEntry(&sListMenuItems[k], sMartInfo.itemList[k], sItemNames[k]);
+        StringCopy(sItemNames[k], gText_Cancel2);
+        sListMenuItems[k].name = sItemNames[k];
+        sListMenuItems[k].id = LIST_CANCEL;
+    }
+    // Restore original palette
+    ScottTmRestorePalette();
+}
+
+static void ScottTmTogglePreview(void)
+{
+    if (sScottTmPreviewMode)
+    {
+        ScottTmRestorePreview();
+        sScottTmPreviewMode = FALSE;
+    }
+    else
+    {
+        ScottTmApplyPreview();
+        sScottTmPreviewMode = TRUE;
+    }
 }
 
 static void Task_ShopMenu(u8 taskId)
@@ -1472,6 +1564,48 @@ static void Task_BuyMenu(u8 taskId)
 
     if (!gPaletteFade.active)
     {
+        // Handle Select button for preview mode in Scott's TM shop
+        if (sIsScottTmShop && JOY_NEW(SELECT_BUTTON))
+        {
+            ScottTmTogglePreview();
+            RedrawListMenu(tListTaskId);
+            BuyMenuPrintCursor(tListTaskId, COLORID_ITEM_LIST);
+            // Refresh the description and pokemon icon sprites for the
+            // currently hovered item, since the item list has been swapped
+            // but the cursor never moved (so moveCursorFunc didn't fire).
+            if (VarGet(VAR_POWER_TM_CLERK) == 1)
+            {
+                u16 scrollOffset, selectedRow;
+                ListMenuGetScrollAndRow(tListTaskId, &scrollOffset, &selectedRow);
+                s32 currentItem = sListMenuItems[scrollOffset + selectedRow].id;
+                if (currentItem != LIST_CANCEL && currentItem != ITEM_SCOTT_TM_INVERT)
+                    CreateShopPokemonIconSprites(currentItem, sShopData->pokemonIconSpriteIds);
+            }
+            return;
+        }
+
+        // Exit preview mode when any non-directional button is pressed
+        if (sIsScottTmShop && sScottTmPreviewMode)
+        {
+            if (JOY_NEW(A_BUTTON | B_BUTTON | START_BUTTON))
+            {
+                ScottTmRestorePreview();
+                sScottTmPreviewMode = FALSE;
+                RedrawListMenu(tListTaskId);
+                BuyMenuPrintCursor(tListTaskId, COLORID_ITEM_LIST);
+                // Refresh sprites for the currently hovered item after un-inverting
+                if (VarGet(VAR_POWER_TM_CLERK) == 1)
+                {
+                    u16 scrollOffset, selectedRow;
+                    ListMenuGetScrollAndRow(tListTaskId, &scrollOffset, &selectedRow);
+                    s32 currentItem = sListMenuItems[scrollOffset + selectedRow].id;
+                    if (currentItem != LIST_CANCEL && currentItem != ITEM_SCOTT_TM_INVERT)
+                        CreateShopPokemonIconSprites(currentItem, sShopData->pokemonIconSpriteIds);
+                }
+                return;
+            }
+        }
+
         s32 itemId = ListMenu_ProcessInput(tListTaskId);
         ListMenuGetScrollAndRow(tListTaskId, &sShopData->scrollOffset, &sShopData->selectedRow);
 
@@ -1834,6 +1968,13 @@ static void ExitBuyMenu(u8 taskId)
     else
         gFieldCallback = MapPostLoadHook_ReturnToShopMenu;
 
+    // Reset preview mode if active when exiting
+    if (sIsScottTmShop && sScottTmPreviewMode)
+    {
+        ScottTmRestorePreview();
+        sScottTmPreviewMode = FALSE;
+    }
+
     sIsScottTmShop = FALSE;
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
     gTasks[taskId].func = Task_ExitBuyMenu;
@@ -1913,6 +2054,7 @@ void CreateScottTmShopMenu(void)
         sScottTmPurchased[i] = FALSE;
     sScottTmPurchasedCount = 0; // Initialize new counter
     sScottTmInvertPurchased = FALSE;
+    sScottTmPreviewMode = FALSE; // Reset preview mode
     VarSet(VAR_POWER_TM_CLERK, 1);
     CreateTask(Task_HandleShopMenuBuy, 8);
 }

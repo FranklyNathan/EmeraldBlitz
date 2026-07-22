@@ -4584,35 +4584,135 @@ void SetObjectGfx(void)
 
 static struct Mail sScriptMail;
 
+#define PRO_LETTER_POOL_SIZE 2
+
+struct ProLetterEntry
+{
+    u16 itemId;
+    const u8 *lines[5];
+    u8 numLines;
+    const u8 *sender;
+};
+
+static const u8 sNathan[] = _("Nathan");
+static const u8 sBirch[] = _("Birch");
+
+// Orange Mail: "Welcome to Blitz!"
+static const u8 sOrange_0[] = _("Welcome to Emerald Blitz!");
+static const u8 sOrange_1[] = _("For full documentation,");
+static const u8 sOrange_2[] = _("check out emeraldblitz.com");
+static const u8 sOrange_3[] = _("Join the discord for");
+static const u8 sOrange_4[] = _("daily community races!");
+
+// Fab Mail: "Flygon Controls"
+static const u8 sFab_0[] = _("Flygon Controls:");
+static const u8 sFab_1[] = _("B to accelerate");
+static const u8 sFab_2[] = _("L to Fly");
+
+// Harbor Mail: "Select Shortcuts"
+static const u8 sHarbor_0[] = _("Press Select...");
+static const u8 sHarbor_1[] = _("To use a registered key item");
+static const u8 sHarbor_2[] = _("During Fly to snap to Slateport");
+static const u8 sHarbor_3[] = _("In Scott's Shop to preview TMs");
+static const u8 sHarbor_4[] = _("While leveling to delay evolution");
+
+// Pro Letter pool
+static const u8 sKCH42[] = _("KCH42");
+static const u8 sCertified[] = _("Certified");
+
+static const u8 sProLetter0_0[] = _("Welcome to Emerald Blitz!");
+static const u8 sProLetter0_1[] = _("All the best Blitzers");
+static const u8 sProLetter0_2[] = _("play the Weekly Box.");
+static const u8 sProLetter0_3[] = _("Be sure to check it out! #ad");
+
+static const u8 sProLetter1_0[] = _("They say that");
+static const u8 sProLetter1_1[] = _("it takes real guts to pull");
+static const u8 sProLetter1_2[] = _("off such a facade.");
+static const u8 sProLetter1_3[] = _("So you better have that");
+static const u8 sProLetter1_4[] = _("Norman check!");
+
+static const struct ProLetterEntry sProLetterPool[PRO_LETTER_POOL_SIZE] =
+{
+    {
+        .itemId = ITEM_RETRO_MAIL,
+        .lines = { sProLetter0_0, sProLetter0_1, sProLetter0_2, sProLetter0_3 },
+        .numLines = 4,
+        .sender = sKCH42,
+    },
+    {
+        .itemId = ITEM_WOOD_MAIL,
+        .lines = { sProLetter1_0, sProLetter1_1, sProLetter1_2, sProLetter1_3, sProLetter1_4 },
+        .numLines = 5,
+        .sender = sCertified,
+    },
+};
+
 void Special_ReadScriptMail(void)
 {
-    u8 playerName[PLAYER_NAME_LENGTH + 1];
     int i;
-    // "Energy Guru"
-    static const u8 sLine0[] = {0xBF,0xE2,0xD9,0xE6,0xDB,0xED,0x00,0xC1,0xE9,0xE6,0xE9,0xFF};
-    // "Waiting calm in the market"
-    static const u8 sLine1[] = {0xD1,0xD5,0xDD,0xE8,0xDD,0xE2,0xDB,0x00,0xD7,0xD5,0xE0,0xE1,0x00,0xDD,0xE2,0x00,0xE8,0xDC,0xD9,0x00,0xE1,0xD5,0xE6,0xDF,0xD9,0xE8,0xFF};
-    // "I'm coming in hot"
-    static const u8 sLine2[] = {0xC3,0xB4,0xE1,0x00,0xD7,0xE3,0xE1,0xDD,0xE2,0xDB,0x00,0xDD,0xE2,0x00,0xDC,0xE3,0xE8,0xFF};
-    const u8 *customLines[] = { sLine0, sLine1, sLine2 };
+    const u8 *customLines[8];
+    u8 numLines;
+    const u8 *sender;
 
     CpuFill16(0, &sScriptMail, sizeof(sScriptMail));
-    sScriptMail.itemId = gSpecialVar_0x8004;
 
-    sScriptMail.words[0] = EC_EMPTY_WORD;
-    sScriptMail.words[1] = EC_EMPTY_WORD;
-    sScriptMail.words[2] = EC_EMPTY_WORD;
-    sScriptMail.words[3] = EC_EMPTY_WORD;
-    sScriptMail.words[4] = EC_EMPTY_WORD;
-    sScriptMail.words[5] = EC_EMPTY_WORD;
-    sScriptMail.words[6] = EC_EMPTY_WORD;
-    sScriptMail.words[7] = EC_EMPTY_WORD;
-    sScriptMail.words[8] = EC_EMPTY_WORD;
+    for (i = 0; i < MAIL_WORDS_COUNT; i++)
+        sScriptMail.words[i] = EC_EMPTY_WORD;
 
-    StringCopy(playerName, gSaveBlock2Ptr->playerName);
-    for (i = 0; i < PLAYER_NAME_LENGTH; i++)
-        sScriptMail.playerName[i] = playerName[i];
+    switch (gSpecialVar_0x8004)
+    {
+    case ITEM_NONE:
+    {
+        u32 idx = Random() % PRO_LETTER_POOL_SIZE;
+        const struct ProLetterEntry *entry = &sProLetterPool[idx];
+        sScriptMail.itemId = entry->itemId;
+        for (i = 0; i < entry->numLines; i++)
+            customLines[i] = entry->lines[i];
+        numLines = entry->numLines;
+        sender = entry->sender;
+        break;
+    }
+    case ITEM_ORANGE_MAIL:
+        sScriptMail.itemId = ITEM_ORANGE_MAIL;
+        customLines[0] = sOrange_0;
+        customLines[1] = sOrange_1;
+        customLines[2] = sOrange_2;
+        customLines[3] = sOrange_3;
+        customLines[4] = sOrange_4;
+        numLines = 5;
+        sender = sNathan;
+        break;
+    case ITEM_FAB_MAIL:
+        sScriptMail.itemId = ITEM_FAB_MAIL;
+        customLines[0] = sFab_0;
+        customLines[1] = sFab_1;
+        customLines[2] = sFab_2;
+        numLines = 3;
+        sender = sBirch;
+        break;
+    case ITEM_HARBOR_MAIL:
+        sScriptMail.itemId = ITEM_HARBOR_MAIL;
+        customLines[0] = sHarbor_0;
+        customLines[1] = sHarbor_1;
+        customLines[2] = sHarbor_2;
+        customLines[3] = sHarbor_3;
+        customLines[4] = sHarbor_4;
+        numLines = 5;
+        sender = sNathan;
+        break;
+    default:
+        sScriptMail.itemId = ITEM_ORANGE_MAIL;
+        customLines[0] = sOrange_0;
+        customLines[1] = sOrange_1;
+        customLines[2] = sOrange_2;
+        customLines[3] = sOrange_3;
+        customLines[4] = sOrange_4;
+        numLines = 5;
+        sender = sNathan;
+        break;
+    }
 
     ReadMail(&sScriptMail, CB2_ReturnToFieldContinueScriptPlayMapMusic, TRUE);
-    Mail_SetCustomText(customLines, ARRAY_COUNT(customLines));
+    Mail_SetCustomSender(sender);
+    Mail_SetCustomText(customLines, numLines);
 }

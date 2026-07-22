@@ -19,6 +19,7 @@
 // mail.h
 void ReadMail(struct Mail *mail, MainCallback exitCallback, bool8 hasText);
 void Mail_SetCustomText(const u8 *lines[], u8 numLines);
+void Mail_SetCustomSender(const u8 *name);
 void Mail_ClearCustomText(void);
 
 // mail_data.h

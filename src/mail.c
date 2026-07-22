@@ -102,6 +102,14 @@ void Mail_ClearCustomText(void)
     sUseCustomMailText = FALSE;
 }
 
+void Mail_SetCustomSender(const u8 *name)
+{
+    u8 i;
+    for (i = 0; name[i] != EOS && i < 11; i++)
+        sMailRead->playerName[i] = name[i];
+    sMailRead->playerName[i] = EOS;
+}
+
 static void CB2_InitMailRead(void);
 static void BufferMailText(void);
 static void PrintMailText(void);
@@ -679,7 +687,14 @@ static void BufferMailText(void)
     }
 
     // Buffer the signature
-    ptr = StringCopy(sMailRead->playerName, sMailRead->mail->playerName);
+    if (!sUseCustomMailText)
+    {
+        ptr = StringCopy(sMailRead->playerName, sMailRead->mail->playerName);
+    }
+    else
+    {
+        ptr = StringCopy(sMailRead->playerName, sMailRead->playerName);
+    }
     if (!sMailRead->international)
     {
         // Never reached

@@ -425,9 +425,32 @@ LittlerootTown_MaysHouse_2F_EventScript_MailBox::
 LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu:
 	msgbox LittlerootTown_MaysHouse_2F_Text_SelectMail, MSGBOX_DEFAULT
 	multichoice 0, 0, MULTI_MAIL_SELECT, FALSE
+	compare VAR_RESULT, 0
+	goto_if_eq LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadOrange
 	compare VAR_RESULT, 1
-	goto_if_eq LittlerootTown_MaysHouse_2F_EventScript_MailBoxCancel
-	setvar VAR_0x8004, ITEM_TROPIC_MAIL
+	goto_if_eq LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadHarbor
+	compare VAR_RESULT, 2
+	goto_if_eq LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadFab
+	compare VAR_RESULT, 3
+	goto_if_eq LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadPro
+	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxCancel
+LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadOrange:
+	setvar VAR_0x8004, ITEM_ORANGE_MAIL
+	special Special_ReadScriptMail
+	waitstate
+	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu
+LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadHarbor:
+	setvar VAR_0x8004, ITEM_HARBOR_MAIL
+	special Special_ReadScriptMail
+	waitstate
+	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu
+LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadFab:
+	setvar VAR_0x8004, ITEM_FAB_MAIL
+	special Special_ReadScriptMail
+	waitstate
+	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu
+LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadPro:
+	setvar VAR_0x8004, ITEM_NONE
 	special Special_ReadScriptMail
 	waitstate
 	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu
@@ -438,7 +461,7 @@ LittlerootTown_MaysHouse_2F_EventScript_MailBoxCancel:
 LittlerootTown_MaysHouse_2F_Text_MailBoxIntro:
 	.string "{PLAYER} peered into the box.\n"
 	.string "It looks to be an assortment\n"
-	.string "of letters...$"
+	.string "of letters…$"
 
 LittlerootTown_MaysHouse_2F_Text_SelectMail:
 	.string "Which letter would you like to read?$"
