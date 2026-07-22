@@ -236,7 +236,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "LittlerootTown_BrendansHouse_2F_EventScript_MailBox",
-      "flag": "0x0"
+      "flag": "FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F_MAILBOX"
     }
   ],
   "warp_events": [

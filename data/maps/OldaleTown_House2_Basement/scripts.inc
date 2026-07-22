@@ -334,7 +334,7 @@ OldaleTown_House2_Basement_Mart_TMs:
 	.hword ITEM_TM_FLAMETHROWER
 	.hword ITEM_TM_FLASH_CANNON
 	.hword ITEM_TM_FLIP_TURN
-	.hword ITEM_TM_FOCUS_BLAST
+	.hword ITEM_TM_BODY_PRESS
 	.hword ITEM_TM_GIGA_DRAIN
 	.hword ITEM_TM_HAIL
 	.hword ITEM_TM_HONE_CLAWS

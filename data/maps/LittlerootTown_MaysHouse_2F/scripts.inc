@@ -8,9 +8,19 @@ LittlerootTown_MaysHouse_2F_OnTransition:
 	call_if_lt VAR_LITTLEROOT_RIVAL_STATE, 2, LittlerootTown_MaysHouse_2F_EventScript_CheckSetReadyToMeetMay
 	call_if_ge VAR_LITTLEROOT_RIVAL_STATE, 3, LittlerootTown_MaysHouse_2F_EventScript_CheckShouldUpdateMayPos
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 4, PlayersHouse_2F_EventScript_BlockStairsUntilClockIsSet
+	call LittlerootTown_MaysHouse_2F_EventScript_CheckShowMailbox
 	call SecretBase_EventScript_SetDecorationFlags
 	setvar VAR_SECRET_BASE_INITIALIZED, 0
 	end
+
+LittlerootTown_MaysHouse_2F_EventScript_CheckShowMailbox::
+	checkplayergender
+	goto_if_eq VAR_RESULT, FEMALE, LittlerootTown_MaysHouse_2F_EventScript_ShowMailbox
+	return
+
+LittlerootTown_MaysHouse_2F_EventScript_ShowMailbox::
+	clearflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_2F_MAILBOX
+	return
 
 LittlerootTown_MaysHouse_2F_EventScript_CheckShouldUpdateMayPos::
 	goto_if_set FLAG_MET_RIVAL_LILYCOVE, LittlerootTown_MaysHouse_2F_EventScript_TryUpdateMayPos
@@ -407,3 +417,28 @@ RivalsHouse_2F_Text_BrendanWhereShouldIGoNext:
 LittlerootTown_MaysHouse_2F_EventScript_GrandPrixMessage::
 	msgbox gText_GrandPrixMessage, MSGBOX_SIGN
 	end
+
+LittlerootTown_MaysHouse_2F_EventScript_MailBox::
+	lock
+	faceplayer
+	msgbox LittlerootTown_MaysHouse_2F_Text_MailBoxIntro, MSGBOX_DEFAULT
+LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu:
+	msgbox LittlerootTown_MaysHouse_2F_Text_SelectMail, MSGBOX_DEFAULT
+	multichoice 0, 0, MULTI_MAIL_SELECT, FALSE
+	compare VAR_RESULT, 1
+	goto_if_eq LittlerootTown_MaysHouse_2F_EventScript_MailBoxCancel
+	setvar VAR_0x8004, ITEM_TROPIC_MAIL
+	special Special_ReadScriptMail
+	waitstate
+	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu
+LittlerootTown_MaysHouse_2F_EventScript_MailBoxCancel:
+	release
+	end
+
+LittlerootTown_MaysHouse_2F_Text_MailBoxIntro:
+	.string "{PLAYER} peered into the box.\n"
+	.string "It looks to be an assortment\n"
+	.string "of letters...$"
+
+LittlerootTown_MaysHouse_2F_Text_SelectMail:
+	.string "Which letter would you like to read?$"

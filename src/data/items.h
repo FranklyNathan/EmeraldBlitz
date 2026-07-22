@@ -12672,19 +12672,19 @@ const struct Item gItemsInfo[] =
         .secondaryId = MOVE_FLASH_CANNON,
     },
 
-    [ITEM_TM_FOCUS_BLAST] =
+    [ITEM_TM_BODY_PRESS] =
     {
-        .name = ITEM_NAME("Focus Blast"),
+        .name = ITEM_NAME("Body Press"),
         .price = 3000,
         .description = COMPOUND_STRING(
             "The user attacks with\n"
-            "a powerful blast. It\n"
-            "may lower Sp. Def."),
+            "its body. It may also\n"
+            "lower the foe's Defense."),
         .importance = I_REUSABLE_TMS,
         .pocket = POCKET_TM_HM,
         .type = ITEM_USE_PARTY_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_TMHM,
-        .secondaryId = MOVE_FOCUS_BLAST,
+        .secondaryId = MOVE_BODY_PRESS,
     },
 
     [ITEM_TM_SCALD] =

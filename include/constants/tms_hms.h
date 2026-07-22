@@ -66,7 +66,7 @@
     F(SHADOW_CLAW) \
     F(DRAGON_PULSE) \
     F(FLASH_CANNON) \
-    F(FOCUS_BLAST) \
+    F(BODY_PRESS) \
     F(SCALD) \
     F(PLAY_ROUGH) \
     F(DUAL_WINGBEAT) \

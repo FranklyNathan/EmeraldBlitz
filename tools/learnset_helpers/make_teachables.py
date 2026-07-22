@@ -71,6 +71,40 @@ EXCLUDED_MOVES = {
     "MOVE_THUNDER_WAVE",
 }
 
+# Per-species move exclusions: species -> moves to remove from that species only
+EXCLUDED_MOVES_BY_SPECIES = {
+    "EEVEE": ["MOVE_CALM_MIND"],
+    "LEAFEON": ["MOVE_CALM_MIND"],
+    "GLACEON": ["MOVE_CALM_MIND"],
+    "VAPOREON": ["MOVE_CALM_MIND"],
+    "FLAREON": ["MOVE_CALM_MIND"],
+    "JOLTEON": ["MOVE_CALM_MIND"],
+    "UMBREON": ["MOVE_CALM_MIND"],
+    "PIKACHU": ["MOVE_CALM_MIND"],
+    "RAICHU": ["MOVE_CALM_MIND"],
+    "IGGLYBUFF": ["MOVE_CALM_MIND"],
+    "JIGGLYPUFF": ["MOVE_CALM_MIND"],
+    "WIGGLYTUFF": ["MOVE_CALM_MIND"],
+    "EXEGGUTOR_ALOLA": ["MOVE_CALM_MIND"],
+    "SCYTHER": ["MOVE_CALM_MIND"],
+    "CLEFFA": ["MOVE_CALM_MIND"],
+    "TOGEPI": ["MOVE_CALM_MIND"],
+    "TOGETIC": ["MOVE_CALM_MIND"],
+    "TOGEKISS": ["MOVE_CALM_MIND"],
+    "SCIZOR": ["MOVE_CALM_MIND"],
+    "MILOTIC": ["MOVE_CALM_MIND"],
+    "MEOWTH_GALAR": ["MOVE_BULK_UP"],
+    "ELECTABUZZ": ["MOVE_BULK_UP"],
+    "SABLEYE": ["MOVE_BULK_UP"],
+    "STARAPTOR": ["MOVE_BULK_UP"],
+    "ELECTIVIRE": ["MOVE_BULK_UP"],
+    "MALAMAR": ["MOVE_BULK_UP"],
+    "PERRSERKER": ["MOVE_BULK_UP"],
+    "TINKATUFF": ["MOVE_BULK_UP"],
+    "TINKATON": ["MOVE_BULK_UP"],
+    "SWAMPERT": ["MOVE_BULK_UP"],
+}
+
 # Special teachable rules: species -> moves to always add
 SPECIAL_TEACHABLE_BY_SPECIES = {
     "SHUPPET": ["MOVE_POUNCE"],
@@ -183,7 +217,11 @@ def prepare_output(all_learnables: dict[str, set[str]], repo_teachables: set[str
             cursor = match_e + 1
             continue
 
-        repo_species_teachables = filter(lambda m: m in repo_teachables, all_learnables[species_upper])
+        species_excluded = set(EXCLUDED_MOVES_BY_SPECIES.get(species_upper, []))
+        repo_species_teachables = filter(
+            lambda m: m in repo_teachables and m not in species_excluded,
+            all_learnables[species_upper]
+        )
 
         new += old[cursor:match_b]
         new += "\n".join([

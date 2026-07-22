@@ -133,9 +133,11 @@ SlateportCity_EventScript_EnergyGuru::
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyGuru_InvalidMon
 	msgbox SlateportCity_Text_EnergyNPC_Confirm, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_EnergyNPC_DeclineConfirm
+	goto_if_set FLAG_FREE_SHOP, SlateportCity_EventScript_EnergyGuru_SkipMoney
 	checkmoney 1000
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_HiddenPowerNPC_NotEnoughMoney
 	removemoney 1000
+SlateportCity_EventScript_EnergyGuru_SkipMoney:
 	callnative TriggerEnergyGuruEvolution
 	waitstate
 	goto SlateportCity_EventScript_EnergyGuru_Decline
@@ -182,9 +184,11 @@ SlateportCity_EventScript_EnergyOracle::
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyOracle_InvalidMon
 	msgbox SlateportCity_Text_EnergyNPC_Confirm, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_EnergyNPC_DeclineConfirm
+	goto_if_set FLAG_FREE_SHOP, SlateportCity_EventScript_EnergyOracle_SkipMoney
 	checkmoney 1000
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_HiddenPowerNPC_NotEnoughMoney
 	removemoney 1000
+SlateportCity_EventScript_EnergyOracle_SkipMoney:
 	callnative TriggerEffortRibbonEvolution
 	waitstate
 	goto SlateportCity_EventScript_EnergyOracle_Decline
