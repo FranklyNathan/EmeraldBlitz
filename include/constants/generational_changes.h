@@ -7,6 +7,7 @@
     F(CRIT_CHANCE,               critChance,              (u32, GEN_COUNT - 1)) \
     F(CRIT_MULTIPLIER,           critMultiplier,          (u32, GEN_COUNT - 1)) \
     F(PARALYSIS_SPEED,           paralysisSpeed,          (u32, GEN_COUNT - 1)) \
+    F(PARALYSIS_CHANCE,          paralysisChance,         (u32, GEN_COUNT - 1)) \
     F(CONFUSION_SELF_DMG_CHANCE, confusionSelfDmgChance,  (u32, GEN_COUNT - 1)) \
     F(MULTI_HIT_CHANCE,          multiHitChance,          (u32, GEN_COUNT - 1)) \
     F(WHITEOUT_MONEY,            whiteoutMoney,           (u32, GEN_COUNT - 1)) /* TODO: use in tests */ \
@@ -195,6 +196,7 @@
     F(AFFECTION_MECHANICS,       affectionMechanics,      (u32, TRUE))          /* TODO: use in tests */ \
     F(OBEDIENCE_MECHANICS,       obedienceMechanics,      (u32, GEN_COUNT - 1)) /* TODO: use in tests */ \
     F(USE_FROSTBITE,             useFrostbite,            (u32, GEN_COUNT - 1)) /* TODO: use in tests */ \
+    F(FREEZE_TURNS,              freezeTurns,             (u32, GEN_COUNT - 1)) \
 
 
 #define GET_CONFIG_MAXIMUM(_typeMaxValue, ...) INVOKE_WITH_B(GET_CONFIG_MAXIMUM_, _typeMaxValue)

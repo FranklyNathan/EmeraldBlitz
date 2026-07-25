@@ -292,5 +292,85 @@
     ],
     "TutorMoves": [],
     "EggMoves": []
+  },
+  "LITTEN": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "TORRACAT": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "INCINEROAR": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "SHROODLE": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "GRAFAIAI": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "URSALUNA": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "ROCKRUFF": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "LYCANROC": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "LYCANROC_MIDNIGHT": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "LYCANROC_DUSK": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
   }
 }

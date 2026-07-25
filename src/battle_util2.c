@@ -154,6 +154,15 @@ u32 BattlePalace_TryEscapeStatus(u8 battler)
                     else
                         gBattleMons[battler].status1 -= toSub;
 
+                    // Champions: cap sleep at 3 turns max
+                    if (B_SLEEP_TURNS >= GEN_LATEST && (gBattleMons[battler].status1 & STATUS1_SLEEP) > 2)
+                    {
+                        if (Random() % 3 == 0)
+                            gBattleMons[battler].status1 = (gBattleMons[battler].status1 & ~STATUS1_SLEEP) | STATUS1_SLEEP_TURN(1);
+                        else
+                            gBattleMons[battler].status1 = (gBattleMons[battler].status1 & ~STATUS1_SLEEP) | STATUS1_SLEEP_TURN(2);
+                    }
+
                     if (gBattleMons[battler].status1 & STATUS1_SLEEP)
                     {
                         // Still asleep
@@ -175,14 +184,17 @@ u32 BattlePalace_TryEscapeStatus(u8 battler)
         case 1:
             if (gBattleMons[battler].status1 & STATUS1_FREEZE)
             {
-                if (Random() % 5 != 0)
+                if (Random() % (B_FREEZE_TURNS >= GEN_LATEST ? 4 : 5) != 0 && GetBattlerPartyState(battler)->freezeTurns < 2)
                 {
+                    if (B_FREEZE_TURNS >= GEN_LATEST)
+                        GetBattlerPartyState(battler)->freezeTurns++;
                     // Still frozen
                     gBattlescriptCurrInstr = BattleScript_MoveUsedIsFrozen;
                 }
                 else
                 {
                     // Unfreeze
+                    GetBattlerPartyState(battler)->freezeTurns = 0;
                     gBattleMons[battler].status1 &= ~(STATUS1_FREEZE);
                     BattleScriptCall(BattleScript_MoveUsedUnfroze);
                     gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_DEFROSTED;

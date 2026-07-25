@@ -5498,7 +5498,6 @@ static const struct LevelUpMove sTogeticLevelUpLearnset[] = {
     LEVEL_UP_MOVE(45, MOVE_DOUBLE_EDGE),
     LEVEL_UP_MOVE(49, MOVE_LAST_RESORT),
     //LEVEL_UP_MOVE(53, MOVE_AFTER_YOU),
-    LEVEL_UP_MOVE(54, MOVE_MOONBLAST),
     LEVEL_UP_END
 };
 
@@ -5523,7 +5522,6 @@ static const struct LevelUpMove sTogekissLevelUpLearnset[] = {
     LEVEL_UP_MOVE(45, MOVE_DOUBLE_EDGE),
     LEVEL_UP_MOVE(49, MOVE_LAST_RESORT),
     //LEVEL_UP_MOVE(53, MOVE_AFTER_YOU),
-    LEVEL_UP_MOVE(54, MOVE_MOONBLAST),
     LEVEL_UP_END
 };
 #endif //P_GEN_4_CROSS_EVOS

@@ -3001,7 +3001,9 @@ static void SetNonVolatileStatus(u32 effectBattler, enum MoveEffect effect, cons
     switch (effect)
     {
     case MOVE_EFFECT_SLEEP:
-        if (B_SLEEP_TURNS >= GEN_5)
+        if (B_SLEEP_TURNS >= GEN_LATEST)
+            gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(2 + RandomWeighted(RNG_SLEEP_TURNS, 1, 2));
+        else if (B_SLEEP_TURNS >= GEN_5)
             gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + RandomUniform(RNG_SLEEP_TURNS, 1, 3));
         else
             gBattleMons[effectBattler].status1 |= STATUS1_SLEEP_TURN(1 + RandomUniform(RNG_SLEEP_TURNS, 2, 5));
@@ -3018,6 +3020,7 @@ static void SetNonVolatileStatus(u32 effectBattler, enum MoveEffect effect, cons
         break;
     case MOVE_EFFECT_FREEZE:
         gBattleMons[effectBattler].status1 |= STATUS1_FREEZE;
+        GetBattlerPartyState(effectBattler)->freezeTurns = 0;
         gBattlescriptCurrInstr = BattleScript_MoveEffectFreeze;
         break;
     case MOVE_EFFECT_PARALYSIS:

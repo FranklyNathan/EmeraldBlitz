@@ -15288,7 +15288,7 @@ Nature: Serious
 Ability: Steadfast
 - Brutal Swing
 - Fury Cutter
-- Revenge
+- Rock Smash
 - Iron Defense
 
 Hariyama (M) @ Sitrus Berry
@@ -15348,7 +15348,7 @@ Nature: Serious
 Ability: Steadfast
 - Sucker Punch
 - Fury Cutter
-- Revenge
+- Brick Break
 - Iron Defense
 
 Hariyama (M) @ Sitrus Berry
@@ -15408,7 +15408,7 @@ Nature: Serious
 Ability: Steadfast
 - Sucker Punch
 - Fury Cutter
-- Revenge
+- Brick Break
 - Leaf Blade
 
 Hariyama (M) @ Sitrus Berry
@@ -15457,7 +15457,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Static
 - Quick Attack
-- Thunder Wave
+- Fire Fang
 - Shock Wave
 - Howl
 
@@ -15506,8 +15506,8 @@ Level: 19
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Static
+- Bite
 - Fire Fang
-- Thunder Wave
 - Shock Wave
 - Howl
 
@@ -15556,8 +15556,8 @@ Level: 24
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Static
+- Bite
 - Fire Fang
-- Thunder Wave
 - Shock Wave
 - Howl
 
@@ -15606,10 +15606,10 @@ Level: 29
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Static
-- Fire Fang
-- Thunder Wave
-- Shock Wave
 - Bite
+- Fire Fang
+- Shock Wave
+- Howl
 
 === TRAINER_WATTSON_5 ===
 Name: WATTSON
@@ -16999,7 +16999,7 @@ Ability: Chlorophyll
 - Sunny Day
 - Aerial Ace
 - Solar Beam
-- Synthesis
+- Whirlwind
 
 Braviary-Hisui (M)
 Level: 40
@@ -17059,7 +17059,7 @@ Ability: Chlorophyll
 - Sunny Day
 - Aerial Ace
 - Solar Beam
-- Leaf Storm
+- Whirlwind
 
 Braviary-Hisui (M)
 Level: 44
@@ -17676,7 +17676,7 @@ Level: 29
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Commander
-- Flip Turn
+- Rain Dance
 - Water Pulse
 - Rapid Spin
 - Dark Pulse
@@ -17726,7 +17726,7 @@ Level: 31
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Commander
-- Flip Turn
+- Rain Dance
 - Water Pulse
 - Rapid Spin
 - Dark Pulse
@@ -17737,7 +17737,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Oblivious
 - Mud Bomb
-- Rain Dance
+- Zen Headbutt
 - Waterfall
 - Rock Slide
 
@@ -17786,7 +17786,7 @@ Level: 38
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Commander
-- Flip Turn
+- Rain Dance
 - Water Pulse
 - Rapid Spin
 - Dark Pulse
@@ -17797,7 +17797,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Oblivious
 - Mud Bomb
-- Rain Dance
+- Zen Headbutt
 - Waterfall
 - Rock Slide
 
@@ -17806,7 +17806,7 @@ Level: 42
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Marvel Scale
-- Disarming Voice
+- Dazzling Gleam
 - Water Pulse
 - Icy Wind
 - Recover
@@ -17846,7 +17846,7 @@ Level: 43
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Commander
-- Flip Turn
+- Rain Dance
 - Water Pulse
 - Dragon Pulse
 - Dark Pulse
@@ -17857,7 +17857,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Oblivious
 - Earthquake
-- Rain Dance
+- Zen Headbutt
 - Waterfall
 - Rock Slide
 

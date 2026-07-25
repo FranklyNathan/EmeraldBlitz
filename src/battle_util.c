@@ -2084,6 +2084,15 @@ static enum MoveCanceler CancelerAsleepOrFrozen(struct BattleContext *ctx)
             else
                 gBattleMons[ctx->battlerAtk].status1 -= toSub;
 
+            // Champions: cap sleep at 3 turns max
+            if (B_SLEEP_TURNS >= GEN_LATEST && (gBattleMons[ctx->battlerAtk].status1 & STATUS1_SLEEP) > 2)
+            {
+                if (Random() % 3 == 0)
+                    gBattleMons[ctx->battlerAtk].status1 = (gBattleMons[ctx->battlerAtk].status1 & ~STATUS1_SLEEP) | STATUS1_SLEEP_TURN(1);
+                else
+                    gBattleMons[ctx->battlerAtk].status1 = (gBattleMons[ctx->battlerAtk].status1 & ~STATUS1_SLEEP) | STATUS1_SLEEP_TURN(2);
+            }
+
             enum BattleMoveEffects moveEffect = GetMoveEffect(ctx->currentMove);
             if (gBattleMons[ctx->battlerAtk].status1 & STATUS1_SLEEP)
             {
@@ -2106,14 +2115,17 @@ static enum MoveCanceler CancelerAsleepOrFrozen(struct BattleContext *ctx)
     }
     else if (gBattleMons[ctx->battlerAtk].status1 & STATUS1_FREEZE && !MoveThawsUser(ctx->currentMove))
     {
-        if (!RandomPercentage(RNG_FROZEN, 20))
+        if (!RandomPercentage(RNG_FROZEN, (B_FREEZE_TURNS >= GEN_LATEST ? 25 : 20)) && GetBattlerPartyState(ctx->battlerAtk)->freezeTurns < 2)
         {
             gProtectStructs[ctx->battlerAtk].nonVolatileStatusImmobility = TRUE;
+            if (B_FREEZE_TURNS >= GEN_LATEST)
+                GetBattlerPartyState(ctx->battlerAtk)->freezeTurns++;
             gBattlescriptCurrInstr = BattleScript_MoveUsedIsFrozen;
             gHitMarker |= HITMARKER_UNABLE_TO_USE_MOVE;
         }
         else // unfreeze
         {
+            GetBattlerPartyState(ctx->battlerAtk)->freezeTurns = 0;
             gBattleMons[ctx->battlerAtk].status1 &= ~STATUS1_FREEZE;
             BattleScriptCall(BattleScript_MoveUsedUnfroze);
             gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_DEFROSTED;
@@ -2351,7 +2363,7 @@ static enum MoveCanceler CancelerParalyzed(struct BattleContext *ctx)
 {
     if (gBattleMons[ctx->battlerAtk].status1 & STATUS1_PARALYSIS
         && !(B_MAGIC_GUARD == GEN_4 && IsAbilityAndRecord(ctx->battlerAtk, ctx->abilities[ctx->battlerAtk], ABILITY_MAGIC_GUARD))
-        && !RandomPercentage(RNG_PARALYSIS, 75))
+        && !RandomPercentage(RNG_PARALYSIS, (B_PARALYSIS_CHANCE >= GEN_LATEST ? 87 : 75)))
     {
         gProtectStructs[ctx->battlerAtk].nonVolatileStatusImmobility = TRUE;
         // This is removed in FRLG and Emerald for some reason
@@ -2526,6 +2538,7 @@ static enum MoveCanceler CancelerThaw(struct BattleContext *ctx)
     {
         if (!(IsMoveEffectRemoveSpeciesType(ctx->currentMove, MOVE_EFFECT_REMOVE_ARG_TYPE, TYPE_FIRE) && !IS_BATTLER_OF_TYPE(ctx->battlerAtk, TYPE_FIRE)))
         {
+            GetBattlerPartyState(ctx->battlerAtk)->freezeTurns = 0;
             gBattleMons[ctx->battlerAtk].status1 &= ~STATUS1_FREEZE;
             BattleScriptCall(BattleScript_MoveUsedUnfroze);
             gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_DEFROSTED_BY_MOVE;
