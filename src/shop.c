@@ -619,7 +619,7 @@ static void PrepareScottTmShopInventory(void)
     // Add Invert option after the 5 TMs
     sScottTmItemList[5] = ITEM_SCOTT_TM_INVERT;
     sScottTmItemList[6] = ITEM_NONE;
-    sScottTmPriceList[5] = 4000; // Invert fixed price
+    sScottTmPriceList[5] = 2000; // Invert fixed price
     sScottTmPriceList[6] = 0;
 }
 
@@ -632,7 +632,7 @@ static u16 GetMartItemPrice(u16 itemId)
     {
         // Handle special options first
         if (itemId == ITEM_SCOTT_TM_INVERT)
-            return 4000; // Fixed price for Invert
+            return 2000; // Fixed price for Invert
 
         // Handle TMs
         for (i = 0; i < 5; i++) // Iterate over the 5 TM slots

@@ -6766,14 +6766,10 @@ static s32 AI_PredictSwitch(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
         ADJUST_SCORE(GOOD_EFFECT);
         break;
     case EFFECT_HIT_SWITCH_TARGET:
-        if (opposingHazardFlags)
-            ADJUST_SCORE(BEST_EFFECT);
-        else
-            ADJUST_SCORE(GOOD_EFFECT);
+        ADJUST_SCORE(GOOD_EFFECT);
         break;
     case EFFECT_ROAR:
-        if (opposingHazardFlags)
-            ADJUST_SCORE(GOOD_EFFECT);
+        ADJUST_SCORE(GOOD_EFFECT);
         break;
     case EFFECT_RAPID_SPIN:
         if (aiHazardFlags)

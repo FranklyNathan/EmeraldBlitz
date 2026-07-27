@@ -4583,8 +4583,10 @@ void SetObjectGfx(void)
 }
 
 static struct Mail sScriptMail;
+static u8 sProLetterIdx;
+static bool8 sProLetterIdxReady;
 
-#define PRO_LETTER_POOL_SIZE 2
+#define PRO_LETTER_POOL_SIZE 14
 
 struct ProLetterEntry
 {
@@ -4631,6 +4633,85 @@ static const u8 sProLetter1_2[] = _("off such a facade.");
 static const u8 sProLetter1_3[] = _("So you better have that");
 static const u8 sProLetter1_4[] = _("Norman check!");
 
+// Letter 2: Harbor - Shartwagon
+static const u8 sShartwagon[] = _("Shartwagon");
+static const u8 sProLetter2_0[] = _("don't forget berries");
+static const u8 sProLetter2_1[] = _("except for when viola");
+static const u8 sProLetter2_2[] = _("it's snowing on mt. fuji");
+
+// Letter 3: Tropic - Kagami
+static const u8 sKagami[] = _("Kagami");
+static const u8 sProLetter3_0[] = _("Oh hello there!");
+static const u8 sProLetter3_1[] = _("It's the prerogative owl");
+static const u8 sProLetter3_2[] = _("Kagami Fukuro wishing ");
+static const u8 sProLetter3_3[] = _("good luck to your run!");
+static const u8 sProLetter3_4[] = _("Double water Double grass!");
+
+// Letter 4: Dream - Mountain Drew
+static const u8 sMountainDrew[] = _("Mountain Drew");
+static const u8 sProLetter4_0[] = _("From King's Rock");
+static const u8 sProLetter4_1[] = _("Everything evolves into me.");
+static const u8 sProLetter4_2[] = _("For I am the Ultimate Evolution!");
+
+// Letter 5: Shadow - Awesome
+static const u8 sAwesome[] = _("Awesome");
+static const u8 sProLetter5_0[] = _("We out here crazy style");
+static const u8 sProLetter5_1[] = _("Low tiers are unstoppable");
+static const u8 sProLetter5_2[] = _("So Truth Nuclear");
+
+// Letter 6: Glitter - Justin
+static const u8 sJustin[] = _("Justin");
+static const u8 sProLetter6_0[] = _("Nothing scarier than Wattson 3");
+static const u8 sProLetter6_1[] = _("Except me at the auction!");
+
+// Letter 7: Glitter - Jeans
+static const u8 sJeans[] = _("Jeans");
+static const u8 sProLetter7_0[] = _("Congratulations!");
+static const u8 sProLetter7_1[] = _("");
+static const u8 sProLetter7_2[] = _("Your run has been blessed");
+static const u8 sProLetter7_3[] = _("by good RNG :)");
+
+// Letter 8: Harbor - Johan
+static const u8 sJohan[] = _("Johan");
+static const u8 sProLetter8_0[] = _("Cetitan and Clobbopus my goat");
+static const u8 sProLetter8_1[] = _("WE are waiting for age o Wally");
+static const u8 sProLetter8_2[] = _("Good luck in season 2!!!");
+static const u8 sProLetter8_3[] = _("Shoutout to B");
+static const u8 sProLetter8_4[] = _("and her Zigzagoon");
+
+// Letter 9: Fab - Jason
+static const u8 sJason[] = _("Jason");
+static const u8 sProLetter9_0[] = _("Looks like you didn't");
+static const u8 sProLetter9_1[] = _("draft Swirlix,");
+static const u8 sProLetter9_2[] = _("that was a mistake!");
+
+// Letter 10: Wave - Christian
+static const u8 sChristian[] = _("Christian");
+static const u8 sProLetter10_0[] = _("Whether or not you");
+static const u8 sProLetter10_1[] = _("check hair color this run...");
+static const u8 sProLetter10_2[] = _("Me, Scrappy Doo, and Kagami's");
+static const u8 sProLetter10_3[] = _("VTube model share a star sign.");
+static const u8 sProLetter10_4[] = _("We're Tauruses!");
+
+// Letter 11: Orange - Beastly
+static const u8 sBeastly[] = _("Beastly");
+static const u8 sProLetter11_0[] = _("You Won't Miss High Jump Kick");
+static const u8 sProLetter11_1[] = _("Just Press It!");
+
+// Letter 12: Wood - Thanh
+static const u8 sThanh[] = _("Thanh");
+static const u8 sProLetter12_0[] = _("Moin");
+static const u8 sProLetter12_1[] = _("");
+static const u8 sProLetter12_2[] = _("Alles hat ein Ende,");
+static const u8 sProLetter12_3[] = _("nur die Wurst hat zwei.");
+
+// Letter 13: Dream - <player>
+static const u8 sProLetter13_0[] = _("I don't want to eat my");
+static const u8 sProLetter13_1[] = _("own words, but I think");
+static const u8 sProLetter13_2[] = _("I'm going to live a lot");
+static const u8 sProLetter13_3[] = _("longer than I thought.");
+static const u8 sProLetter13_4[] = _("Forever, even.");
+
 static const struct ProLetterEntry sProLetterPool[PRO_LETTER_POOL_SIZE] =
 {
     {
@@ -4644,6 +4725,78 @@ static const struct ProLetterEntry sProLetterPool[PRO_LETTER_POOL_SIZE] =
         .lines = { sProLetter1_0, sProLetter1_1, sProLetter1_2, sProLetter1_3, sProLetter1_4 },
         .numLines = 5,
         .sender = sCertified,
+    },
+    {
+        .itemId = ITEM_HARBOR_MAIL,
+        .lines = { sProLetter2_0, sProLetter2_1, sProLetter2_2 },
+        .numLines = 3,
+        .sender = sShartwagon,
+    },
+    {
+        .itemId = ITEM_TROPIC_MAIL,
+        .lines = { sProLetter3_0, sProLetter3_1, sProLetter3_2, sProLetter3_3, sProLetter3_4 },
+        .numLines = 5,
+        .sender = sKagami,
+    },
+    {
+        .itemId = ITEM_DREAM_MAIL,
+        .lines = { sProLetter4_0, sProLetter4_1, sProLetter4_2 },
+        .numLines = 3,
+        .sender = sMountainDrew,
+    },
+    {
+        .itemId = ITEM_SHADOW_MAIL,
+        .lines = { sProLetter5_0, sProLetter5_1, sProLetter5_2 },
+        .numLines = 3,
+        .sender = sAwesome,
+    },
+    {
+        .itemId = ITEM_GLITTER_MAIL,
+        .lines = { sProLetter6_0, sProLetter6_1 },
+        .numLines = 2,
+        .sender = sJustin,
+    },
+    {
+        .itemId = ITEM_GLITTER_MAIL,
+        .lines = { sProLetter7_0, sProLetter7_1, sProLetter7_2, sProLetter7_3 },
+        .numLines = 4,
+        .sender = sJeans,
+    },
+    {
+        .itemId = ITEM_HARBOR_MAIL,
+        .lines = { sProLetter8_0, sProLetter8_1, sProLetter8_2, sProLetter8_3, sProLetter8_4 },
+        .numLines = 5,
+        .sender = sJohan,
+    },
+    {
+        .itemId = ITEM_FAB_MAIL,
+        .lines = { sProLetter9_0, sProLetter9_1, sProLetter9_2 },
+        .numLines = 3,
+        .sender = sJason,
+    },
+    {
+        .itemId = ITEM_WAVE_MAIL,
+        .lines = { sProLetter10_0, sProLetter10_1, sProLetter10_2, sProLetter10_3, sProLetter10_4 },
+        .numLines = 5,
+        .sender = sChristian,
+    },
+    {
+        .itemId = ITEM_ORANGE_MAIL,
+        .lines = { sProLetter11_0, sProLetter11_1 },
+        .numLines = 2,
+        .sender = sBeastly,
+    },
+    {
+        .itemId = ITEM_WOOD_MAIL,
+        .lines = { sProLetter12_0, sProLetter12_1, sProLetter12_2, sProLetter12_3 },
+        .numLines = 4,
+        .sender = sThanh,
+    },
+    {
+        .itemId = ITEM_DREAM_MAIL,
+        .lines = { sProLetter13_0, sProLetter13_1, sProLetter13_2, sProLetter13_3, sProLetter13_4 },
+        .numLines = 5,
+        .sender = NULL,
     },
 };
 
@@ -4663,8 +4816,12 @@ void Special_ReadScriptMail(void)
     {
     case ITEM_NONE:
     {
-        u32 idx = Random() % PRO_LETTER_POOL_SIZE;
-        const struct ProLetterEntry *entry = &sProLetterPool[idx];
+        if (!sProLetterIdxReady)
+        {
+            sProLetterIdx = Random() % PRO_LETTER_POOL_SIZE;
+            sProLetterIdxReady = TRUE;
+        }
+        const struct ProLetterEntry *entry = &sProLetterPool[sProLetterIdx];
         sScriptMail.itemId = entry->itemId;
         for (i = 0; i < entry->numLines; i++)
             customLines[i] = entry->lines[i];
@@ -4713,6 +4870,8 @@ void Special_ReadScriptMail(void)
     }
 
     ReadMail(&sScriptMail, CB2_ReturnToFieldContinueScriptPlayMapMusic, TRUE);
+    if (sender == NULL)
+        sender = gSaveBlock2Ptr->playerName;
     Mail_SetCustomSender(sender);
     Mail_SetCustomText(customLines, numLines);
 }

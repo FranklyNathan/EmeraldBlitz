@@ -39743,7 +39743,7 @@ F_TRAINER_FEMALE |
 #line 15289
                 MOVE_BRUTAL_SWING,
                 MOVE_FURY_CUTTER,
-                MOVE_REVENGE,
+                MOVE_ROCK_SMASH,
                 MOVE_IRON_DEFENSE,
             },
             },
@@ -39882,7 +39882,7 @@ F_TRAINER_FEMALE |
 #line 15349
                 MOVE_SUCKER_PUNCH,
                 MOVE_FURY_CUTTER,
-                MOVE_REVENGE,
+                MOVE_BRICK_BREAK,
                 MOVE_IRON_DEFENSE,
             },
             },
@@ -40021,7 +40021,7 @@ F_TRAINER_FEMALE |
 #line 15409
                 MOVE_SUCKER_PUNCH,
                 MOVE_FURY_CUTTER,
-                MOVE_REVENGE,
+                MOVE_BRICK_BREAK,
                 MOVE_LEAF_BLADE,
             },
             },
@@ -40135,7 +40135,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 15459
                 MOVE_QUICK_ATTACK,
-                MOVE_THUNDER_WAVE,
+                MOVE_FIRE_FANG,
                 MOVE_SHOCK_WAVE,
                 MOVE_HOWL,
             },
@@ -40247,8 +40247,8 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15509
+                MOVE_BITE,
                 MOVE_FIRE_FANG,
-                MOVE_THUNDER_WAVE,
                 MOVE_SHOCK_WAVE,
                 MOVE_HOWL,
             },
@@ -40360,8 +40360,8 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15559
+                MOVE_BITE,
                 MOVE_FIRE_FANG,
-                MOVE_THUNDER_WAVE,
                 MOVE_SHOCK_WAVE,
                 MOVE_HOWL,
             },
@@ -40473,10 +40473,10 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15609
-                MOVE_FIRE_FANG,
-                MOVE_THUNDER_WAVE,
-                MOVE_SHOCK_WAVE,
                 MOVE_BITE,
+                MOVE_FIRE_FANG,
+                MOVE_SHOCK_WAVE,
+                MOVE_HOWL,
             },
             },
         },
@@ -40655,9 +40655,9 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 15689
                 MOVE_SHOCK_WAVE,
-                MOVE_DISCHARGE,
+                MOVE_CHARGE_BEAM,
                 MOVE_ENERGY_BALL,
-                MOVE_SELF_DESTRUCT,
+                MOVE_EXPLOSION,
             },
             },
             {
@@ -40790,7 +40790,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 15749
                 MOVE_SHOCK_WAVE,
-                MOVE_DISCHARGE,
+                MOVE_CHARGE_BEAM,
                 MOVE_ENERGY_BALL,
                 MOVE_EXPLOSION,
             },
@@ -40925,7 +40925,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 15809
                 MOVE_SHOCK_WAVE,
-                MOVE_DISCHARGE,
+                MOVE_CHARGE_BEAM,
                 MOVE_ENERGY_BALL,
                 MOVE_EXPLOSION,
             },
@@ -43703,7 +43703,7 @@ F_TRAINER_FEMALE |
                 MOVE_SUNNY_DAY,
                 MOVE_AERIAL_ACE,
                 MOVE_SOLAR_BEAM,
-                MOVE_SYNTHESIS,
+                MOVE_WHIRLWIND,
             },
             },
             {
@@ -43844,7 +43844,7 @@ F_TRAINER_FEMALE |
                 MOVE_SUNNY_DAY,
                 MOVE_AERIAL_ACE,
                 MOVE_SOLAR_BEAM,
-                MOVE_LEAF_STORM,
+                MOVE_WHIRLWIND,
             },
             },
             {
@@ -45266,7 +45266,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17679
-                MOVE_FLIP_TURN,
+                MOVE_RAIN_DANCE,
                 MOVE_WATER_PULSE,
                 MOVE_RAPID_SPIN,
                 MOVE_DARK_PULSE,
@@ -45383,7 +45383,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17729
-                MOVE_FLIP_TURN,
+                MOVE_RAIN_DANCE,
                 MOVE_WATER_PULSE,
                 MOVE_RAPID_SPIN,
                 MOVE_DARK_PULSE,
@@ -45406,7 +45406,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 17739
                 MOVE_MUD_BOMB,
-                MOVE_RAIN_DANCE,
+                MOVE_ZEN_HEADBUTT,
                 MOVE_WATERFALL,
                 MOVE_ROCK_SLIDE,
             },
@@ -45522,7 +45522,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17789
-                MOVE_FLIP_TURN,
+                MOVE_RAIN_DANCE,
                 MOVE_WATER_PULSE,
                 MOVE_RAPID_SPIN,
                 MOVE_DARK_PULSE,
@@ -45545,7 +45545,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 17799
                 MOVE_MUD_BOMB,
-                MOVE_RAIN_DANCE,
+                MOVE_ZEN_HEADBUTT,
                 MOVE_WATERFALL,
                 MOVE_ROCK_SLIDE,
             },
@@ -45568,7 +45568,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17809
-                MOVE_DISARMING_VOICE,
+                MOVE_DAZZLING_GLEAM,
                 MOVE_WATER_PULSE,
                 MOVE_ICY_WIND,
                 MOVE_RECOVER,
@@ -45661,7 +45661,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17849
-                MOVE_FLIP_TURN,
+                MOVE_RAIN_DANCE,
                 MOVE_WATER_PULSE,
                 MOVE_DRAGON_PULSE,
                 MOVE_DARK_PULSE,
@@ -45684,7 +45684,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 17859
                 MOVE_EARTHQUAKE,
-                MOVE_RAIN_DANCE,
+                MOVE_ZEN_HEADBUTT,
                 MOVE_WATERFALL,
                 MOVE_ROCK_SLIDE,
             },
@@ -46194,9 +46194,9 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 18081
                 MOVE_LEAF_TORNADO,
-                MOVE_WHIRLWIND,
-                MOVE_SWAGGER,
                 MOVE_HURRICANE,
+                MOVE_WHIRLWIND,
+                MOVE_DOUBLE_TEAM,
             },
             },
             {

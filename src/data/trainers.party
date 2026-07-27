@@ -15687,9 +15687,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Soundproof
 - Shock Wave
-- Discharge
+- Charge Beam
 - Energy Ball
-- Self Destruct
+- Explosion
 
 Magneton
 Level: 33
@@ -15747,7 +15747,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Soundproof
 - Shock Wave
-- Discharge
+- Charge Beam
 - Energy Ball
 - Explosion
 
@@ -15807,7 +15807,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Soundproof
 - Shock Wave
-- Discharge
+- Charge Beam
 - Energy Ball
 - Explosion
 
@@ -18079,9 +18079,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Chlorophyll
 - Leaf Tornado
-- Whirlwind
-- Swagger
 - Hurricane
+- Whirlwind
+- Double Team
 
 Decidueye-Hisui (M)
 Level: 54

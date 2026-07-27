@@ -5562,10 +5562,17 @@ bool32 AI_IsBattlerAsleepOrComatose(u32 battlerId)
 
 s32 AI_TryToClearStats(u32 battlerAtk, u32 battlerDef, bool32 isDoubleBattle)
 {
+    s32 totalBoosts;
+
     if (isDoubleBattle)
-        return min(CountPositiveStatStages(battlerDef) + CountPositiveStatStages(BATTLE_PARTNER(battlerDef)), 7);
+        totalBoosts = CountPositiveStatStages(battlerDef) + CountPositiveStatStages(BATTLE_PARTNER(battlerDef));
     else
-        return min(CountPositiveStatStages(battlerDef), 4);
+        totalBoosts = CountPositiveStatStages(battlerDef);
+
+    if (totalBoosts < 3)
+        return 0;
+
+    return isDoubleBattle ? min(totalBoosts, 7) : min(totalBoosts, 4);
 }
 
 bool32 AI_ShouldCopyStatChanges(u32 battlerAtk, u32 battlerDef)
