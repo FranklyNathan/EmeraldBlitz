@@ -259,6 +259,7 @@ void NewGameInitData(void)
         FlagSet(FLAG_CLEANSE_TAG);
         VarSet(VAR_LITTLEROOT_INTRO_STATE, 5);
         VarSet(VAR_0x8005, 8);
+        VarSet(VAR_TRUCK_SCENARIO, 255);
         FlagClear(FLAG_HIDE_LITTLEROOT_TOWN_FAT_MAN);
         FlagClear(FLAG_HIDE_MAP_NAME_POPUP);
         FlagSet(FLAG_SYS_PC_LANETTE); 
