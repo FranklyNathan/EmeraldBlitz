@@ -4586,7 +4586,7 @@ static struct Mail sScriptMail;
 static u8 sProLetterIdx;
 static bool8 sProLetterIdxReady;
 
-#define PRO_LETTER_POOL_SIZE 14
+#define PRO_LETTER_POOL_SIZE 17
 
 struct ProLetterEntry
 {
@@ -4700,6 +4700,30 @@ static const u8 sProLetter11_1[] = _("Just Press It!");
 
 // Letter 12: Wood - Thanh
 static const u8 sThanh[] = _("Thanh");
+
+// Letter 14: Shadow - Rohdianer
+static const u8 sRohdianer[] = _("Rohdianer");
+static const u8 sProLetter14_0[] = _("Wer reitet so spät ");
+static const u8 sProLetter14_1[] = _("durch Nacht und Wind?");
+static const u8 sProLetter14_2[] = _("Es ist der Vater mit seinem Kind;");
+static const u8 sProLetter14_3[] = _("Er hat den Knaben wohl in dem Arm,");
+static const u8 sProLetter14_4[] = _("Er fasst ihn sicher, er hält ihn warm.");
+
+// Letter 15: Glitter - manthief
+static const u8 sManthief[] = _("manthief");
+static const u8 sProLetter15_0[] = _("DRAFT A LOT OF POKEMON");
+static const u8 sProLetter15_1[] = _("A LOT");
+static const u8 sProLetter15_2[] = _("FEED YOUR DOG");
+static const u8 sProLetter15_3[] = _("YEAH YEAH, FIRE");
+
+// Letter 16: Tropic - livii
+static const u8 sLivii[] = _("livii");
+static const u8 sProLetter16_0[] = _("Prerogative is a concept");
+static const u8 sProLetter16_1[] = _("Invented by Kagami");
+static const u8 sProLetter16_2[] = _("To sell cheaper Grass-types");
+static const u8 sProLetter16_3[] = _("and Water-types");
+static const u8 sProLetter16_4[] = _("Late in an auction.");
+
 static const u8 sProLetter12_0[] = _("Moin");
 static const u8 sProLetter12_1[] = _("");
 static const u8 sProLetter12_2[] = _("Alles hat ein Ende,");
@@ -4797,6 +4821,24 @@ static const struct ProLetterEntry sProLetterPool[PRO_LETTER_POOL_SIZE] =
         .lines = { sProLetter13_0, sProLetter13_1, sProLetter13_2, sProLetter13_3, sProLetter13_4 },
         .numLines = 5,
         .sender = NULL,
+    },
+    {
+        .itemId = ITEM_SHADOW_MAIL,
+        .lines = { sProLetter14_0, sProLetter14_1, sProLetter14_2, sProLetter14_3, sProLetter14_4 },
+        .numLines = 5,
+        .sender = sRohdianer,
+    },
+    {
+        .itemId = ITEM_GLITTER_MAIL,
+        .lines = { sProLetter15_0, sProLetter15_1, sProLetter15_2, sProLetter15_3 },
+        .numLines = 4,
+        .sender = sManthief,
+    },
+    {
+        .itemId = ITEM_TROPIC_MAIL,
+        .lines = { sProLetter16_0, sProLetter16_1, sProLetter16_2, sProLetter16_3, sProLetter16_4 },
+        .numLines = 5,
+        .sender = sLivii,
     },
 };
 
