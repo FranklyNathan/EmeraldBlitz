@@ -329,6 +329,7 @@ static const struct HallofFameMon sDummyFameMon =
 {
     .tid = 0x3EA03EA,
     .personality = 0,
+    .heldItem = 0,
     .isShiny = FALSE,
     .species = SPECIES_NONE,
     .lvl = 0,
@@ -456,6 +457,7 @@ static void Task_Hof_InitMonData(u8 taskId)
             sHofMonPtr->mon[i].isShiny = GetMonData(&gPlayerParty[i], MON_DATA_IS_SHINY);
             sHofMonPtr->mon[i].personality = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
             sHofMonPtr->mon[i].lvl = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
+            sHofMonPtr->mon[i].heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
             GetMonData(&gPlayerParty[i], MON_DATA_NICKNAME, nickname);
             for (j = 0; j < POKEMON_NAME_LENGTH; j++)
                 sHofMonPtr->mon[i].nickname[j] = nickname[j];
@@ -468,6 +470,7 @@ static void Task_Hof_InitMonData(u8 taskId)
             sHofMonPtr->mon[i].isShiny = FALSE;
             sHofMonPtr->mon[i].personality = 0;
             sHofMonPtr->mon[i].lvl = 0;
+            sHofMonPtr->mon[i].heldItem = 0;
             sHofMonPtr->mon[i].nickname[0] = EOS;
         }
     }
@@ -567,6 +570,27 @@ static void Task_Hof_SetMonDisplayTask(u8 taskId)
     gTasks[taskId].func = Task_Hof_DisplayMon;
 }
 
+static u16 GetHallOfFameMonSpriteSpecies(struct HallofFameMon *mon)
+{
+    u16 species = mon->species;
+    if (species != SPECIES_EGG && species != SPECIES_NONE)
+    {
+        const struct FormChange *formChanges = GetSpeciesFormChanges(species);
+        u32 i;
+        for (i = 0; formChanges[i].method != FORM_CHANGE_TERMINATOR; i++)
+        {
+            if (formChanges[i].method == FORM_CHANGE_BATTLE_MEGA_EVOLUTION_ITEM
+                && mon->heldItem == formChanges[i].param1)
+            {
+                return formChanges[i].targetSpecies;
+            }
+        }
+        if (species == SPECIES_WISHIWASHI)
+            return SPECIES_WISHIWASHI_SCHOOL;
+    }
+    return species;
+}
+
 #define tDestinationX  data[1]
 #define tDestinationY  data[2]
 #define tSpecies       data[7]
@@ -597,11 +621,14 @@ static void Task_Hof_DisplayMon(u8 taskId)
     if (currMon->species == SPECIES_EGG)
         destY += 10;
 
-    spriteId = CreateMonPicSprite_Affine(currMon->species, currMon->isShiny, currMon->personality, MON_PIC_AFFINE_FRONT, startX, startY, currMonId, TAG_NONE);
-    gSprites[spriteId].tDestinationX = destX;
-    gSprites[spriteId].tDestinationY = destY;
-    gSprites[spriteId].data[0] = 0;
-    gSprites[spriteId].tSpecies = currMon->species;
+    {
+        u16 spriteSpecies = GetHallOfFameMonSpriteSpecies(currMon);
+        spriteId = CreateMonPicSprite_Affine(spriteSpecies, currMon->isShiny, currMon->personality, MON_PIC_AFFINE_FRONT, startX, startY, currMonId, TAG_NONE);
+        gSprites[spriteId].tDestinationX = destX;
+        gSprites[spriteId].tDestinationY = destY;
+        gSprites[spriteId].data[0] = 0;
+        gSprites[spriteId].tSpecies = spriteSpecies;
+    }
     gSprites[spriteId].callback = SpriteCB_GetOnScreenAndAnimate;
     gTasks[taskId].tMonSpriteId(currMonId) = spriteId;
     ClearDialogWindowAndFrame(0, TRUE);
@@ -968,7 +995,7 @@ static void Task_HofPC_DrawSpritesPrintText(u8 taskId)
             if (currMon->species == SPECIES_EGG)
                 posY += 10;
 
-            spriteId = CreateMonPicSprite(currMon->species, currMon->isShiny, currMon->personality, TRUE, posX, posY, i, TAG_NONE);
+            spriteId = CreateMonPicSprite(GetHallOfFameMonSpriteSpecies(currMon), currMon->isShiny, currMon->personality, TRUE, posX, posY, i, TAG_NONE);
             gSprites[spriteId].oam.priority = 1;
             gTasks[taskId].tMonSpriteId(i) = spriteId;
         }

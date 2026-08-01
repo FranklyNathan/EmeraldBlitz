@@ -5,6 +5,7 @@ struct HallofFameMon
 {
     u32 tid;
     u32 personality;
+    u16 heldItem;
     u16 isShiny:1;
     u16 species:15;
     u8 lvl;

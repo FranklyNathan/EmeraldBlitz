@@ -157,7 +157,7 @@ RustboroCity_Movement_ScottApproach:
 	step_end
 
 RustboroCity_EventScript_ScottText0::
-	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
+	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_RUSTBORO_SCOTT
 	special OpenScottTmShop
@@ -179,7 +179,7 @@ Common_EventScript_ScottStolen::
 	end
 
 RustboroCity_EventScript_ScottText1::
-	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
+	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_RUSTBORO_SCOTT
 	special OpenScottTmShop

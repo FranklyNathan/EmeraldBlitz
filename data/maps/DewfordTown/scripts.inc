@@ -710,7 +710,7 @@ DewfordTown_Movement_ScottApproach:
 	step_end
 
 DewfordTown_EventScript_ScottText0::
-	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
+	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
 	special OpenScottTmShop
@@ -720,7 +720,7 @@ DewfordTown_EventScript_ScottText0::
 	return
 
 DewfordTown_EventScript_ScottText1::
-	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
+	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
 	special OpenScottTmShop

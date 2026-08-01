@@ -21,7 +21,7 @@ static u16 GetEnergyGuruEvolutionTarget(struct Pokemon *mon, u32 partyId)
     for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
     {
         if (evolutions[i].method == EVO_LEVEL 
-            && evolutions[i].param >= 30
+            && evolutions[i].param > 30
             && DoesMonMeetAdditionalConditions(mon, evolutions[i].params, NULL, partyId, NULL, CHECK_EVO))
         {
             // Check if the target species can evolve further
@@ -108,7 +108,7 @@ static u16 GetEffortRibbonEvolutionTarget(struct Pokemon *mon, u32 partyId)
     {
         // Condition 2: Evolves via Level Up > 36
         if (evolutions[i].method == EVO_LEVEL 
-            && evolutions[i].param >= 36 
+            && evolutions[i].param > 36 
             && DoesMonMeetAdditionalConditions(mon, evolutions[i].params, NULL, partyId, NULL, CHECK_EVO))
         {
             // Condition 3: Target species cannot evolve further

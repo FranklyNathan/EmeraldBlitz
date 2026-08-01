@@ -20853,6 +20853,7 @@ static const u16 sKlefkiTeachableLearnset[] = {
 
 #if P_FAMILY_PHANTUMP
 static const u16 sPhantumpTeachableLearnset[] = {
+    MOVE_BULLET_SEED,
     MOVE_DARK_PULSE,
     MOVE_FACADE,
     MOVE_GIGA_DRAIN,
@@ -20876,6 +20877,7 @@ static const u16 sPhantumpTeachableLearnset[] = {
 };
 
 static const u16 sTrevenantTeachableLearnset[] = {
+    MOVE_BULLET_SEED,
     MOVE_CALM_MIND,
     MOVE_DARK_PULSE,
     MOVE_EARTHQUAKE,

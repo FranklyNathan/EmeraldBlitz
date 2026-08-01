@@ -372,5 +372,21 @@
     ],
     "TutorMoves": [],
     "EggMoves": []
+  },
+  "PHANTUMP": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_BULLET_SEED"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "TREVENANT": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_BULLET_SEED"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
   }
 }

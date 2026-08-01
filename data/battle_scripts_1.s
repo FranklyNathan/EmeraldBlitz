@@ -6169,6 +6169,7 @@ BattleScript_ThrashConfuses::
 	volatileanimation BS_ATTACKER, VOLATILE_CONFUSION
 	printstring STRINGID_PKMNFATIGUECONFUSION
 	waitmessage B_WAIT_TIME_LONG
+	tryactivateitem BS_ATTACKER, ACTIVATION_ON_STATUS_CHANGE
 	end2
 
 BattleScript_MoveUsedIsConfused::

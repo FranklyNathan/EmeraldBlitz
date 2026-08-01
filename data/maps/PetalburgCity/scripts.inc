@@ -145,7 +145,7 @@ PetalburgCity_EventScript_ScottEncounter::
 	end
 
 PetalburgCity_EventScript_ScottText1::
-	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
+	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_PETALBURG_SCOTT
 	special OpenScottTmShop
@@ -153,7 +153,7 @@ PetalburgCity_EventScript_ScottText1::
 	return
 
 PetalburgCity_EventScript_ScottText2::
-	goto_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
+	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym2, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_PETALBURG_SCOTT
 	special OpenScottTmShop

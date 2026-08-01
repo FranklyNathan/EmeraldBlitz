@@ -991,7 +991,7 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             if (gBagPosition.pocket == POCKET_TM_HM && itemIndex != LIST_CANCEL)
             {
                 u16 itemId = GetBagItemId(gBagPosition.pocket, itemIndex);
-                if (GetItemTMHMIndex(itemId) <= NUM_TECHNICAL_MACHINES)
+                if (GetItemTMHMIndex(itemId) != 0)
                     shouldShowIcons = TRUE;
             }
             if (!shouldShowIcons)
@@ -1066,7 +1066,7 @@ static void PrintItemDescription(int itemIndex)
     if (gBagPosition.pocket == POCKET_TM_HM && itemIndex != LIST_CANCEL)
     {
         u16 itemId = GetBagItemId(gBagPosition.pocket, itemIndex);
-        if (GetItemTMHMIndex(itemId) <= NUM_TECHNICAL_MACHINES)
+        if (GetItemTMHMIndex(itemId) != 0)
         {
             CreateShopPokemonIconSprites(itemId, sBagPokemonIconSpriteIds);
             CopyWindowToVram(WIN_DESCRIPTION, COPYWIN_GFX);

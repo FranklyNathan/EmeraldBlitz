@@ -194,6 +194,8 @@ static u16 sScottTmSavedPal3; // Saved palette entry 3 for preview restore
 static EWRAM_DATA struct ListMenuItem *sListMenuItems = NULL;
 static EWRAM_DATA u16 sSeenScottTmPairs[ARRAY_COUNT(sScottTmPartners)] = {0}; // Track which partner pairs have been seen
 static EWRAM_DATA u8 sScottShopLoadCount = 0; // Track how many times the shop has been loaded
+static EWRAM_DATA u32 sLastOfferedTypeMask = 0; // Bitmask of partner pair indices offered in the last visit
+static EWRAM_DATA bool8 sHasPreviousVisit = FALSE; // Whether a previous Scott TM shop visit has occurred
 
 // Special item ID for Scott's TM shop option
 #define ITEM_SCOTT_TM_INVERT  0xFFFD
@@ -494,6 +496,17 @@ static void SetShopItemsForSale(const u16 *items)
     }
 }
 
+static u16 GetScottTmPairIndex(u16 tmId)
+{
+    u16 i;
+    for (i = 0; i < ARRAY_COUNT(sScottTmPartners); i++)
+    {
+        if (sScottTmPartners[i][0] == tmId || sScottTmPartners[i][1] == tmId)
+            return i;
+    }
+    return ARRAY_COUNT(sScottTmPartners);
+}
+
 static void PrepareScottTmShopInventory(void)
 {
     u16 poolItems[ARRAY_COUNT(sScottTmPool)] = {0};
@@ -505,6 +518,7 @@ static void PrepareScottTmShopInventory(void)
     {
         u16 unseenPairs[ARRAY_COUNT(sScottTmPartners)];
         u16 numUnseen = 0;
+        u32 offeredThisVisitMask = 0;
     for (i = 0; i < ARRAY_COUNT(sScottTmPartners); i++)
     {
             if (!sSeenScottTmPairs[i])
@@ -517,6 +531,7 @@ static void PrepareScottTmShopInventory(void)
             u16 pairIdx = unseenPairs[i];
             sScottTmItemList[i] = sScottTmPartners[pairIdx][Random() % 2];
             sSeenScottTmPairs[pairIdx] = 1; // Mark as seen
+            offeredThisVisitMask |= (1 << pairIdx);
         }
         // Fill remainder if any
         for (; i < 5; i++)
@@ -525,7 +540,13 @@ static void PrepareScottTmShopInventory(void)
              // Refill pool for random selection
             poolSize = 0;
             for (j = 0; sScottTmPool[j] != ITEM_NONE; j++)
+            {
+                u16 pairIdx = GetScottTmPairIndex(sScottTmPool[j]);
+                if ((sHasPreviousVisit && (sLastOfferedTypeMask & (1 << pairIdx)))
+                    || (offeredThisVisitMask & (1 << pairIdx)))
+                    continue;
                 poolItems[poolSize++] = sScottTmPool[j];
+            }
 
             bool8 validItemFound = FALSE;
             while (!validItemFound)
@@ -568,7 +589,11 @@ static void PrepareScottTmShopInventory(void)
     else
 {
         for (i = 0; sScottTmPool[i] != ITEM_NONE; i++)
+        {
+            if (sHasPreviousVisit && (sLastOfferedTypeMask & (1 << GetScottTmPairIndex(sScottTmPool[i]))))
+                continue;
             poolItems[poolSize++] = sScottTmPool[i];
+        }
 
         // Select 5 random TMs ensuring no partners
             for (i = 0; i < 5; i++)
@@ -611,6 +636,11 @@ static void PrepareScottTmShopInventory(void)
             }
         }
     }
+    // Record current selection so these types are excluded from the next visit
+    sLastOfferedTypeMask = 0;
+    for (i = 0; i < 5; i++)
+        sLastOfferedTypeMask |= (1 << GetScottTmPairIndex(sScottTmItemList[i]));
+    sHasPreviousVisit = TRUE;
     // Assign initial prices for TMs (all 4000). These are effectively dummy values for TMs
     // because GetMartItemPrice will calculate the actual dynamic price.
     for (i = 0; i < 5; i++)
@@ -716,7 +746,8 @@ static void ScottTmInvert(u8 taskId)
         sListMenuItems[k].id = LIST_CANCEL;
     }
 
-    // sScottTmPurchasedCount (price tier) is NOT reset as per requirements.
+    // Reset the TM price tier so the remaining TMs cost 4000 again.
+    sScottTmPurchasedCount = 0;
     // Mark Invert as purchased for this session.
     sScottTmInvertPurchased = TRUE;
 
