@@ -406,11 +406,28 @@ void SetPartyHPBarSprite(struct Sprite *sprite, u8 animNum)
     sprite->animCmdIndex = 0;
 }
 
+static u8 sFaintedPaletteRefCount[6];
+
 void MakeMonIconSpriteFainted(struct Sprite *sprite)
 {
     u8 origPalNum = sprite->oam.paletteNum;
-    u16 newTag = POKE_ICON_BASE_PAL_TAG + 200 + (sprite - gSprites);
-    u8 newPalNum = AllocSpritePalette(newTag);
+    u16 origTag = GetSpritePaletteTagByPaletteNum(origPalNum);
+    if (origTag < POKE_ICON_BASE_PAL_TAG || origTag >= POKE_ICON_BASE_PAL_TAG + 6)
+        return;
+
+    u8 palIndex = origTag - POKE_ICON_BASE_PAL_TAG;
+    u16 newTag = POKE_ICON_BASE_PAL_TAG + 200 + palIndex;
+
+    u8 newPalNum = IndexOfSpritePaletteTag(newTag);
+    if (newPalNum != 0xFF)
+    {
+        sFaintedPaletteRefCount[palIndex]++;
+        sprite->data[7] = newTag;
+        sprite->oam.paletteNum = newPalNum;
+        return;
+    }
+
+    newPalNum = AllocSpritePalette(newTag);
     if (newPalNum == 0xFF)
         return;
 
@@ -420,6 +437,7 @@ void MakeMonIconSpriteFainted(struct Sprite *sprite)
     TintPalette_GrayScale(&gPlttBufferUnfaded[newOffset], 16);
     CpuCopy16(&gPlttBufferUnfaded[newOffset], &gPlttBufferFaded[newOffset], PLTT_SIZE_4BPP);
 
+    sFaintedPaletteRefCount[palIndex] = 1;
     sprite->data[7] = newTag;
     sprite->oam.paletteNum = newPalNum;
 }
@@ -428,7 +446,14 @@ void FreeMonIconSpriteFaintedPalette(struct Sprite *sprite)
 {
     if (sprite->data[7] != 0)
     {
-        FreeSpritePaletteByTag(sprite->data[7]);
+        u16 tag = sprite->data[7];
+        u8 palIndex = tag - POKE_ICON_BASE_PAL_TAG - 200;
+        if (palIndex < 6)
+        {
+            sFaintedPaletteRefCount[palIndex]--;
+            if (sFaintedPaletteRefCount[palIndex] == 0)
+                FreeSpritePaletteByTag(tag);
+        }
         sprite->data[7] = 0;
     }
 }

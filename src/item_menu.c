@@ -96,6 +96,8 @@ enum {
     ACTION_BY_TYPE,
     ACTION_BY_AMOUNT,
     ACTION_BY_INDEX,
+    ACTION_FULL_HEAL,
+    ACTION_SEMI_HEAL,
     ACTION_DUMMY,
 };
 
@@ -200,6 +202,7 @@ static void DrawItemListBgRow(u8);
 static void BagMenu_MoveCursorCallback(s32, bool8, struct ListMenu *);
 static void BagMenu_ItemPrintCallback(u8, u32, u8);
 static void ItemMenu_UseOutOfBattle(u8);
+static void ItemMenu_MedKitFullHeal(u8);
 static void ItemMenu_Toss(u8);
 static void ItemMenu_Register(u8);
 static void ItemMenu_Give(u8);
@@ -314,6 +317,8 @@ static const struct MenuAction sItemMenuActions[] = {
     [ACTION_BY_TYPE]           = {COMPOUND_STRING("Type"),      {ItemMenu_SortByType}},
     [ACTION_BY_AMOUNT]         = {COMPOUND_STRING("Amount"),    {ItemMenu_SortByAmount}},
     [ACTION_BY_INDEX]          = {COMPOUND_STRING("Index"),     {ItemMenu_SortByIndex}},
+    [ACTION_FULL_HEAL]         = {COMPOUND_STRING("FULL HEAL"), {ItemMenu_MedKitFullHeal}},
+    [ACTION_SEMI_HEAL]         = {COMPOUND_STRING("SEMI HEAL"), {ItemMenu_UseOutOfBattle}},
     [ACTION_DUMMY]             = {gText_EmptyString2, {NULL}}
 };
 
@@ -1759,6 +1764,11 @@ static void OpenContextMenu(u8 taskId)
                     if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
                         gBagMenu->contextMenuItemsBuffer[0] = ACTION_WALK;
                 }
+                if (gSpecialVar_ItemId == ITEM_MED_KIT)
+                {
+                    gBagMenu->contextMenuItemsBuffer[0] = ACTION_SEMI_HEAL;
+                    gBagMenu->contextMenuItemsBuffer[2] = ACTION_FULL_HEAL;
+                }
                 break;
             case POCKET_POKE_BALLS:
                 gBagMenu->contextMenuItemsPtr = sContextMenuItems_BallsPocket;
@@ -1950,6 +1960,14 @@ static void ItemMenu_UseOutOfBattle(u8 taskId)
                 ItemUseOutOfBattle_Berry(taskId);
         }
     }
+}
+
+static void ItemMenu_MedKitFullHeal(u8 taskId)
+{
+    RemoveContextWindow();
+    FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
+    ScheduleBgCopyTilemapToVram(0);
+    ItemUseOutOfBattle_MedKitFullHeal(taskId);
 }
 
 static void ItemMenu_Toss(u8 taskId)

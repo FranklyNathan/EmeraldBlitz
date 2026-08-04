@@ -4586,7 +4586,7 @@ static struct Mail sScriptMail;
 static u8 sProLetterIdx;
 static bool8 sProLetterIdxReady;
 
-#define PRO_LETTER_POOL_SIZE 17
+#define PRO_LETTER_POOL_SIZE 20
 
 struct ProLetterEntry
 {
@@ -4700,6 +4700,17 @@ static const u8 sProLetter11_1[] = _("Just Press It!");
 
 // Letter 12: Wood - Thanh
 static const u8 sThanh[] = _("Thanh");
+static const u8 sProLetter12_0[] = _("Moin");
+static const u8 sProLetter12_1[] = _("");
+static const u8 sProLetter12_2[] = _("Alles hat ein Ende,");
+static const u8 sProLetter12_3[] = _("nur die Wurst hat zwei.");
+
+// Letter 13: Dream - <player>
+static const u8 sProLetter13_0[] = _("I don't want to eat my");
+static const u8 sProLetter13_1[] = _("own words, but I think");
+static const u8 sProLetter13_2[] = _("I'm going to live a lot");
+static const u8 sProLetter13_3[] = _("longer than I thought.");
+static const u8 sProLetter13_4[] = _("Forever, even.");
 
 // Letter 14: Shadow - Rohdianer
 static const u8 sRohdianer[] = _("Rohdianer");
@@ -4724,17 +4735,27 @@ static const u8 sProLetter16_2[] = _("To sell cheaper Grass-types");
 static const u8 sProLetter16_3[] = _("and Water-types");
 static const u8 sProLetter16_4[] = _("Late in an auction.");
 
-static const u8 sProLetter12_0[] = _("Moin");
-static const u8 sProLetter12_1[] = _("");
-static const u8 sProLetter12_2[] = _("Alles hat ein Ende,");
-static const u8 sProLetter12_3[] = _("nur die Wurst hat zwei.");
+// Letter 17: Shadow - freez
+static const u8 sFreez[] = _("freez");
+static const u8 sProLetter17_0[] = _("Despite everything,");
+static const u8 sProLetter17_1[] = _("it's still you...");
+static const u8 sProLetter17_2[] = _("...clicking excadrill");
+static const u8 sProLetter17_3[] = _("earthquake into steven");
+static const u8 sProLetter17_4[] = _("five times");
 
-// Letter 13: Dream - <player>
-static const u8 sProLetter13_0[] = _("I don't want to eat my");
-static const u8 sProLetter13_1[] = _("own words, but I think");
-static const u8 sProLetter13_2[] = _("I'm going to live a lot");
-static const u8 sProLetter13_3[] = _("longer than I thought.");
-static const u8 sProLetter13_4[] = _("Forever, even.");
+// Letter 18: Tropic - HariQr
+static const u8 sHariQr[] = _("HariQr");
+static const u8 sProLetter18_0[] = _("Esta carta va dedicada a");
+static const u8 sProLetter18_1[] = _("Treecko, mi fraude favorito");
+static const u8 sProLetter18_2[] = _("Y mucha suerte en tu run");
+
+// Letter 19: Dream - Mfrazz
+static const u8 sMfrazz[] = _("Mfrazz");
+static const u8 sProLetter19_0[] = _("This game is the coolest");
+static const u8 sProLetter19_1[] = _("thing of all time.");
+static const u8 sProLetter19_2[] = _("By playing it you are");
+static const u8 sProLetter19_3[] = _("making history.");
+static const u8 sProLetter19_4[] = _("Don't forget that.");
 
 static const struct ProLetterEntry sProLetterPool[PRO_LETTER_POOL_SIZE] =
 {
@@ -4839,6 +4860,24 @@ static const struct ProLetterEntry sProLetterPool[PRO_LETTER_POOL_SIZE] =
         .lines = { sProLetter16_0, sProLetter16_1, sProLetter16_2, sProLetter16_3, sProLetter16_4 },
         .numLines = 5,
         .sender = sLivii,
+    },
+    {
+        .itemId = ITEM_SHADOW_MAIL,
+        .lines = { sProLetter17_0, sProLetter17_1, sProLetter17_2, sProLetter17_3, sProLetter17_4 },
+        .numLines = 5,
+        .sender = sFreez,
+    },
+    {
+        .itemId = ITEM_TROPIC_MAIL,
+        .lines = { sProLetter18_0, sProLetter18_1, sProLetter18_2 },
+        .numLines = 3,
+        .sender = sHariQr,
+    },
+    {
+        .itemId = ITEM_DREAM_MAIL,
+        .lines = { sProLetter19_0, sProLetter19_1, sProLetter19_2, sProLetter19_3, sProLetter19_4 },
+        .numLines = 5,
+        .sender = sMfrazz,
     },
 };
 
