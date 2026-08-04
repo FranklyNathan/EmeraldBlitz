@@ -3423,10 +3423,7 @@ static const u16 sSobbleEggMoveLearnset[] = {
 
 #if P_FAMILY_SKWOVET
 static const u16 sSkwovetEggMoveLearnset[] = {
-    MOVE_ROLLOUT,
-    MOVE_DEFENSE_CURL,
     MOVE_LAST_RESORT,
-    MOVE_BELLY_DRUM,
     MOVE_UNAVAILABLE,
 };
 #endif //P_FAMILY_SKWOVET

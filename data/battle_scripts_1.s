@@ -6319,6 +6319,12 @@ BattleScript_BufferEndTurn::
 	waitmessage B_WAIT_TIME_LONG
 	end2
 
+BattleScript_HealBlockEndTurn::
+	printstring STRINGID_BUFFERENDS
+	waitmessage B_WAIT_TIME_LONG
+	tryactivateitem BS_ATTACKER, ACTIVATION_ON_HP_THRESHOLD
+	end2
+
 BattleScript_ToxicOrb::
 	setbyte cMULTISTRING_CHOOSER, 0
 	copybyte gEffectBattler, gBattlerAttacker

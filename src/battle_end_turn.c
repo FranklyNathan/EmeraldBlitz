@@ -841,7 +841,7 @@ static bool32 HandleEndTurnHealBlock(u32 battler)
     {
         gBattleMons[battler].volatiles.healBlock = FALSE;
         gBattleScripting.battler = battler;
-        BattleScriptExecute(BattleScript_BufferEndTurn);
+        BattleScriptExecute(BattleScript_HealBlockEndTurn);
         PREPARE_MOVE_BUFFER(gBattleTextBuff1, MOVE_HEAL_BLOCK);
         effect = TRUE;
     }

@@ -859,6 +859,7 @@ static void Task_ShopMenu(u8 taskId)
 #define tListTaskId data[7]
 #define tCallbackHi data[8]
 #define tCallbackLo data[9]
+#define tIsScottTmShopExit data[0]
 
 static void Task_HandleShopMenuBuy(u8 taskId)
 {
@@ -1171,6 +1172,20 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
     }
 }
 
+static bool8 IsInEliteFourArea(void)
+{
+    u8 mapGroup = gSaveBlock1Ptr->location.mapGroup;
+    u8 mapNum = gSaveBlock1Ptr->location.mapNum;
+
+    if (mapGroup != MAP_GROUP(MAP_EVER_GRANDE_CITY_SIDNEYS_ROOM))
+        return FALSE;
+
+    // E4 member chambers: Sidney(0), Phoebe(1), Glacia(2), Drake(3)
+    // E4 hallways: HALL1-5 (5-9)
+    // Pokemon League entrance floors: 1F (10), 2F (14)
+    return (mapNum <= 3 || (mapNum >= 5 && mapNum <= 9) || mapNum == 10 || mapNum == 14);
+}
+
 void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds)
 {
     LoadMonIconPalettes();
@@ -1180,6 +1195,7 @@ void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds)
     u8 count = 0;
     u16 move = ItemIdToBattleMoveId(itemId);
     struct Pokemon tempMon;
+    bool8 partyOnly = IsInEliteFourArea();
 
     for (i = 0; i < 10; i++)
     {
@@ -1203,23 +1219,26 @@ void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds)
         }
     }
 
-    for (i = 0; i < TOTAL_BOXES_COUNT && count < 10; i++)
+    if (!partyOnly)
     {
-        for (j = 0; j < IN_BOX_COUNT && count < 10; j++)
+        for (i = 0; i < TOTAL_BOXES_COUNT && count < 10; i++)
         {
-            u16 species = GetBoxMonDataAt(i, j, MON_DATA_SPECIES);
-            if (species != SPECIES_NONE)
+            for (j = 0; j < IN_BOX_COUNT && count < 10; j++)
             {
-                BoxMonAtToMon(i, j, &tempMon);
-                u16 hp = GetMonData(&tempMon, MON_DATA_HP);
-                if (hp != 0 && CanLearnTeachableMove(species, move))
+                u16 species = GetBoxMonDataAt(i, j, MON_DATA_SPECIES);
+                if (species != SPECIES_NONE)
                 {
-                    u16 x = 16 + (count % 4) * 24;
-                    u16 y = 112 + (count / 4) * 24;
-                    u32 personality = GetMonData(&tempMon, MON_DATA_PERSONALITY);
-                    spriteId = CreateMonIcon(species, SpriteCallbackDummy, x, y, 4, personality);
-                    spriteIds[count] = spriteId;
-                    count++;
+                    BoxMonAtToMon(i, j, &tempMon);
+                    u16 hp = GetMonData(&tempMon, MON_DATA_HP);
+                    if (hp != 0 && CanLearnTeachableMove(species, move))
+                    {
+                        u16 x = 16 + (count % 4) * 24;
+                        u16 y = 112 + (count / 4) * 24;
+                        u32 personality = GetMonData(&tempMon, MON_DATA_PERSONALITY);
+                        spriteId = CreateMonIcon(species, SpriteCallbackDummy, x, y, 4, personality);
+                        spriteIds[count] = spriteId;
+                        count++;
+                    }
                 }
             }
         }
@@ -1992,12 +2011,19 @@ static void BuyMenuPrintItemQuantityAndPrice(u8 taskId)
 
 static void ExitBuyMenu(u8 taskId)
 {
+    s16 *data = gTasks[taskId].data;
     if (FlagGet(FLAG_IN_BASEMENT))
         gFieldCallback = FieldCB_ContinueScriptHandleMusic;
     else if (sIsScottTmShop)
         gFieldCallback = FieldCB_ContinueScript; // Fade back in with time-of-day tinting, then enable scripts
     else
         gFieldCallback = MapPostLoadHook_ReturnToShopMenu;
+
+    // Remember whether this exit closes a Scott TM shop, so Task_ExitBuyMenu
+    // knows whether to reset VAR_POWER_TM_CLERK. Regular TM clerks (e.g.
+    // Slateport) reset the var from script once the shop fully closes, and
+    // need it to stay set while returning to the "anything else" menu.
+    tIsScottTmShopExit = sIsScottTmShop;
 
     // Reset preview mode if active when exiting
     if (sIsScottTmShop && sScottTmPreviewMode)
@@ -2013,6 +2039,7 @@ static void ExitBuyMenu(u8 taskId)
 
 static void Task_ExitBuyMenu(u8 taskId)
 {
+    s16 *data = gTasks[taskId].data;
     if (!gPaletteFade.active)
     {
         RemoveMoneyLabelObject();
@@ -2022,7 +2049,12 @@ static void Task_ExitBuyMenu(u8 taskId)
             for (i = 0; i < 10; i++)
                 if (sShopData->pokemonIconSpriteIds[i] != SPRITE_NONE)
                     DestroySprite(&gSprites[sShopData->pokemonIconSpriteIds[i]]);
-            VarSet(VAR_POWER_TM_CLERK, 0);
+            // Only clear the flag for Scott's TM shop, whose script doesn't
+            // reset it. For normal TM clerks the shop is still active when the
+            // buy menu is exited, so the flag must remain set for the next
+            // time BUY is chosen (the script resets it when the shop ends).
+            if (tIsScottTmShopExit)
+                VarSet(VAR_POWER_TM_CLERK, 0);
         }
         BuyMenuFreeMemory();
         SetMainCallback2(CB2_ReturnToField);
@@ -2067,6 +2099,7 @@ static void RecordItemPurchase(u8 taskId)
 #undef tListTaskId
 #undef tCallbackHi
 #undef tCallbackLo
+#undef tIsScottTmShopExit
 
 void CreateScottTmShopMenu(void)
 {

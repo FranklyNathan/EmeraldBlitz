@@ -10,6 +10,7 @@ OldaleTown_House2_Basement_OnTransition:
 	call_if_set FLAG_IN_BASEMENT, OldaleTown_House2_Basement_EventScript_InstantLights
 	special HealPlayerParty
 	setvar VAR_FORCEANIM, 1
+	setflag FLAG_HIDE_BASEMENT_E4_WARP_NPC  @ Set to hide E4 warp NPC. Comment out to show.
 	end
 
 OldaleTown_House2_Basement_EventScript_InstantLights::
@@ -1666,3 +1667,99 @@ OldaleTown_House2_Basement_Text_HypnoNight:
 
 OldaleTown_House2_Basement_Text_HypnoDecline:
     .string "HYPNO continues swinging its pendulum…$"
+
+OldaleTown_House2_Basement_EventScript_E4WarpNPC::
+	lock
+	faceplayer
+	message OldaleTown_House2_Basement_Text_E4WarpIntro
+	waitmessage
+	dynmultipush OldaleTown_House2_Basement_Text_E4WarpSidney, 0
+	dynmultipush OldaleTown_House2_Basement_Text_E4WarpPhoebe, 1
+	dynmultipush OldaleTown_House2_Basement_Text_E4WarpGlacia, 2
+	dynmultipush OldaleTown_House2_Basement_Text_E4WarpDrake, 3
+	dynmultipush OldaleTown_House2_Basement_Text_E4WarpChampion, 4
+	dynmultipush OldaleTown_House2_Basement_Text_E4WarpSpenser, 5
+	dynmultipush OldaleTown_House2_Basement_Text_E4WarpLucy, 6
+	dynmultipush OldaleTown_House2_Basement_Text_E4WarpBrandon, 7
+	dynmultipush gText_Exit, 8
+	dynmultistack 0, 0, FALSE, 6, FALSE, 0, DYN_MULTICHOICE_CB_NONE
+	closemessage
+	switch VAR_RESULT
+	case 0, OldaleTown_House2_Basement_EventScript_WarpToSidney
+	case 1, OldaleTown_House2_Basement_EventScript_WarpToPhoebe
+	case 2, OldaleTown_House2_Basement_EventScript_WarpToGlacia
+	case 3, OldaleTown_House2_Basement_EventScript_WarpToDrake
+	case 4, OldaleTown_House2_Basement_EventScript_WarpToChampion
+	case 5, OldaleTown_House2_Basement_EventScript_WarpToSpenser
+	case 6, OldaleTown_House2_Basement_EventScript_WarpToLucy
+	case 7, OldaleTown_House2_Basement_EventScript_WarpToBrandon
+	release
+	end
+
+OldaleTown_House2_Basement_EventScript_WarpToSidney::
+	setflag FLAG_ENTERED_ELITE_FOUR
+	warp MAP_EVER_GRANDE_CITY_SIDNEYS_ROOM, 6, 13
+	end
+
+OldaleTown_House2_Basement_EventScript_WarpToPhoebe::
+	setflag FLAG_ENTERED_ELITE_FOUR
+	warp MAP_EVER_GRANDE_CITY_PHOEBES_ROOM, 6, 13
+	end
+
+OldaleTown_House2_Basement_EventScript_WarpToGlacia::
+	setflag FLAG_ENTERED_ELITE_FOUR
+	warp MAP_EVER_GRANDE_CITY_GLACIAS_ROOM, 6, 13
+	end
+
+OldaleTown_House2_Basement_EventScript_WarpToDrake::
+	setflag FLAG_ENTERED_ELITE_FOUR
+	warp MAP_EVER_GRANDE_CITY_DRAKES_ROOM, 6, 13
+	end
+
+OldaleTown_House2_Basement_EventScript_WarpToChampion::
+	setflag FLAG_ENTERED_ELITE_FOUR
+	warp MAP_EVER_GRANDE_CITY_CHAMPIONS_ROOM, 6, 12
+	end
+
+OldaleTown_House2_Basement_EventScript_WarpToSpenser::
+	setflag FLAG_ENTERED_ELITE_FOUR
+	warp MAP_EVER_GRANDE_CITY_SPENSERS_ROOM, 6, 13
+	end
+
+OldaleTown_House2_Basement_EventScript_WarpToLucy::
+	setflag FLAG_ENTERED_ELITE_FOUR
+	warp MAP_EVER_GRANDE_CITY_LUCYS_ROOM, 6, 13
+	end
+
+OldaleTown_House2_Basement_EventScript_WarpToBrandon::
+	setflag FLAG_ENTERED_ELITE_FOUR
+	warp MAP_EVER_GRANDE_CITY_BRANDONS_ROOM, 6, 13
+	end
+
+OldaleTown_House2_Basement_Text_E4WarpIntro:
+	.string "I can warp you to any E4 chamber.\n"
+	.string "Where would you like to go?$"
+
+OldaleTown_House2_Basement_Text_E4WarpSidney:
+	.string "Sidney's Room$"
+
+OldaleTown_House2_Basement_Text_E4WarpPhoebe:
+	.string "Phoebe's Room$"
+
+OldaleTown_House2_Basement_Text_E4WarpGlacia:
+	.string "Glacia's Room$"
+
+OldaleTown_House2_Basement_Text_E4WarpDrake:
+	.string "Drake's Room$"
+
+OldaleTown_House2_Basement_Text_E4WarpChampion:
+	.string "Champion's Room$"
+
+OldaleTown_House2_Basement_Text_E4WarpSpenser:
+	.string "Spenser's Room$"
+
+OldaleTown_House2_Basement_Text_E4WarpLucy:
+	.string "Lucy's Room$"
+
+OldaleTown_House2_Basement_Text_E4WarpBrandon:
+	.string "Brandon's Room$"
