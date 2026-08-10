@@ -1207,14 +1207,17 @@ static void BufferNameForCardBack(void)
 
     if (sData->trainerCard.winsCount > 12)
     {
-        StringCopy(sData->textPlayersCard, COMPOUND_STRING("BLITZ CHAMPION!     "));
-
         u8 *str = sData->textHofTime;
         str = ConvertIntToDecimalStringN(str, sData->trainerCard.wins[12].hours, STR_CONV_MODE_LEFT_ALIGN, 3);
         *str++ = CHAR_COLON;
         str = ConvertIntToDecimalStringN(str, sData->trainerCard.wins[12].minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
         *str++ = CHAR_COLON;
         ConvertIntToDecimalStringN(str, sData->trainerCard.wins[12].seconds, STR_CONV_MODE_LEADING_ZEROS, 2);
+
+        if (sData->trainerCard.wins[12].trainerId & 0x8000)
+            StringCopy(sData->textPlayersCard, COMPOUND_STRING("TRAINER CARD"));
+        else
+            StringCopy(sData->textPlayersCard, COMPOUND_STRING("BLITZ CHAMPION!     "));
     }
     else if (sData->cardType != CARD_TYPE_FRLG)
     {
@@ -1228,13 +1231,27 @@ static void PrintNameOnCardBack(void)
     if (sData->trainerCard.winsCount > 12)
     {
         u32 textWidth = GetStringWidth(FONT_NORMAL, sData->textPlayersCard, 0);
-        u32 timeWidth = GetStringWidth(FONT_NORMAL, sData->textHofTime, 0);
-        u32 totalWidth = textWidth + 40 + timeWidth;
-        s32 startX = ((224 - totalWidth) / 2) - 12;
 
-        AddTextPrinterParameterized3(WIN_CARD_TEXT, FONT_NORMAL, startX, 9, sTrainerCardGoldTextColors, TEXT_SKIP_DRAW, sData->textPlayersCard);
-        AddTextPrinterParameterized3(WIN_CARD_TEXT, FONT_NORMAL, startX + textWidth + 40, 9, sTrainerCardGoldTextColors, TEXT_SKIP_DRAW, sData->textHofTime);
-        sData->championSpritesX = startX + textWidth + 4;
+        if (sData->trainerCard.wins[12].trainerId & 0x8000)
+        {
+            s32 timeX = GetStringRightAlignXOffset(FONT_NORMAL, sData->textHofTime, 198); // 18px left of before
+            s32 leftMiniX = timeX - 22;             // minis keep their pre-shift position
+            s32 textX = leftMiniX - textWidth - 26; // 18px clear of the minis
+
+            AddTextPrinterParameterized3(WIN_CARD_TEXT, FONT_NORMAL, textX, 9, sTrainerCardTextColors, TEXT_SKIP_DRAW, sData->textPlayersCard);
+            AddTextPrinterParameterized3(WIN_CARD_TEXT, FONT_NORMAL, timeX, 9, sTrainerCardTextColors, TEXT_SKIP_DRAW, sData->textHofTime);
+            sData->championSpritesX = leftMiniX - 16;
+        }
+        else
+        {
+            u32 timeWidth = GetStringWidth(FONT_NORMAL, sData->textHofTime, 0);
+            u32 totalWidth = textWidth + 40 + timeWidth;
+            s32 startX = ((224 - totalWidth) / 2) - 12;
+
+            AddTextPrinterParameterized3(WIN_CARD_TEXT, FONT_NORMAL, startX, 9, sTrainerCardGoldTextColors, TEXT_SKIP_DRAW, sData->textPlayersCard);
+            AddTextPrinterParameterized3(WIN_CARD_TEXT, FONT_NORMAL, startX + textWidth + 40, 9, sTrainerCardGoldTextColors, TEXT_SKIP_DRAW, sData->textHofTime);
+            sData->championSpritesX = startX + textWidth + 4;
+        }
     }
     else if (!sData->isHoenn)
         AddTextPrinterParameterized3(WIN_CARD_TEXT, FONT_NORMAL, 136, 9, sTrainerCardTextColors, TEXT_SKIP_DRAW, sData->textPlayersCard);
@@ -1558,7 +1575,7 @@ static void CreateWinRecordSprites(void)
 
     if (sData->trainerCard.winsCount > 12)
     {
-        u16 trainerId = sData->trainerCard.wins[12].trainerId;
+        u16 trainerId = sData->trainerCard.wins[12].trainerId & 0x7FFF;
         u8 picIndex = GetTrainerPicFromId(trainerId);
         u8 greyPalNum;
         s16 x = sData->championSpritesX + 16;
@@ -1570,12 +1587,17 @@ static void CreateWinRecordSprites(void)
         StartSpriteAnim(&gSprites[sData->championSpriteIds[1]], 0);
 
         if (picIndex == GetTrainerPicFromId(TRAINER_STEVEN))
+        {
             greyPalNum = AllocateAndGreyOutPalette(sData->championSpriteIds[1], 12, 1);
+            if (greyPalNum != 0xFF)
+                gSprites[sData->championSpriteIds[1]].oam.paletteNum = greyPalNum;
+        }
         else
+        {
             greyPalNum = AllocateAndGreyOutPalette(sData->championSpriteIds[0], 12, 0);
-
-        if (greyPalNum != 0xFF)
-            gSprites[picIndex == GetTrainerPicFromId(TRAINER_STEVEN) ? sData->championSpriteIds[1] : sData->championSpriteIds[0]].oam.paletteNum = greyPalNum;
+            if (greyPalNum != 0xFF)
+                gSprites[sData->championSpriteIds[0]].oam.paletteNum = greyPalNum;
+        }
     }
 }
 
@@ -1877,7 +1899,9 @@ void RecordTrainerCardLoss(u16 trainerId)
             return; // Already in the list (as win or loss)
     }
 
-    if (gSaveBlock2Ptr->trainerCardWinsCount < 12)
+    if (gSaveBlock2Ptr->trainerCardWinsCount < 12
+        || (gSaveBlock2Ptr->trainerCardWinsCount == 12
+            && (trainerId == TRAINER_STEVEN || trainerId == TRAINER_WALLY)))
     {
         u8 count = gSaveBlock2Ptr->trainerCardWinsCount;
         gSaveBlock2Ptr->trainerCardWins[count].trainerId = trainerId | 0x8000;

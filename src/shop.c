@@ -533,21 +533,18 @@ static void PrepareScottTmShopInventory(void)
             sSeenScottTmPairs[pairIdx] = 1; // Mark as seen
             offeredThisVisitMask |= (1 << pairIdx);
         }
+        // Build pool once, excluding pairs offered last visit or earlier this visit
+        for (j = 0; sScottTmPool[j] != ITEM_NONE; j++)
+        {
+            u16 pairIdx = GetScottTmPairIndex(sScottTmPool[j]);
+            if ((sHasPreviousVisit && (sLastOfferedTypeMask & (1 << pairIdx)))
+                || (offeredThisVisitMask & (1 << pairIdx)))
+                continue;
+            poolItems[poolSize++] = sScottTmPool[j];
+        }
         // Fill remainder if any
         for (; i < 5; i++)
-    {
-             // Fallback to random if not enough unseen
-             // Refill pool for random selection
-            poolSize = 0;
-            for (j = 0; sScottTmPool[j] != ITEM_NONE; j++)
-            {
-                u16 pairIdx = GetScottTmPairIndex(sScottTmPool[j]);
-                if ((sHasPreviousVisit && (sLastOfferedTypeMask & (1 << pairIdx)))
-                    || (offeredThisVisitMask & (1 << pairIdx)))
-                    continue;
-                poolItems[poolSize++] = sScottTmPool[j];
-            }
-
+        {
             bool8 validItemFound = FALSE;
             while (!validItemFound)
     {
@@ -577,10 +574,22 @@ static void PrepareScottTmShopInventory(void)
         break;
                         }
                     }
-                    // Remove from pool so we don't pick it again
+                    // Remove the chosen TM and its partner from the pool so the
+                    // same type can never be offered twice in one visit.
                     for (j = chosenIndex; j < poolSize - 1; j++)
                         poolItems[j] = poolItems[j + 1];
                     poolSize--;
+                    for (j = 0; j < poolSize; j++)
+                    {
+                        if (poolItems[j] == GetScottTmPartner(chosenItem))
+                        {
+                            u16 k;
+                            for (k = j; k < poolSize - 1; k++)
+                                poolItems[k] = poolItems[k + 1];
+                            poolSize--;
+                            break;
+                        }
+                    }
                     validItemFound = TRUE;
                 }
             }
@@ -627,10 +636,22 @@ static void PrepareScottTmShopInventory(void)
                     break;
                         }
                     }
-                    // Remove from pool so we don't pick it again
+                    // Remove the chosen TM and its partner from the pool so the
+                    // same type can never be offered twice in one visit.
                     for (j = chosenIndex; j < poolSize - 1; j++)
                         poolItems[j] = poolItems[j + 1];
                     poolSize--;
+                    for (j = 0; j < poolSize; j++)
+                    {
+                        if (poolItems[j] == GetScottTmPartner(chosenItem))
+                        {
+                            u16 k;
+                            for (k = j; k < poolSize - 1; k++)
+                                poolItems[k] = poolItems[k + 1];
+                            poolSize--;
+                            break;
+                        }
+                    }
                     validItemFound = TRUE;
                 }
             }
