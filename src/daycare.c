@@ -18,6 +18,7 @@
 #include "task.h"
 #include "window.h"
 #include "party_menu.h"
+#include "constants/party_menu.h"
 #include "list_menu.h"
 #include "overworld.h"
 #include "item.h"
@@ -284,8 +285,22 @@ static void StorePokemonInEmptyDaycareSlot(struct Pokemon *mon, struct DayCare *
 
 void StoreSelectedPokemonInDaycare(void)
 {
-    u8 monId = GetCursorSelectionMonId();
-    StorePokemonInEmptyDaycareSlot(&gPlayerParty[monId], &gSaveBlock1Ptr->daycare);
+    u8 slotId = GetCursorSelectionMonId();
+    if (IsPcSlot(slotId))
+    {
+        u8 boxPos = GetPcSlotBoxPosition(slotId);
+        if (boxPos != 0xFF)
+        {
+            struct Pokemon tempMon;
+            BoxMonToMon(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &tempMon);
+            StorePokemonInEmptyDaycareSlot(&tempMon, &gSaveBlock1Ptr->daycare);
+            ZeroBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos]);
+        }
+    }
+    else
+    {
+        StorePokemonInEmptyDaycareSlot(&gPlayerParty[slotId], &gSaveBlock1Ptr->daycare);
+    }
 }
 
 // Shifts the second daycare Pokémon slot into the first slot.
@@ -1256,8 +1271,22 @@ static void _GetDaycareMonNicknames(struct DayCare *daycare)
 
 u16 GetSelectedMonNicknameAndSpecies(void)
 {
-    GetBoxMonNickname(&gPlayerParty[GetCursorSelectionMonId()].box, gStringVar1);
-    return GetBoxMonData(&gPlayerParty[GetCursorSelectionMonId()].box, MON_DATA_SPECIES);
+    u8 slotId = GetCursorSelectionMonId();
+    if (IsPcSlot(slotId))
+    {
+        u8 boxPos = GetPcSlotBoxPosition(slotId);
+        if (boxPos != 0xFF)
+        {
+            GetBoxMonNickname(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], gStringVar1);
+            return GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], MON_DATA_SPECIES);
+        }
+        return SPECIES_NONE;
+    }
+    else
+    {
+        GetBoxMonNickname(&gPlayerParty[slotId].box, gStringVar1);
+        return GetBoxMonData(&gPlayerParty[slotId].box, MON_DATA_SPECIES);
+    }
 }
 
 void GetDaycareMonNicknames(void)
@@ -1616,5 +1645,13 @@ static u8 ModifyBreedingScoreForOvalCharm(u8 score)
 
 void Script_IsSelectedMonFainted(void)
 {
-    gSpecialVar_Result = (GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_HP) == 0);
+    if (IsPcSlot(gSpecialVar_0x8004))
+    {
+        u8 boxPos = GetPcSlotBoxPosition(gSpecialVar_0x8004);
+        gSpecialVar_Result = (boxPos != 0xFF && GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], MON_DATA_HP) == 0);
+    }
+    else
+    {
+        gSpecialVar_Result = (GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_HP) == 0);
+    }
 }

@@ -128,7 +128,7 @@ SlateportCity_EventScript_EnergyGuru::
 	msgbox SlateportCity_Text_EnergyGuru_ChooseMon, MSGBOX_DEFAULT
 	special ChoosePartyMon
 	waitstate
-	goto_if_ge VAR_0x8004, PARTY_SIZE, SlateportCity_EventScript_EnergyGuru_Decline
+	goto_if_ge VAR_0x8004, PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT, SlateportCity_EventScript_EnergyGuru_Decline
 	callnative CheckSelectedMonForEnergyGuru
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyGuru_InvalidMon
 	msgbox SlateportCity_Text_EnergyNPC_Confirm, MSGBOX_YESNO
@@ -179,7 +179,7 @@ SlateportCity_EventScript_EnergyOracle::
 	msgbox SlateportCity_Text_EnergyOracle_ChooseMon, MSGBOX_DEFAULT
 	special ChoosePartyMon
 	waitstate
-	goto_if_ge VAR_0x8004, PARTY_SIZE, SlateportCity_EventScript_EnergyOracle_Decline
+	goto_if_ge VAR_0x8004, PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT, SlateportCity_EventScript_EnergyOracle_Decline
 	callnative CheckSelectedMonForEffortRibbon
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyOracle_InvalidMon
 	msgbox SlateportCity_Text_EnergyNPC_Confirm, MSGBOX_YESNO

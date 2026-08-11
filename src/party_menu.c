@@ -298,14 +298,14 @@ static u8 GetPartyMenuPartyCount(void)
     return gPlayerPartyCount;
 }
 
-static bool8 IsPcSlot(s8 slotId)
+bool8 IsPcSlot(s8 slotId)
 {
     return slotId >= PARTY_PC_SLOT_START && slotId < PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT;
 }
 
 // Returns the position in Box 1 that PC slot `slotId` shows, or 0xFF if empty.
 // PC slots show the first PARTY_PC_SLOT_COUNT non-empty Box 1 positions in order.
-static u8 GetPcSlotBoxPosition(s8 slotId)
+u8 GetPcSlotBoxPosition(s8 slotId)
 {
     u8 index = slotId - PARTY_PC_SLOT_START;
     u8 boxPos;
@@ -468,7 +468,7 @@ static void UpdatePartySelectionSinglePcLayout(s8 *, s8);
 static bool8 PartyMonCanEvolve(u16, u8);
 static s8 GetPcSlotGridTarget(s8, s8);
 static s8 GetRightmostSelectablePcSlot(u8);
-static u8 GetFirstEmptyPartySlot(void);
+u8 GetFirstEmptyPartySlot(void);
 static u8 GetFirstEmptyBoxPosition(u8 boxId);
 static u8 GetPcSlotIndexForNewBoxPosition(u8 boxPos);
 static void WithdrawPcMon(u8 partySlot, u8 boxPos);
@@ -3731,11 +3731,20 @@ static bool8 CreateSelectionWindow(u8 taskId)
         GetBoxMonNickname(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], gStringVar1);
         PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
         sPartyMenuInternal->numActions = 0;
-        AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
-        AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SWITCH);
-        if (gPlayerPartyCount < PARTY_SIZE)
-            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_WITHDRAW);
-        AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL1);
+        if (gPartyMenu.menuType == PARTY_MENU_TYPE_DAYCARE)
+        {
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_STORE);
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL1);
+        }
+        else
+        {
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SWITCH);
+            if (gPlayerPartyCount < PARTY_SIZE)
+                AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_WITHDRAW);
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL1);
+        }
         DisplaySelectionWindow(SELECTWINDOW_ACTIONS);
         DisplayPartyMenuStdMessage(PARTY_MSG_DO_WHAT_WITH_MON);
         return TRUE;
@@ -4330,7 +4339,7 @@ static void FinishTwoMonAction(u8 taskId)
     gTasks[taskId].func = Task_HandleChooseMonInput;
 }
 
-static u8 GetFirstEmptyPartySlot(void)
+u8 GetFirstEmptyPartySlot(void)
 {
     u8 i;
 
@@ -8306,17 +8315,9 @@ static bool8 IsInEliteFourBuilding(void)
     if (mapGroup != MAP_GROUP(MAP_EVER_GRANDE_CITY_SIDNEYS_ROOM))
         return FALSE;
 
-    switch (mapNum)
-    {
-    case MAP_NUM(MAP_EVER_GRANDE_CITY_SIDNEYS_ROOM):
-    case MAP_NUM(MAP_EVER_GRANDE_CITY_PHOEBES_ROOM):
-    case MAP_NUM(MAP_EVER_GRANDE_CITY_GLACIAS_ROOM):
-    case MAP_NUM(MAP_EVER_GRANDE_CITY_DRAKES_ROOM):
-    case MAP_NUM(MAP_EVER_GRANDE_CITY_CHAMPIONS_ROOM):
-        return TRUE;
-    default:
-        return FALSE;
-    }
+    // E4 member chambers (0-3), Champion's room (4),
+    // hallways (5-9), Pokemon League entrance 1F (10), 2F (14)
+    return (mapNum <= 10 || mapNum == 14);
 }
 
 void CB2_PartyMenuFromStartMenu(void)
@@ -9163,7 +9164,7 @@ static void SlideMultiPartyMenuBoxSpritesOneStep(u8 taskId)
 
 void ChooseMonForDaycare(void)
 {
-    InitPartyMenu(PARTY_MENU_TYPE_DAYCARE, PARTY_LAYOUT_SINGLE, PARTY_ACTION_CHOOSE_MON, FALSE, PARTY_MSG_CHOOSE_MON_2, Task_HandleChooseMonInput, BufferMonSelection);
+    InitPartyMenu(PARTY_MENU_TYPE_DAYCARE, IsInEliteFourBuilding() ? PARTY_LAYOUT_SINGLE : PARTY_LAYOUT_SINGLE_PC, PARTY_ACTION_CHOOSE_MON, FALSE, PARTY_MSG_CHOOSE_MON_2, Task_HandleChooseMonInput, BufferMonSelection);
 }
 
 static void UNUSED ChoosePartyMonByMenuType(u8 menuType)
@@ -9175,8 +9176,6 @@ static void UNUSED ChoosePartyMonByMenuType(u8 menuType)
 static void BufferMonSelection(void)
 {
     gSpecialVar_0x8004 = GetCursorSelectionMonId();
-    if (gSpecialVar_0x8004 >= PARTY_SIZE)
-        gSpecialVar_0x8004 = PARTY_NOTHING_CHOSEN;
     gFieldCallback2 = CB2_FadeFromPartyMenu;
     SetMainCallback2(CB2_ReturnToField);
 }
@@ -9238,7 +9237,7 @@ static void Task_ChoosePartyMon(u8 taskId)
     if (!gPaletteFade.active)
     {
         CleanupOverworldWindowsAndTilemaps();
-        InitPartyMenu(PARTY_MENU_TYPE_CHOOSE_MON, PARTY_LAYOUT_SINGLE, PARTY_ACTION_CHOOSE_AND_CLOSE, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, BufferMonSelection);
+        InitPartyMenu(PARTY_MENU_TYPE_CHOOSE_MON, IsInEliteFourBuilding() ? PARTY_LAYOUT_SINGLE : PARTY_LAYOUT_SINGLE_PC, PARTY_ACTION_CHOOSE_AND_CLOSE, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, BufferMonSelection);
         DestroyTask(taskId);
     }
 }
