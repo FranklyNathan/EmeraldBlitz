@@ -17,8 +17,15 @@
 #define PARTY_LAYOUT_DOUBLE          1
 #define PARTY_LAYOUT_MULTI           2
 #define PARTY_LAYOUT_MULTI_SHOWCASE  3  // The layout during the screen that appears just before a multi battle
-#define PARTY_LAYOUT_COUNT           4
+#define PARTY_LAYOUT_SINGLE_PC       4  // Single layout extended with 6 PC box slots
+#define PARTY_LAYOUT_COUNT           5
 #define KEEP_PARTY_LAYOUT            0xFF
+
+// Slot ids used by the PC box slots of PARTY_LAYOUT_SINGLE_PC.
+// These sit above the Confirm (PARTY_SIZE) and Cancel (PARTY_SIZE + 1) ids.
+#define PARTY_PC_SLOT_START          (PARTY_SIZE + 2)
+#define PARTY_PC_SLOT_COUNT          6
+#define PARTY_PC_BOX_ID              0 // Box 1, the source of the PC slots
 
 #define PARTY_MENU_TYPE_FIELD                     0
 #define PARTY_MENU_TYPE_IN_BATTLE                 1

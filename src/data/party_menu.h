@@ -103,6 +103,31 @@ static const u8 sPartyMenuSpriteCoords[PARTY_LAYOUT_COUNT][PARTY_SIZE][4 * 2] =
         {104, 106, 106, 116, 136, 115, 102, 113},
         {104, 130, 106, 140, 136, 139, 102, 137},
     },
+    [PARTY_LAYOUT_SINGLE_PC] =
+    {
+        // Lead mon box was shifted down 2 tiles to clear the PC box slots below it
+        {16, 40, 20, 50, 50, 52, 16, 34},
+        {104, 18, 108, 28, 136, 27, 102, 25},
+        {104, 42, 108, 52, 136, 51, 102, 49},
+        {104, 66, 108, 76, 136, 75, 102, 73},
+        {104, 90, 108, 100, 136, 99, 102, 97},
+        {104, 114, 108, 124, 136, 123, 102, 121},
+    },
+};
+
+// Sprite coords for the 6 PC box slots, laid out as a 3x2 grid below the lead
+// mon box. The icons sit on openable Poké Balls like the party slots; only the
+// icon and Poké Ball coords are used (item/status coords are unused). The whole
+// grid is shifted 3px left of the previous version, and each icon sits an extra
+// 4px left of its Poké Ball (centered on the ball art).
+static const u8 sPcSlotSpriteCoords[PARTY_PC_SLOT_COUNT][4 * 2] =
+{
+    {19, 88, 19, 88, 19, 88, 23, 95},      // column 0, row 0
+    {45, 88, 45, 88, 45, 88, 49, 95},      // column 1, row 0
+    {71, 88, 71, 88, 71, 88, 75, 95},      // column 2, row 0
+    {19, 112, 19, 112, 19, 112, 23, 119},  // column 0, row 1
+    {45, 112, 45, 112, 45, 112, 49, 119},  // column 1, row 1
+    {71, 112, 71, 112, 71, 112, 75, 119},  // column 2, row 1
 };
 
 // Used only when both Cancel and Confirm are present
@@ -189,6 +214,73 @@ static const struct WindowTemplate sSinglePartyMenuWindowTemplate[] =
     DUMMY_WIN_TEMPLATE
 };
 
+static const struct WindowTemplate sSinglePcPartyMenuWindowTemplate[] =
+{
+    { // Party mon 1, shifted down 2 tiles to clear the PC box slots below it
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 3,
+        .width = 10,
+        .height = 7,
+        .paletteNum = 3,
+        .baseBlock = 0x63,
+    },
+    { // Party mon 2
+        .bg = 0,
+        .tilemapLeft = 12,
+        .tilemapTop = 1,
+        .width = 18,
+        .height = 3,
+        .paletteNum = 4,
+        .baseBlock = 0xA9,
+    },
+    { // Party mon 3
+        .bg = 0,
+        .tilemapLeft = 12,
+        .tilemapTop = 4,
+        .width = 18,
+        .height = 3,
+        .paletteNum = 5,
+        .baseBlock = 0xDF,
+    },
+    { // Party mon 4
+        .bg = 0,
+        .tilemapLeft = 12,
+        .tilemapTop = 7,
+        .width = 18,
+        .height = 3,
+        .paletteNum = 6,
+        .baseBlock = 0x115,
+    },
+    { // Party mon 5
+        .bg = 0,
+        .tilemapLeft = 12,
+        .tilemapTop = 10,
+        .width = 18,
+        .height = 3,
+        .paletteNum = 7,
+        .baseBlock = 0x14B,
+    },
+    { // Party mon 6
+        .bg = 0,
+        .tilemapLeft = 12,
+        .tilemapTop = 13,
+        .width = 18,
+        .height = 3,
+        .paletteNum = 8,
+        .baseBlock = 0x181,
+    },
+    [WIN_MSG] = {
+        .bg = 2,
+        .tilemapLeft = 1,
+        .tilemapTop = 15,
+        .width = 28,
+        .height = 4,
+        .paletteNum = 14,
+        .baseBlock = 0x1DF,
+    },
+    DUMMY_WIN_TEMPLATE
+};
 static const struct WindowTemplate sDoublePartyMenuWindowTemplate[] =
 {
     { // Party mon 1

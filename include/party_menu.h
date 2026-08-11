@@ -11,7 +11,7 @@ struct PartyMenu
     MainCallback exitCallback;
     TaskFunc task;
     u8 menuType:4;
-    u8 layout:2;
+    u8 layout:3;
     s8 slotId;
     s8 slotId2;
     u8 action;
