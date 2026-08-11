@@ -423,6 +423,12 @@ static void DrawCancelConfirmButtons(void);
 static u8 CreatePokeballButtonSprite(u8, u8);
 static void AnimateSelectedPartyIcon(u8, u8, bool8);
 static void PartyMenuStartSpriteAnim(u8, u8);
+static void Task_HandlePcSwitchAnimation(u8 taskId);
+static void StartPartyMenuSlotSwitchShrinkAnimation(u8 slot);
+static void StartPartyMenuSlotSwitchGrowAnimation(u8 slot);
+static void StartPartyMenuSwitchSpriteShrink(u8 spriteId);
+static void StartPartyMenuSwitchSpriteGrow(u8 spriteId);
+static void RefreshPartyMenuBoxAfterSwitchWithGrow(u8 slot);
 static u8 GetPartyBoxPaletteFlags(u8, u8);
 static bool8 PartyBoxPal_ParnterOrDisqualifiedInArena(u8);
 static u8 GetPartyIdFromBattleSlot(u8);
@@ -3871,11 +3877,11 @@ static void SwitchSelectedMons(u8 taskId)
     }
     else if (IsPcSlot(gPartyMenu.slotId) || IsPcSlot(gPartyMenu.slotId2))
     {
-        // PC box slots have no windows, so swap them directly instead of using the slide animation.
-        SwitchPartyMon();
-        RefreshPartyMenuBoxAfterSwitch(gPartyMenu.slotId);
-        RefreshPartyMenuBoxAfterSwitch(gPartyMenu.slotId2);
-        FinishTwoMonAction(taskId);
+        // PC-involved switches use a quick shrink/grow animation instead of the party-only slide animation.
+        gTasks[taskId].data[0] = 0;
+        gTasks[taskId].func = Task_HandlePcSwitchAnimation;
+        StartPartyMenuSwitchSpriteShrink(sPartyMenuBoxes[gPartyMenu.slotId].monSpriteId);
+        StartPartyMenuSwitchSpriteShrink(sPartyMenuBoxes[gPartyMenu.slotId2].monSpriteId);
     }
     else
     {
@@ -4088,10 +4094,18 @@ static void DestroyPartyMenuBoxSprites(u8 slot)
     {
         if (spriteIds[i] != SPRITE_NONE)
         {
+            struct Sprite *sprite = &gSprites[spriteIds[i]];
+            if (sprite->oam.affineMode & ST_OAM_AFFINE_ON_MASK)
+            {
+                FreeOamMatrix(sprite->oam.matrixNum);
+                sprite->oam.affineMode = ST_OAM_AFFINE_OFF;
+                sprite->oam.matrixNum = 0;
+            }
+
             if (i == 0)
-                FreeAndDestroyMonIconSprite(&gSprites[spriteIds[i]]);
+                FreeAndDestroyMonIconSprite(sprite);
             else
-                DestroySprite(&gSprites[spriteIds[i]]);
+                DestroySprite(sprite);
         }
     }
     box->monSpriteId = SPRITE_NONE;
@@ -4101,6 +4115,120 @@ static void DestroyPartyMenuBoxSprites(u8 slot)
 }
 
 // Redraws a box slot after a switch, recreating its sprites from the new occupant.
+static void SetPartyMenuBoxSpritesVisible(u8 slot, bool8 visible)
+{
+    struct PartyMenuBox *box = &sPartyMenuBoxes[slot];
+
+    if (box->monSpriteId != SPRITE_NONE)
+        gSprites[box->monSpriteId].invisible = !visible;
+    if (box->itemSpriteId != SPRITE_NONE)
+        gSprites[box->itemSpriteId].invisible = !visible;
+    if (box->pokeballSpriteId != SPRITE_NONE)
+        gSprites[box->pokeballSpriteId].invisible = !visible;
+    if (box->statusSpriteId != SPRITE_NONE)
+        gSprites[box->statusSpriteId].invisible = !visible;
+}
+
+static const union AffineAnimCmd sAffineAnim_PartyMenuSwitch_Shrink[] =
+{
+    AFFINEANIMCMD_FRAME(-0x10, -0x10, 0, 15),
+    AFFINEANIMCMD_END
+};
+
+static const union AffineAnimCmd sAffineAnim_PartyMenuSwitch_Grow[] =
+{
+    AFFINEANIMCMD_FRAME(0x10, 0x10, 0, 0),
+    AFFINEANIMCMD_FRAME(0x10, 0x10, 0, 15),
+    AFFINEANIMCMD_END
+};
+
+static const union AffineAnimCmd *const sAffineAnims_PartyMenuSwitch[] =
+{
+    sAffineAnim_PartyMenuSwitch_Shrink,
+    sAffineAnim_PartyMenuSwitch_Grow
+};
+
+static bool8 IsPartyMenuSwitchSpriteAnimDone(u8 spriteId)
+{
+    if (spriteId == SPRITE_NONE)
+        return TRUE;
+    return gSprites[spriteId].affineAnimEnded;
+}
+
+static void StartPartyMenuSwitchSpriteShrink(u8 spriteId)
+{
+    if (spriteId == SPRITE_NONE)
+        return;
+
+    struct Sprite *sprite = &gSprites[spriteId];
+    if (sprite->oam.affineMode & ST_OAM_AFFINE_ON_MASK)
+    {
+        FreeOamMatrix(sprite->oam.matrixNum);
+        sprite->oam.affineMode = ST_OAM_AFFINE_OFF;
+        sprite->oam.matrixNum = 0;
+    }
+
+    sprite->oam.affineMode = ST_OAM_AFFINE_NORMAL;
+    InitSpriteAffineAnim(sprite);
+    sprite->affineAnims = sAffineAnims_PartyMenuSwitch;
+    StartSpriteAffineAnim(sprite, 0);
+}
+
+static void StartPartyMenuSwitchSpriteGrow(u8 spriteId)
+{
+    if (spriteId == SPRITE_NONE)
+        return;
+
+    struct Sprite *sprite = &gSprites[spriteId];
+    if (sprite->oam.affineMode & ST_OAM_AFFINE_ON_MASK)
+    {
+        FreeOamMatrix(sprite->oam.matrixNum);
+        sprite->oam.affineMode = ST_OAM_AFFINE_OFF;
+        sprite->oam.matrixNum = 0;
+    }
+
+    sprite->oam.affineMode = ST_OAM_AFFINE_NORMAL;
+    InitSpriteAffineAnim(sprite);
+    SetOamMatrixRotationScaling(sprite->oam.matrixNum, 0x10, 0x10, 0);
+    sprite->affineAnims = sAffineAnims_PartyMenuSwitch;
+    StartSpriteAffineAnim(sprite, 1);
+}
+
+static void Task_HandlePcSwitchAnimation(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u8 slot1 = gPartyMenu.slotId;
+    u8 slot2 = gPartyMenu.slotId2;
+
+    if (data[0] == 0)
+    {
+        if (IsPartyMenuSwitchSpriteAnimDone(sPartyMenuBoxes[slot1].monSpriteId)
+        && IsPartyMenuSwitchSpriteAnimDone(sPartyMenuBoxes[slot2].monSpriteId))
+        {
+            SwitchPartyMon();
+            RefreshPartyMenuBoxAfterSwitchWithGrow(slot1);
+            RefreshPartyMenuBoxAfterSwitchWithGrow(slot2);
+            data[0] = 1;
+        }
+        return;
+    }
+
+    if (IsPartyMenuSwitchSpriteAnimDone(sPartyMenuBoxes[slot1].monSpriteId)
+    && IsPartyMenuSwitchSpriteAnimDone(sPartyMenuBoxes[slot2].monSpriteId))
+    {
+        FinishTwoMonAction(taskId);
+    }
+}
+
+static void RefreshPartyMenuBoxAfterSwitchWithGrow(u8 slot)
+{
+    struct PartyMenuBox *box = &sPartyMenuBoxes[slot];
+
+    RefreshPartyMenuBoxAfterSwitch(slot);
+    StartPartyMenuSwitchSpriteGrow(box->monSpriteId);
+    gSprites[box->monSpriteId].invisible = FALSE;
+}
+
 static void RefreshPartyMenuBoxAfterSwitch(u8 slot)
 {
     struct PartyMenuBox *box = &sPartyMenuBoxes[slot];
