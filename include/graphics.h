@@ -3340,6 +3340,7 @@ extern const u32 gPartyMenuPokeball_Gfx[];
 extern const u32 gPartyMenuPokeballSmall_Gfx[];
 extern const u16 gStatusPal_Icons[];
 extern const u16 gPartyMenuPokeball_Pal[];
+extern const u16 gPartyMenuPokeballEvo_Pal[];
 extern const u16 gStatusPal_Icons[];
 
 // Roulette

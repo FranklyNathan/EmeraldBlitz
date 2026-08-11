@@ -184,6 +184,7 @@ enum {
     TAG_POKEBALL = 1200,
     TAG_POKEBALL_SMALL,
     TAG_STATUS_ICONS,
+    TAG_POKEBALL_EVO,
 };
 
 #define TAG_HELD_ITEM 55120
@@ -409,7 +410,7 @@ static void DisplayPartyPokemonMaxHP(u16, struct PartyMenuBox *);
 static void DisplayPartyPokemonHPBar(u16, u16, struct PartyMenuBox *);
 static void CreatePartyMonIconSpriteParameterized(u16, u32, struct PartyMenuBox *, u8);
 static void CreatePartyMonHeldItemSpriteParameterized(u16, u16, struct PartyMenuBox *);
-static void CreatePartyMonPokeballSpriteParameterized(u16, struct PartyMenuBox *);
+static void CreatePartyMonPokeballSpriteParameterized(u16, u8, struct PartyMenuBox *);
 static void CreatePartyMonStatusSpriteParameterized(u16, u8, struct PartyMenuBox *);
 // These next 4 functions are essentially redundant with the above 4
 // The only difference is that rather than receive the data directly they retrieve it from the mon struct
@@ -457,6 +458,7 @@ static void Task_ReturnToChooseMonAfterText(u8);
 static void UpdateCurrentPartySelection(s8 *, s8);
 static void UpdatePartySelectionSingleLayout(s8 *, s8);
 static void UpdatePartySelectionSinglePcLayout(s8 *, s8);
+static bool8 PartyMonCanEvolve(u16, u8);
 static s8 GetPcSlotGridTarget(s8, s8);
 static s8 GetRightmostSelectablePcSlot(u8);
 static void UpdatePartySelectionDoubleLayout(s8 *, s8);
@@ -1467,7 +1469,7 @@ static void CreatePartyMonSprites(u8 slot)
             u16 species = GetBoxMonData(boxMon, MON_DATA_SPECIES);
             u32 personality = GetBoxMonData(boxMon, MON_DATA_PERSONALITY);
             CreatePartyMonIconSpriteParameterized(species, personality, &sPartyMenuBoxes[slot], 1);
-            CreatePartyMonPokeballSpriteParameterized(species, &sPartyMenuBoxes[slot]);
+            CreatePartyMonPokeballSpriteParameterized(species, GetBoxMonData(boxMon, MON_DATA_LEVEL), &sPartyMenuBoxes[slot]);
             gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.priority = 1;
             if (GetBoxMonData(boxMon, MON_DATA_HP) == 0)
                 MakeMonIconSpriteFainted(&gSprites[sPartyMenuBoxes[slot].monSpriteId]);
@@ -1486,7 +1488,7 @@ static void CreatePartyMonSprites(u8 slot)
         {
             CreatePartyMonIconSpriteParameterized(gMultiPartnerParty[actualSlot].species, gMultiPartnerParty[actualSlot].personality, &sPartyMenuBoxes[slot], 0);
             CreatePartyMonHeldItemSpriteParameterized(gMultiPartnerParty[actualSlot].species, gMultiPartnerParty[actualSlot].heldItem, &sPartyMenuBoxes[slot]);
-            CreatePartyMonPokeballSpriteParameterized(gMultiPartnerParty[actualSlot].species, &sPartyMenuBoxes[slot]);
+            CreatePartyMonPokeballSpriteParameterized(gMultiPartnerParty[actualSlot].species, gMultiPartnerParty[actualSlot].level, &sPartyMenuBoxes[slot]);
             if (gMultiPartnerParty[actualSlot].hp == 0)
                 status = AILMENT_FNT;
             else
@@ -1560,6 +1562,13 @@ void AnimatePartySlot(u8 slot, u8 animNum)
     case PARTY_PC_SLOT_START + 5:
         if (IsPcSlotSelectable(slot))
         {
+            u8 boxPos = GetPcSlotBoxPosition(slot);
+            if (boxPos != 0xFF)
+            {
+                struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+                if (PartyMonCanEvolve(GetBoxMonData(boxMon, MON_DATA_SPECIES), GetBoxMonData(boxMon, MON_DATA_LEVEL)))
+                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.paletteNum = IndexOfSpritePaletteTag(TAG_POKEBALL_EVO);
+            }
             AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum, TRUE);
             PartyMenuStartSpriteAnim(sPartyMenuBoxes[slot].pokeballSpriteId, animNum);
         }
@@ -2832,6 +2841,154 @@ static const u8 sPartyBoxPurplePalIds2[] = {28, 68, 68};
 static const u8 sPartyBoxCurrSelectionPurplePalIds1[] = {70, 72, 72};
 static const u8 sPartyBoxCurrSelectionPurplePalIds2[] = {8, 72, 72};
 
+// Returns TRUE if the pokemon (by species and level, either in the party or in the
+// PC box) can currently evolve, which turns the party box background light green
+// and the PC pokeball top light green.
+static bool8 PartyMonCanEvolve(u16 species, u8 level)
+{
+    return ((VarGet(VAR_BADGE_COUNT) >= 8 && (
+            species == SPECIES_SLIGGOO
+         || species == SPECIES_SLIGGOO_HISUI
+        )) || (VarGet(VAR_BADGE_COUNT) >= 6 && (
+            species == SPECIES_GRAVELER
+         || species == SPECIES_KADABRA
+         || species == SPECIES_PORYGON2
+         || species == SPECIES_MAGMAR
+         || species == SPECIES_ELECTABUZZ
+         || species == SPECIES_GURDURR
+         || species == SPECIES_HAUNTER
+         || species == SPECIES_BOLDORE
+         || species == SPECIES_MACHOKE
+         || species == SPECIES_DUSCLOPS
+        )) || (VarGet(VAR_BADGE_COUNT) >= 4 && (
+            species == SPECIES_VULPIX_ALOLA
+         || species == SPECIES_GROWLITHE
+         || species == SPECIES_GROWLITHE_HISUI
+         || species == SPECIES_PANSEAR
+         || species == SPECIES_CHARCADET
+         || species == SPECIES_BINACLE
+         //|| species == SPECIES_CAPSAKID
+         || species == SPECIES_POLIWHIRL
+         || species == SPECIES_SHELLDER
+         || species == SPECIES_STARYU
+         || species == SPECIES_LOMBRE
+         || species == SPECIES_PIKACHU
+         || species == SPECIES_EELEKTRIK
+         || species == SPECIES_MAGNETON
+         || species == SPECIES_CHARJABUG
+         || species == SPECIES_GLOOM
+         || species == SPECIES_ONIX
+         || species == SPECIES_PETILIL
+         //|| species == SPECIES_WEEPINBELL
+         || species == SPECIES_EXEGGCUTE
+         //|| species == SPECIES_NUZLEAF
+         || species == SPECIES_EEVEE
+         || species == SPECIES_NOSEPASS
+         || species == SPECIES_TADBULB
+         || species == SPECIES_VOLTORB_HISUI
+         //|| species == SPECIES_VULPIX
+         || species == SPECIES_CETODDLE
+         //|| species == SPECIES_SUNKERN
+         || species == SPECIES_COTTONEE
+         || species == SPECIES_HELIOPTILE
+         || species == SPECIES_CLOBBOPUS
+         //|| species == SPECIES_NIDORINA
+         //|| species == SPECIES_NIDORINO
+         || species == SPECIES_CLEFAIRY
+         || species == SPECIES_JIGGLYPUFF
+         || species == SPECIES_GLIGAR
+         //|| species == SPECIES_MUNNA
+         || species == SPECIES_KIRLIA
+         || species == SPECIES_SNORUNT
+         || species == SPECIES_MURKROW
+         || species == SPECIES_MISDREAVUS
+         || species == SPECIES_DOUBLADE
+         || species == SPECIES_LAMPENT
+         || species == SPECIES_SNEASEL
+         || species == SPECIES_ROSELIA
+         || species == SPECIES_TOGETIC
+         || species == SPECIES_MINCCINO
+         || GET_BASE_SPECIES_ID(species) == SPECIES_FLOETTE
+         || species == SPECIES_SKRELP
+         || species == SPECIES_SEADRA
+         //|| species == SPECIES_SLOWPOKE
+         || species == SPECIES_SLOWPOKE_GALAR
+         || species == SPECIES_SCYTHER
+         || species == SPECIES_NOIBAT
+         || species == SPECIES_FEEBAS
+         || species == SPECIES_PILOSWINE
+         || species == SPECIES_ELGYEM
+         || species == SPECIES_MEDITITE
+         || species == SPECIES_SKORUPI
+         || species == SPECIES_CROAGUNK
+         || species == SPECIES_SNOVER
+         || species == SPECIES_LARVESTA
+         || species == SPECIES_SCRAGGY
+         || species == SPECIES_CLAUNCHER
+         || species == SPECIES_TIRTOUGA
+         || species == SPECIES_AMAURA
+         || species == SPECIES_VAROOM
+         //|| species == SPECIES_GOLETT
+         || species == SPECIES_RUFFLET
+         || species == SPECIES_FRILLISH
+         || species == SPECIES_SANDYGAST
+         || species == SPECIES_CORSOLA_GALAR
+         || species == SPECIES_PONYTA
+         || species == SPECIES_SHUPPET
+         || species == SPECIES_TYRUNT
+         || species == SPECIES_ARCHEN
+         || species == SPECIES_ANORITH
+         || species == SPECIES_WAILMER
+         //|| species == SPECIES_PONYTA_GALAR
+        )) || (VarGet(VAR_BADGE_COUNT) >= 2 && (
+            species == SPECIES_LITWICK
+         || species == SPECIES_SOLOSIS
+         || species == SPECIES_JANGMO_O
+         || species == SPECIES_TRAPINCH
+         || species == SPECIES_VANILLITE
+         || species == SPECIES_HATENNA
+         || species == SPECIES_DUSKULL
+         || species == SPECIES_SPHEAL
+         || species == SPECIES_HORSEA
+         || species == SPECIES_ARON
+         || species == SPECIES_AXEW
+         || species == SPECIES_GOOMY
+         || species == SPECIES_GOTHITA
+         || species == SPECIES_HONEDGE
+         || species == SPECIES_IMPIDIMP
+         || species == SPECIES_FRIGIBAX
+         //|| species == SPECIES_DEINO
+         || species == SPECIES_TYNAMO
+         || species == SPECIES_SWINUB
+        )) || (level >= 9 && (
+            GET_BASE_SPECIES_ID(species) == SPECIES_SCATTERBUG
+         || GET_BASE_SPECIES_ID(species) == SPECIES_SPEWPA
+         || species == SPECIES_PIKIPEK
+         || species == SPECIES_MAREEP
+         || species == SPECIES_CYNDAQUIL
+         || species == SPECIES_SHINX
+         || species == SPECIES_TAROUNTULA
+         || species == SPECIES_STARLY
+         || species == SPECIES_WEEDLE
+         || species == SPECIES_KAKUNA
+         || species == SPECIES_LOTAD
+         || species == SPECIES_BLIPBUG
+         || species == SPECIES_CHIMCHAR
+         || species == SPECIES_PICHU
+         || species == SPECIES_CLEFFA
+         || species == SPECIES_IGGLYBUFF
+         || species == SPECIES_AZURILL
+        )) || (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_RUSTBORO_CITY_GYM) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_RUSTBORO_CITY_GYM) && (
+            species == SPECIES_APPLIN
+        )) || (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_FORTREE_CITY_GYM) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_FORTREE_CITY_GYM) && (
+            species == SPECIES_APPLIN
+        )) || (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_LAVARIDGE_TOWN_GYM_1F) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_LAVARIDGE_TOWN_GYM_1F) && (
+            species == SPECIES_APPLIN
+        )) || (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_LAVARIDGE_TOWN_GYM_B1F) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_LAVARIDGE_TOWN_GYM_B1F) && (
+            species == SPECIES_APPLIN
+        )));
+}
+
 static void LoadPartyBoxPalette(struct PartyMenuBox *menuBox, u8 palFlags)
 {
     u8 palOffset = BG_PLTT_ID(GetWindowAttribute(menuBox->windowId, WINDOW_PALETTE_NUM));
@@ -2940,147 +3097,7 @@ static void LoadPartyBoxPalette(struct PartyMenuBox *menuBox, u8 palFlags)
 //            LOAD_PARTY_BOX_PAL(sPartyBoxPurplePalIds2, sPartyBoxPalOffsets2);
 //        }}
     if (!(palFlags & (PARTY_PAL_NO_MON | PARTY_PAL_FAINTED | PARTY_PAL_MULTI_ALT))
-        && ((VarGet(VAR_BADGE_COUNT) >= 8 && (
-            GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SLIGGOO
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SLIGGOO_HISUI
-        )) || (VarGet(VAR_BADGE_COUNT) >= 6 && (
-            GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_GRAVELER
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_KADABRA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_PORYGON2
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_MAGMAR
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_ELECTABUZZ
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_GURDURR
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_HAUNTER
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_BOLDORE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_MACHOKE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_DUSCLOPS
-        )) || (VarGet(VAR_BADGE_COUNT) >= 4 && (
-            GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_VULPIX_ALOLA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_GROWLITHE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_GROWLITHE_HISUI
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_PANSEAR
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CHARCADET
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_BINACLE
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CAPSAKID
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_POLIWHIRL
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SHELLDER
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_STARYU
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_LOMBRE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_PIKACHU
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_EELEKTRIK
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_MAGNETON
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CHARJABUG
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_GLOOM
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_ONIX
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_PETILIL
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_WEEPINBELL
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_EXEGGCUTE
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_NUZLEAF
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_EEVEE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_NOSEPASS
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_TADBULB
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_VOLTORB_HISUI
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_VULPIX
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CETODDLE
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SUNKERN
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_COTTONEE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_HELIOPTILE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CLOBBOPUS
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_NIDORINA
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_NIDORINO
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CLEFAIRY
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_JIGGLYPUFF
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_GLIGAR
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_MUNNA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_KIRLIA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SNORUNT
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_MURKROW
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_MISDREAVUS
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_DOUBLADE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_LAMPENT
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SNEASEL
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_ROSELIA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_TOGETIC
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_MINCCINO
-         || GET_BASE_SPECIES_ID(GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES)) == SPECIES_FLOETTE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SKRELP
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SEADRA
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SLOWPOKE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SLOWPOKE_GALAR
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SCYTHER
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_NOIBAT
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_FEEBAS
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_PILOSWINE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_ELGYEM
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_MEDITITE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SKORUPI
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CROAGUNK
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SNOVER
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_LARVESTA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SCRAGGY
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CLAUNCHER
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_TIRTOUGA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_AMAURA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_VAROOM
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_GOLETT
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_RUFFLET
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_FRILLISH
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SANDYGAST
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CORSOLA_GALAR
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_PONYTA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SHUPPET
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_TYRUNT
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_ARCHEN
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_ANORITH
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_WAILMER
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_PONYTA_GALAR
-        )) || (VarGet(VAR_BADGE_COUNT) >= 2 && (
-            GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_LITWICK
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SOLOSIS
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_JANGMO_O
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_TRAPINCH
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_VANILLITE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_HATENNA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_DUSKULL
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SPHEAL
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_HORSEA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_ARON
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_AXEW
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_GOOMY
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_GOTHITA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_HONEDGE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_IMPIDIMP
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_FRIGIBAX
-         //|| GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_DEINO
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_TYNAMO
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SWINUB
-        )) || (GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_LEVEL) >= 9 && (
-            GET_BASE_SPECIES_ID(GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES)) == SPECIES_SCATTERBUG
-         || GET_BASE_SPECIES_ID(GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES)) == SPECIES_SPEWPA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_PIKIPEK
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_MAREEP
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CYNDAQUIL
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_SHINX
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_TAROUNTULA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_STARLY
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_WEEDLE
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_KAKUNA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_LOTAD
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_BLIPBUG
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CHIMCHAR
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_PICHU
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_CLEFFA
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_IGGLYBUFF
-         || GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_AZURILL
-        )) || (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_RUSTBORO_CITY_GYM) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_RUSTBORO_CITY_GYM) && (
-            GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_APPLIN
-        )) || (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_FORTREE_CITY_GYM) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_FORTREE_CITY_GYM) && (
-            GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_APPLIN
-        )) || (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_LAVARIDGE_TOWN_GYM_1F) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_LAVARIDGE_TOWN_GYM_1F) && (
-            GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_APPLIN
-        )) || (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_LAVARIDGE_TOWN_GYM_B1F) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_LAVARIDGE_TOWN_GYM_B1F) && (
-            GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES) == SPECIES_APPLIN
-        ))))
+        && PartyMonCanEvolve(GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_SPECIES), GetMonData(&gPlayerParty[menuBox->windowId], MON_DATA_LEVEL)))
     {
         if (palFlags & PARTY_PAL_SELECTED)
         {
@@ -5354,11 +5371,16 @@ static void CreatePartyMonPokeballSprite(struct Pokemon *mon, struct PartyMenuBo
         menuBox->pokeballSpriteId = CreateSprite(&sSpriteTemplate_MenuPokeball, menuBox->spriteCoords[6], menuBox->spriteCoords[7], 8);
 }
 
-static void CreatePartyMonPokeballSpriteParameterized(u16 species, struct PartyMenuBox *menuBox)
+static void CreatePartyMonPokeballSpriteParameterized(u16 species, u8 level, struct PartyMenuBox *menuBox)
 {
     if (species != SPECIES_NONE)
     {
-        menuBox->pokeballSpriteId = CreateSprite(&sSpriteTemplate_MenuPokeball, menuBox->spriteCoords[6], menuBox->spriteCoords[7], 8);
+        const struct SpriteTemplate *template = &sSpriteTemplate_MenuPokeball;
+
+        if (PartyMonCanEvolve(species, level))
+            template = &sSpriteTemplate_MenuPokeballEvo;
+
+        menuBox->pokeballSpriteId = CreateSprite(template, menuBox->spriteCoords[6], menuBox->spriteCoords[7], 8);
         gSprites[menuBox->pokeballSpriteId].oam.priority = 0;
     }
 }
@@ -5408,6 +5430,7 @@ static void LoadPartyMenuPokeballGfx(void)
     LoadCompressedSpriteSheet(&sSpriteSheet_MenuPokeball);
     LoadCompressedSpriteSheet(&sSpriteSheet_MenuPokeballSmall);
     LoadSpritePalette(&sSpritePalette_MenuPokeball);
+    LoadSpritePalette(&sSpritePalette_MenuPokeballEvo);
 }
 
 static void CreatePartyMonStatusSprite(struct Pokemon *mon, struct PartyMenuBox *menuBox)
