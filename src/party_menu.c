@@ -187,6 +187,7 @@ enum {
     TAG_POKEBALL_SMALL,
     TAG_STATUS_ICONS,
     TAG_POKEBALL_EVO,
+    TAG_POKEBALL_SWITCH,
 };
 
 #define TAG_HELD_ITEM 55120
@@ -467,7 +468,6 @@ static void UpdatePartySelectionSinglePcLayout(s8 *, s8);
 static bool8 PartyMonCanEvolve(u16, u8);
 static s8 GetPcSlotGridTarget(s8, s8);
 static s8 GetRightmostSelectablePcSlot(u8);
-static u8 GetPcBox1MonCount(void);
 static u8 GetFirstEmptyPartySlot(void);
 static u8 GetFirstEmptyBoxPosition(u8 boxId);
 static u8 GetPcSlotIndexForNewBoxPosition(u8 boxPos);
@@ -1578,13 +1578,24 @@ void AnimatePartySlot(u8 slot, u8 animNum)
     case PARTY_PC_SLOT_START + 5:
         if (IsPcSlotSelectable(slot))
         {
-            u8 boxPos = GetPcSlotBoxPosition(slot);
-            if (boxPos != 0xFF)
+            u16 pokeballTag = TAG_POKEBALL;
+            if (gPartyMenu.action == PARTY_ACTION_SWITCH
+                && slot == gPartyMenu.slotId
+                && gPartyMenu.slotId2 != gPartyMenu.slotId)
             {
-                struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
-                if (PartyMonCanEvolve(GetBoxMonData(boxMon, MON_DATA_SPECIES), GetBoxMonData(boxMon, MON_DATA_LEVEL)))
-                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.paletteNum = IndexOfSpritePaletteTag(TAG_POKEBALL_EVO);
+                pokeballTag = TAG_POKEBALL_SWITCH;
             }
+            else
+            {
+                u8 boxPos = GetPcSlotBoxPosition(slot);
+                if (boxPos != 0xFF)
+                {
+                    struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+                    if (PartyMonCanEvolve(GetBoxMonData(boxMon, MON_DATA_SPECIES), GetBoxMonData(boxMon, MON_DATA_LEVEL)))
+                        pokeballTag = TAG_POKEBALL_EVO;
+                }
+            }
+            gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.paletteNum = IndexOfSpritePaletteTag(pokeballTag);
             AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum, TRUE);
             PartyMenuStartSpriteAnim(sPartyMenuBoxes[slot].pokeballSpriteId, animNum);
         }
@@ -4319,19 +4330,6 @@ static void FinishTwoMonAction(u8 taskId)
     gTasks[taskId].func = Task_HandleChooseMonInput;
 }
 
-static u8 GetPcBox1MonCount(void)
-{
-    u8 count = 0;
-    u8 i;
-
-    for (i = 0; i < IN_BOX_COUNT; i++)
-    {
-        if (GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][i], MON_DATA_SANITY_HAS_SPECIES))
-            count++;
-    }
-    return count;
-}
-
 static u8 GetFirstEmptyPartySlot(void)
 {
     u8 i;
@@ -5754,6 +5752,7 @@ static void LoadPartyMenuPokeballGfx(void)
     LoadCompressedSpriteSheet(&sSpriteSheet_MenuPokeballSmall);
     LoadSpritePalette(&sSpritePalette_MenuPokeball);
     LoadSpritePalette(&sSpritePalette_MenuPokeballEvo);
+    LoadSpritePalette(&sSpritePalette_MenuPokeballSwitch);
 }
 
 static void CreatePartyMonStatusSprite(struct Pokemon *mon, struct PartyMenuBox *menuBox)

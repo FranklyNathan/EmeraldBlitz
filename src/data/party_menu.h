@@ -1037,6 +1037,11 @@ static const struct SpritePalette sSpritePalette_MenuPokeballEvo =
     gPartyMenuPokeballEvo_Pal, TAG_POKEBALL_EVO
 };
 
+static const struct SpritePalette sSpritePalette_MenuPokeballSwitch =
+{
+    gPartyMenuPokeballSwitch_Pal, TAG_POKEBALL_SWITCH
+};
+
 // Used for the Poké Ball sprite on each party slot / Cancel button
 static const struct SpriteTemplate sSpriteTemplate_MenuPokeball =
 {
