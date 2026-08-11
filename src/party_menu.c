@@ -3602,8 +3602,7 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
     {
         if (GetMonData(&mons[1], MON_DATA_SPECIES) != SPECIES_NONE)
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SWITCH);
-        if (GetPcBox1MonCount() < 6
-            && gPlayerPartyCount > 1
+        if (gPlayerPartyCount > 1
             && !GetMonData(&mons[slotId], MON_DATA_IS_EGG)
             && GetMonData(&mons[slotId], MON_DATA_HP) == 0)
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_DEPOSIT);
@@ -6857,7 +6856,7 @@ static void CB2_ReturnToPartyMenuWhileLearningMove(void)
 
     if (sFinalLevel != 0)
         SetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_LEVEL, &sFinalLevel); // to avoid displaying incorrect level
-    if (GetItemFieldFunc(gSpecialVar_ItemId) == ItemUseOutOfBattle_RareCandy && gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD && CheckBagHasItem(gSpecialVar_ItemId, 1))
+    if (GetItemFieldFunc(gSpecialVar_ItemId) == ItemUseOutOfBattle_RareCandy && gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD && CheckBagHasItem(gSpecialVar_ItemId, 1) && !returnToPartyMenuAfterEvo)
         InitPartyMenu(PARTY_MENU_TYPE_FIELD, KEEP_PARTY_LAYOUT, PARTY_ACTION_USE_ITEM, TRUE, PARTY_MSG_NONE, Task_ReturnToPartyMenuWhileLearningMove, gPartyMenu.exitCallback);
     else
         InitPartyMenu(PARTY_MENU_TYPE_FIELD, KEEP_PARTY_LAYOUT, PARTY_ACTION_CHOOSE_MON, TRUE, PARTY_MSG_NONE, Task_ReturnToPartyMenuWhileLearningMove, gPartyMenu.exitCallback);
@@ -7050,6 +7049,12 @@ void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
             if (learnMove != 0)  // If a move is learned (not 0 = no move to learn)
             {
                 learnedNewMove = TRUE;
+                // Store the move if it was given to an open slot,
+                // so Task_TryLearnNewMoves can display the message.
+                // (MON_ALREADY_KNOWS_MOVE and MON_HAS_MAX_MOVES are
+                // handled separately and don't need the stored move.)
+                if (learnMove != MON_ALREADY_KNOWS_MOVE && learnMove != MON_HAS_MAX_MOVES)
+                    gTasks[taskId].data[0] = learnMove;
             }
 
             // Check if the Pokémon can evolve
@@ -7139,24 +7144,31 @@ static void UpdateMonDisplayInfoAfterRareCandy(u8 slot, struct Pokemon *mon)
 static void Task_TryLearnNewMoves(u8 taskId)
 {
     u16 learnMove;
+    u16 alreadyLearnedMove = gTasks[taskId].data[0];
+    gPartyMenu.learnMoveState = 1;
+
+    if (alreadyLearnedMove != MOVE_NONE)
     {
-        learnMove = MonTryLearningNewMove(&gPlayerParty[gPartyMenu.slotId], TRUE);
-        gPartyMenu.learnMoveState = 1;
-        switch (learnMove)
-        {
-        case 0: // No moves to learn
-            PartyMenuTryEvolution(taskId);
-            break;
-        case MON_HAS_MAX_MOVES:
-            DisplayMonNeedsToReplaceMove(taskId);
-            break;
-        case MON_ALREADY_KNOWS_MOVE:
-            gTasks[taskId].func = Task_TryLearningNextMove;
-            break;
-        default:
-            DisplayMonLearnedMove(taskId, learnMove);
-            break;
-        }
+        gTasks[taskId].data[0] = MOVE_NONE;
+        DisplayMonLearnedMove(taskId, alreadyLearnedMove);
+        return;
+    }
+
+    learnMove = MonTryLearningNewMove(&gPlayerParty[gPartyMenu.slotId], TRUE);
+    switch (learnMove)
+    {
+    case 0: // No moves to learn
+        PartyMenuTryEvolution(taskId);
+        break;
+    case MON_HAS_MAX_MOVES:
+        DisplayMonNeedsToReplaceMove(taskId);
+        break;
+    case MON_ALREADY_KNOWS_MOVE:
+        gTasks[taskId].func = Task_TryLearningNextMove;
+        break;
+    default:
+        DisplayMonLearnedMove(taskId, learnMove);
+        break;
     }
 }
 
