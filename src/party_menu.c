@@ -150,6 +150,8 @@ enum {
     MENU_CHANGE_FORM,
     MENU_CHANGE_ABILITY,
     MENU_CLEAR,
+    MENU_WITHDRAW,
+    MENU_DEPOSIT,
     MENU_FIELD_MOVES
 };
 
@@ -424,8 +426,6 @@ static u8 CreatePokeballButtonSprite(u8, u8);
 static void AnimateSelectedPartyIcon(u8, u8, bool8);
 static void PartyMenuStartSpriteAnim(u8, u8);
 static void Task_HandlePcSwitchAnimation(u8 taskId);
-static void StartPartyMenuSlotSwitchShrinkAnimation(u8 slot);
-static void StartPartyMenuSlotSwitchGrowAnimation(u8 slot);
 static void StartPartyMenuSwitchSpriteShrink(u8 spriteId);
 static void StartPartyMenuSwitchSpriteGrow(u8 spriteId);
 static void RefreshPartyMenuBoxAfterSwitchWithGrow(u8 slot);
@@ -467,6 +467,14 @@ static void UpdatePartySelectionSinglePcLayout(s8 *, s8);
 static bool8 PartyMonCanEvolve(u16, u8);
 static s8 GetPcSlotGridTarget(s8, s8);
 static s8 GetRightmostSelectablePcSlot(u8);
+static u8 GetPcBox1MonCount(void);
+static u8 GetFirstEmptyPartySlot(void);
+static u8 GetFirstEmptyBoxPosition(u8 boxId);
+static u8 GetPcSlotIndexForNewBoxPosition(u8 boxPos);
+static void WithdrawPcMon(u8 partySlot, u8 boxPos);
+static void DepositPartyMon(u8 partySlot, u8 boxPos);
+static void Task_HandlePcWithdrawAnimation(u8 taskId);
+static void Task_HandlePcDepositAnimation(u8 taskId);
 static void UpdatePartySelectionDoubleLayout(s8 *, s8);
 static s8 GetNewSlotDoubleLayout(s8, s8);
 static void PrintMessage(const u8 *);
@@ -637,6 +645,8 @@ static void CursorCb_CatalogTrash(u8);
 static void CursorCb_ChangeForm(u8);
 static void CursorCb_ChangeAbility(u8);
 static void CursorCb_Clear(u8 taskId);
+static void CursorCb_Withdraw(u8 taskId);
+static void CursorCb_Deposit(u8 taskId);
 static void Task_UpdateHeldItemSpritesAndReturn(u8 taskId);
 bool32 SetUpFieldMove_Surf(void);
 bool32 SetUpFieldMove_Fly(void);
@@ -3592,6 +3602,11 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
     {
         if (GetMonData(&mons[1], MON_DATA_SPECIES) != SPECIES_NONE)
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SWITCH);
+        if (GetPcBox1MonCount() < 6
+            && gPlayerPartyCount > 1
+            && !GetMonData(&mons[slotId], MON_DATA_IS_EGG)
+            && GetMonData(&mons[slotId], MON_DATA_HP) == 0)
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_DEPOSIT);
         if (ItemIsMail(GetMonData(&mons[slotId], MON_DATA_HELD_ITEM)))
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_MAIL);
         else
@@ -3705,7 +3720,12 @@ static bool8 CreateSelectionWindow(u8 taskId)
 
         GetBoxMonNickname(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], gStringVar1);
         PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
-        SetPartyMonSelectionActions(NULL, 0, ACTIONS_SWITCH);
+        sPartyMenuInternal->numActions = 0;
+        AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
+        AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SWITCH);
+        if (gPlayerPartyCount < PARTY_SIZE)
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_WITHDRAW);
+        AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL1);
         DisplaySelectionWindow(SELECTWINDOW_ACTIONS);
         DisplayPartyMenuStdMessage(PARTY_MSG_DO_WHAT_WITH_MON);
         return TRUE;
@@ -4114,21 +4134,6 @@ static void DestroyPartyMenuBoxSprites(u8 slot)
     box->statusSpriteId = SPRITE_NONE;
 }
 
-// Redraws a box slot after a switch, recreating its sprites from the new occupant.
-static void SetPartyMenuBoxSpritesVisible(u8 slot, bool8 visible)
-{
-    struct PartyMenuBox *box = &sPartyMenuBoxes[slot];
-
-    if (box->monSpriteId != SPRITE_NONE)
-        gSprites[box->monSpriteId].invisible = !visible;
-    if (box->itemSpriteId != SPRITE_NONE)
-        gSprites[box->itemSpriteId].invisible = !visible;
-    if (box->pokeballSpriteId != SPRITE_NONE)
-        gSprites[box->pokeballSpriteId].invisible = !visible;
-    if (box->statusSpriteId != SPRITE_NONE)
-        gSprites[box->statusSpriteId].invisible = !visible;
-}
-
 static const union AffineAnimCmd sAffineAnim_PartyMenuSwitch_Shrink[] =
 {
     AFFINEANIMCMD_FRAME(-0x10, -0x10, 0, 15),
@@ -4237,13 +4242,26 @@ static void RefreshPartyMenuBoxAfterSwitch(u8 slot)
 
     if (!IsPcSlot(slot))
     {
-        DisplayPartyPokemonData(slot);
+        // Empty-slot blit uses color key 0, so clear leftover text/HP first.
+        if (GetMonData(&GetPartyMenuParty()[slot], MON_DATA_SPECIES) == SPECIES_NONE)
+        {
+            FillWindowPixelBuffer(box->windowId, PIXEL_FILL(0));
+            DrawEmptySlot(box->windowId);
+            LoadPartyBoxPalette(box, PARTY_PAL_NO_MON);
+        }
+        else
+        {
+            DisplayPartyPokemonData(slot);
+        }
         CopyWindowToVram(box->windowId, COPYWIN_GFX);
         PutWindowTilemap(box->windowId);
     }
     CreatePartyMonSprites(slot);
     AnimatePartySlot(slot, 0);
-    ScheduleBgCopyTilemapToVram(2);
+    if (gPartyMenu.menuType == PARTY_MENU_TYPE_MULTI_SHOWCASE && slot >= MULTI_PARTY_SIZE)
+        ScheduleBgCopyTilemapToVram(2);
+    else
+        ScheduleBgCopyTilemapToVram(0);
 }
 
 static void SwitchPartyMon(void)
@@ -4300,6 +4318,184 @@ static void FinishTwoMonAction(u8 taskId)
     AnimatePartySlot(gPartyMenu.slotId2, 1);
     DisplayPartyMenuStdMessage(PARTY_MSG_CHOOSE_MON);
     gTasks[taskId].func = Task_HandleChooseMonInput;
+}
+
+static u8 GetPcBox1MonCount(void)
+{
+    u8 count = 0;
+    u8 i;
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][i], MON_DATA_SANITY_HAS_SPECIES))
+            count++;
+    }
+    return count;
+}
+
+static u8 GetFirstEmptyPartySlot(void)
+{
+    u8 i;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE)
+            return i;
+    }
+    return PARTY_SIZE;
+}
+
+static u8 GetFirstEmptyBoxPosition(u8 boxId)
+{
+    u8 i;
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (!GetBoxMonData(&gPokemonStoragePtr->boxes[boxId][i], MON_DATA_SANITY_HAS_SPECIES))
+            return i;
+    }
+    return 0xFF;
+}
+
+// Returns the PC slot index (0..PARTY_PC_SLOT_COUNT-1) that a newly-occupied box position will appear in.
+static u8 GetPcSlotIndexForNewBoxPosition(u8 boxPos)
+{
+    u8 i;
+    u8 count = 0;
+
+    for (i = 0; i < boxPos; i++)
+    {
+        if (GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][i], MON_DATA_SANITY_HAS_SPECIES))
+            count++;
+    }
+    return count;
+}
+
+// Moves a Box 1 Pokémon into an empty party slot and clears the box position.
+static void WithdrawPcMon(u8 partySlot, u8 boxPos)
+{
+    BoxMonToMon(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &gPlayerParty[partySlot]);
+    ZeroBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos]);
+}
+
+// Moves a party Pokémon into an empty Box 1 position and clears the party slot.
+static void DepositPartyMon(u8 partySlot, u8 boxPos)
+{
+    gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos] = gPlayerParty[partySlot].box;
+    ZeroMonData(&gPlayerParty[partySlot]);
+}
+
+static void Task_HandlePcWithdrawAnimation(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u8 pcSlot = gPartyMenu.slotId;
+    u8 partySlot = gPartyMenu.slotId2;
+    u8 boxPos;
+    u8 i;
+
+    if (data[0] == 0)
+    {
+        if (IsPartyMenuSwitchSpriteAnimDone(sPartyMenuBoxes[pcSlot].monSpriteId))
+        {
+            // Resolve box position before clearing the PC mon.
+            boxPos = GetPcSlotBoxPosition(pcSlot);
+            WithdrawPcMon(partySlot, boxPos);
+            CalculatePlayerPartyCount();
+            RefreshPartyMenuBoxAfterSwitchWithGrow(partySlot);
+            for (i = PARTY_PC_SLOT_START; i < PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT; i++)
+                RefreshPartyMenuBoxAfterSwitch(i);
+            data[0] = 1;
+        }
+        return;
+    }
+
+    if (IsPartyMenuSwitchSpriteAnimDone(sPartyMenuBoxes[partySlot].monSpriteId))
+    {
+        FinishTwoMonAction(taskId);
+    }
+}
+
+static void Task_HandlePcDepositAnimation(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u8 partySlot = gPartyMenu.slotId;
+    u8 pcSlot = gPartyMenu.slotId2;
+    u8 boxPos;
+    u8 i;
+
+    if (data[0] == 0)
+    {
+        if (IsPartyMenuSwitchSpriteAnimDone(sPartyMenuBoxes[partySlot].monSpriteId))
+        {
+            // Destination is still empty; do not use GetPcSlotBoxPosition here.
+            boxPos = GetFirstEmptyBoxPosition(PARTY_PC_BOX_ID);
+            DepositPartyMon(partySlot, boxPos);
+            CompactPartySlots();
+            CalculatePlayerPartyCount();
+            for (i = partySlot; i < PARTY_SIZE; i++)
+                RefreshPartyMenuBoxAfterSwitch(i);
+            RefreshPartyMenuBoxAfterSwitchWithGrow(pcSlot);
+            for (i = PARTY_PC_SLOT_START; i < PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT; i++)
+            {
+                if (i != pcSlot)
+                    RefreshPartyMenuBoxAfterSwitch(i);
+            }
+            data[0] = 1;
+        }
+        return;
+    }
+
+    if (IsPartyMenuSwitchSpriteAnimDone(sPartyMenuBoxes[pcSlot].monSpriteId))
+    {
+        FinishTwoMonAction(taskId);
+    }
+}
+
+static void CursorCb_Withdraw(u8 taskId)
+{
+    u8 partySlot = GetFirstEmptyPartySlot();
+    u8 pcSlot = gPartyMenu.slotId;
+
+    if (partySlot >= PARTY_SIZE)
+        return;
+
+    if (pcSlot == 0 || partySlot == 0)
+        gFollowerSteps = 0;
+
+    PlaySE(SE_SELECT);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+    gPartyMenu.slotId2 = partySlot;
+    AnimatePartySlot(pcSlot, 1);
+    gTasks[taskId].data[0] = 0;
+    gTasks[taskId].func = Task_HandlePcWithdrawAnimation;
+    StartPartyMenuSwitchSpriteShrink(sPartyMenuBoxes[pcSlot].monSpriteId);
+}
+
+static void CursorCb_Deposit(u8 taskId)
+{
+    u8 boxPos = GetFirstEmptyBoxPosition(PARTY_PC_BOX_ID);
+    u8 partySlot = gPartyMenu.slotId;
+    u8 pcSlotIndex;
+
+    if (boxPos == 0xFF)
+        return;
+
+    pcSlotIndex = GetPcSlotIndexForNewBoxPosition(boxPos);
+    if (pcSlotIndex >= PARTY_PC_SLOT_COUNT)
+        return;
+
+    if (partySlot == 0)
+        gFollowerSteps = 0;
+
+    PlaySE(SE_SELECT);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+    gPartyMenu.slotId2 = PARTY_PC_SLOT_START + pcSlotIndex;
+    AnimatePartySlot(partySlot, 1);
+    gTasks[taskId].data[0] = 0;
+    gTasks[taskId].func = Task_HandlePcDepositAnimation;
+    StartPartyMenuSwitchSpriteShrink(sPartyMenuBoxes[partySlot].monSpriteId);
 }
 
 #undef tSlot1Left
@@ -6657,12 +6853,16 @@ static void CB2_ShowSummaryScreenToForgetMove(void)
 
 static void CB2_ReturnToPartyMenuWhileLearningMove(void)
 {
+    bool8 returnToPartyMenuAfterEvo = sReturnToPartyMenuAfterEvo;
+
     if (sFinalLevel != 0)
         SetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_LEVEL, &sFinalLevel); // to avoid displaying incorrect level
     if (GetItemFieldFunc(gSpecialVar_ItemId) == ItemUseOutOfBattle_RareCandy && gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD && CheckBagHasItem(gSpecialVar_ItemId, 1))
-        InitPartyMenu(PARTY_MENU_TYPE_FIELD, PARTY_LAYOUT_SINGLE, PARTY_ACTION_USE_ITEM, TRUE, PARTY_MSG_NONE, Task_ReturnToPartyMenuWhileLearningMove, gPartyMenu.exitCallback);
+        InitPartyMenu(PARTY_MENU_TYPE_FIELD, KEEP_PARTY_LAYOUT, PARTY_ACTION_USE_ITEM, TRUE, PARTY_MSG_NONE, Task_ReturnToPartyMenuWhileLearningMove, gPartyMenu.exitCallback);
     else
-        InitPartyMenu(PARTY_MENU_TYPE_FIELD, PARTY_LAYOUT_SINGLE, PARTY_ACTION_CHOOSE_MON, TRUE, PARTY_MSG_NONE, Task_ReturnToPartyMenuWhileLearningMove, gPartyMenu.exitCallback);
+        InitPartyMenu(PARTY_MENU_TYPE_FIELD, KEEP_PARTY_LAYOUT, PARTY_ACTION_CHOOSE_MON, TRUE, PARTY_MSG_NONE, Task_ReturnToPartyMenuWhileLearningMove, gPartyMenu.exitCallback);
+
+    sReturnToPartyMenuAfterEvo = returnToPartyMenuAfterEvo;
 }
 
 static void Task_ReturnToPartyMenuWhileLearningMove(u8 taskId)
