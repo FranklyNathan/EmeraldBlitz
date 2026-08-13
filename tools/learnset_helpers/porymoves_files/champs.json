@@ -9,6 +9,14 @@
     "TutorMoves": [],
     "EggMoves": []
   },
+  "BEEDRILL": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
   "EELEKTROSS": {
     "LevelMoves": [],
     "TMMoves": [
@@ -349,7 +357,15 @@
     "TutorMoves": [],
     "EggMoves": []
   },
-  "LYCANROC": {
+  "LYCANROC_MIDDAY": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_HONE_CLAWS"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "LYCANROC_DUSK": {
     "LevelMoves": [],
     "TMMoves": [
       "MOVE_HONE_CLAWS"

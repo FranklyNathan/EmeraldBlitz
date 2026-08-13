@@ -158,6 +158,7 @@ FortreeCity_EventScript_WalkDown::
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkRight
 	waitmovement 0
 	call_if_set FLAG_SCOTT_DISAPPOINTED, FortreeCity_EventScript_FlygonOvercame
+	setflag FLAG_GYM_SHUPPET_FORTREE
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall

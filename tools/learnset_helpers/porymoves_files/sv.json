@@ -28171,14 +28171,18 @@
   "ELECTRIKE": {
     "LevelMoves": [],
     "PreEvoMoves": [],
-    "TMMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
     "EggMoves": [],
     "TutorMoves": []
   },
   "MANECTRIC": {
     "LevelMoves": [],
     "PreEvoMoves": [],
-    "TMMoves": [],
+    "TMMoves": [
+      "MOVE_POUNCE"
+    ],
     "EggMoves": [],
     "TutorMoves": []
   },
@@ -47556,7 +47560,9 @@
       "MOVE_SYNTHESIS",
       "MOVE_WORRY_SEED"
     ],
-    "TutorMoves": []
+    "TutorMoves": [
+      "MOVE_FURY_CUTTER"
+    ]
   },
   "LEAVANNY": {
     "LevelMoves": [
@@ -47678,7 +47684,9 @@
       "MOVE_SYNTHESIS",
       "MOVE_WORRY_SEED"
     ],
-    "TutorMoves": []
+    "TutorMoves": [
+      "MOVE_FURY_CUTTER"
+    ]
   },
   "VENIPEDE": {
     "LevelMoves": [],
@@ -63470,6 +63478,7 @@
     ],
     "EggMoves": [
       "MOVE_DISCHARGE",
+      "MOVE_FURY_CUTTER",
       "MOVE_HARDEN"
     ],
     "TutorMoves": []
@@ -64771,7 +64780,9 @@
       "MOVE_POWER_SPLIT",
       "MOVE_STICKY_WEB"
     ],
-    "TutorMoves": []
+    "TutorMoves": [
+       "MOVE_FURY_CUTTER"
+    ]
   },
   "ARAQUANID": {
     "LevelMoves": [
@@ -64880,7 +64891,9 @@
       "MOVE_STICKY_WEB",
       "MOVE_STOCKPILE"
     ],
-    "TutorMoves": []
+    "TutorMoves": [
+      "MOVE_FURY_CUTTER"
+    ]
   },
   "FOMANTIS": {
     "LevelMoves": [
@@ -79213,6 +79226,7 @@
     "EggMoves": [
       "MOVE_DESTINY_BOND",
       "MOVE_DISABLE",
+      "MOVE_FURY_CUTTER",
       "MOVE_SPITE"
     ],
     "TutorMoves": []
@@ -80094,7 +80108,9 @@
       "MOVE_SWAGGER",
       "MOVE_TOXIC"
     ],
-    "TutorMoves": []
+    "TutorMoves": [
+      "MOVE_FURY_CUTTER"
+    ]
   },
   "BRAMBLIN": {
     "LevelMoves": [

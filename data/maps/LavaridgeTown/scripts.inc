@@ -158,6 +158,7 @@ LavaridgeTown_EventScript_RivalGiveGoGoggles::
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkRight
 	waitmovement 0
 	setvar VAR_LAVARIDGE_TOWN_STATE, 2
+	setflag FLAG_GYM_SHUPPET_LAVARIDGE
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall

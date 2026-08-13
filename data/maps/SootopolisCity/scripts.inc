@@ -296,6 +296,7 @@ SootopolisCity_EventScript_WalkDown::
 	setvar VAR_SOOTOPOLIS_CITY_STATE, 6
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkDown
 	waitmovement 0
+	setflag FLAG_GYM_SHUPPET_SOOTOPOLIS
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall

@@ -474,6 +474,62 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "Route104_EventScript_Rival",
       "flag": "FLAG_HIDE_ROUTE_104_RIVAL"
+    },
+    {
+      "local_id": "LOCALID_104_SHUPPET_1",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 2,
+      "y": 16,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_104_SHUPPET_2",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 29,
+      "y": 69,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_UP",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_104_SHUPPET_3",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 28,
+      "y": 69,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_UP",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_104_SHUPPET_8",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 33,
+      "y": -1,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
     }
   ],
   "warp_events": [

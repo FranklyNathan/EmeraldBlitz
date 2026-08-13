@@ -97,6 +97,7 @@ MossdeepCity_EventScript_WalkDown::
 	setvar VAR_MOSSDEEP_CITY_STATE, 4
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkDown
 	waitmovement 0
+	setflag FLAG_GYM_SHUPPET_MOSSDEEP
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall

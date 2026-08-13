@@ -85,7 +85,7 @@
 #define FLAG_RALTS_USED_TELEPORT    FLAG_UNUSED_0x036
 #define FLAG_ELGYEM_USED_TELEPORT   FLAG_UNUSED_0x037
 #define FLAG_ESPURR_USED_TELEPORT    FLAG_UNUSED_0x038 // Unused Flag
-#define FLAG_UNUSED_0x043    0x43 // Unused Flag
+#define FLAG_GHOST_TOWN      0x43 // When set, shuppets near the player materialize as physical objects
 #define FLAG_UNUSED_0x044    0x44 // Unused Flag
 #define FLAG_UNUSED_0x045    0x45 // Unused Flag
 #define FLAG_UNUSED_0x046    0x46 // Unused Flag
@@ -1560,26 +1560,26 @@
 #define FLAG_UNUSED_0x90E                           (SYSTEM_FLAGS + 0xAE) // Unused Flag
 #define FLAG_UNUSED_0x90F                           (SYSTEM_FLAGS + 0xAF) // Unused Flag
 #define FLAG_UNUSED_0x910                           (SYSTEM_FLAGS + 0xB0) // Unused Flag
-#define FLAG_UNUSED_0x911                           (SYSTEM_FLAGS + 0xB1) // Unused Flag
-#define FLAG_UNUSED_0x912                           (SYSTEM_FLAGS + 0xB2) // Unused Flag
-#define FLAG_UNUSED_0x913                           (SYSTEM_FLAGS + 0xB3) // Unused Flag
-#define FLAG_UNUSED_0x914                           (SYSTEM_FLAGS + 0xB4) // Unused Flag
-#define FLAG_UNUSED_0x915                           (SYSTEM_FLAGS + 0xB5) // Unused Flag
-#define FLAG_UNUSED_0x916                           (SYSTEM_FLAGS + 0xB6) // Unused Flag
-#define FLAG_UNUSED_0x917                           (SYSTEM_FLAGS + 0xB7) // Unused Flag
-#define FLAG_UNUSED_0x918                           (SYSTEM_FLAGS + 0xB8) // Unused Flag
+#define FLAG_GYM_SHUPPET_RUSTBORO                       (SYSTEM_FLAGS + 0xB1)
+#define FLAG_GYM_SHUPPET_DEWFORD                        (SYSTEM_FLAGS + 0xB2)
+#define FLAG_GYM_SHUPPET_MAUVILLE                       (SYSTEM_FLAGS + 0xB3)
+#define FLAG_GYM_SHUPPET_LAVARIDGE                      (SYSTEM_FLAGS + 0xB4)
+#define FLAG_GYM_SHUPPET_PETALBURG                      (SYSTEM_FLAGS + 0xB5)
+#define FLAG_GYM_SHUPPET_FORTREE                        (SYSTEM_FLAGS + 0xB6)
+#define FLAG_GYM_SHUPPET_MOSSDEEP                       (SYSTEM_FLAGS + 0xB7)
+#define FLAG_GYM_SHUPPET_SOOTOPOLIS                     (SYSTEM_FLAGS + 0xB8)
 #define FLAG_UNUSED_0x919                           (SYSTEM_FLAGS + 0xB9) // Unused Flag
 #define FLAG_UNUSED_0x91A                           (SYSTEM_FLAGS + 0xBA) // Unused Flag
 #define FLAG_UNUSED_0x91B                           (SYSTEM_FLAGS + 0xBB) // Unused Flag
 #define FLAG_UNUSED_0x91C                           (SYSTEM_FLAGS + 0xBC) // Unused Flag
 #define FLAG_UNUSED_0x91D                           (SYSTEM_FLAGS + 0xBD) // Unused Flag
-#define FLAG_UNUSED_0x91E                           (SYSTEM_FLAGS + 0xBE) // Unused Flag
-#define FLAG_UNUSED_0x91F                           (SYSTEM_FLAGS + 0xBF) // Unused Flag
+#define FLAG_HIDE_LITTLEROOT_TOWN_SHUPPET_AT_BRENDANS_HOUSE         (SYSTEM_FLAGS + 0xBE)
+#define FLAG_HIDE_LITTLEROOT_TOWN_SHUPPET_AT_MAYS_HOUSE             (SYSTEM_FLAGS + 0xBF)
 
 // Daily Flags
 // These flags are cleared once per day
 // The start and end are byte-aligned because the flags are cleared in byte increments
-#define DAILY_FLAGS_START                           (FLAG_UNUSED_0x91F + (8 - FLAG_UNUSED_0x91F % 8))
+#define DAILY_FLAGS_START                           (FLAG_HIDE_LITTLEROOT_TOWN_SHUPPET_AT_MAYS_HOUSE + (8 - FLAG_HIDE_LITTLEROOT_TOWN_SHUPPET_AT_MAYS_HOUSE % 8))
 #define FLAG_UNUSED_0x920                           (DAILY_FLAGS_START + 0x0)  // Unused Flag
 #define FLAG_DAILY_CONTEST_LOBBY_RECEIVED_BERRY     (DAILY_FLAGS_START + 0x1)
 #define FLAG_DAILY_SECRET_BASE                      (DAILY_FLAGS_START + 0x2)

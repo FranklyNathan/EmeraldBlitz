@@ -7153,6 +7153,7 @@ void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
     bool8 canEvolve = FALSE;
     u16 learnMove;
     gTasks[taskId].data[15] = (u32)task;
+    gTasks[taskId].data[0] = MOVE_NONE; // Clear stale scratch value (PC-swap/withdraw tasks leave 1 here)
     u16 targetSpecies;
     bool32 canStopEvo = TRUE;
     bool8 fromFieldMove = gIsFromFieldMove; // Store gIsFromFieldMove before it's reset

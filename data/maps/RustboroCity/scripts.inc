@@ -120,6 +120,7 @@ RustboroCity_EventScript_WalkDown::
 	setvar VAR_RUSTBORO_CITY_STATE, 5
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkDown
 	waitmovement 0
+	setflag FLAG_GYM_SHUPPET_RUSTBORO
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall

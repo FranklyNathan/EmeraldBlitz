@@ -4386,6 +4386,7 @@ static const struct LevelUpMove sJolteonLevelUpLearnset[] = {
 static const struct LevelUpMove sFlareonLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 0, MOVE_EMBER),
     LEVEL_UP_MOVE( 1, MOVE_CHARM),
+    LEVEL_UP_MOVE( 1, MOVE_SCARY_FACE),
     //LEVEL_UP_MOVE( 1, MOVE_EMBER),
     LEVEL_UP_MOVE( 1, MOVE_HELPING_HAND),
     //LEVEL_UP_MOVE( 1, MOVE_TACKLE),
@@ -4396,7 +4397,6 @@ static const struct LevelUpMove sFlareonLevelUpLearnset[] = {
     LEVEL_UP_MOVE(17, MOVE_BITE),
     LEVEL_UP_MOVE(20, MOVE_FIRE_FANG),
     LEVEL_UP_MOVE(25, MOVE_FIRE_SPIN),
-    LEVEL_UP_MOVE(29, MOVE_SCARY_FACE),
     //LEVEL_UP_MOVE(33, MOVE_SMOG),
     LEVEL_UP_MOVE(37, MOVE_LAVA_PLUME),
     LEVEL_UP_MOVE(41, MOVE_LAST_RESORT),

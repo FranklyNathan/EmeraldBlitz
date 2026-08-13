@@ -20,6 +20,7 @@
 #include "field_specials.h"
 #include "fldeff_misc.h"
 #include "follower_npc.h"
+#include "ghost_town.h"
 #include "item_menu.h"
 #include "link.h"
 #include "match_call.h"
@@ -403,8 +404,13 @@ static const u8 *GetInteractedObjectEventScript(struct MapPosition *position, u8
         script = GetTrainerHillTrainerScript();
     else if (PlayerHasFollowerNPC() && objectEventId == GetFollowerNPCObjectId())
         script = GetFollowerNPCScriptPointer();
+    else if (GhostTownIsGhostObject(&gObjectEvents[objectEventId]))
+        script = GhostTownGetInteractScript(objectEventId);
     else
         script = GetObjectEventScriptPointerByObjectEventId(objectEventId);
+
+    if (script == NULL)
+        return NULL;
 
     script = GetRamScript(gSpecialVar_LastTalked, script);
     return script;

@@ -110,7 +110,7 @@ static void SetDefaultOptions(void)
     gSaveBlock2Ptr->optionsWindowFrameType = 0;
     gSaveBlock2Ptr->optionsSound = OPTIONS_SOUND_MONO;
     gSaveBlock2Ptr->optionsBattleStyle = 0; // Set to off
-    gSaveBlock2Ptr->optionsBattleSceneOff = TRUE;
+    gSaveBlock2Ptr->optionsBattleSceneOff = FALSE;
     gSaveBlock2Ptr->regionMapZoom = FALSE;
 }
 
@@ -263,6 +263,7 @@ void NewGameInitData(void)
         FlagClear(FLAG_HIDE_LITTLEROOT_TOWN_FAT_MAN);
         FlagClear(FLAG_HIDE_MAP_NAME_POPUP);
         FlagSet(FLAG_SYS_PC_LANETTE); 
+        FlagSet(FLAG_GHOST_TOWN);
 
     SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
     ResetItemFlags();

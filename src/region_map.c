@@ -2138,7 +2138,7 @@ u32 FilterFlyDestination(struct RegionMap* regionMap)
     case MAPSEC_LITTLEROOT_TOWN:
         return (gSaveBlock2Ptr->playerGender == MALE ? HEAL_LOCATION_LITTLEROOT_TOWN_BRENDANS_HOUSE : HEAL_LOCATION_LITTLEROOT_TOWN_MAYS_HOUSE);
     case MAPSEC_EVER_GRANDE_CITY:
-        return (FlagGet(FLAG_LANDMARK_POKEMON_LEAGUE) && regionMap->posWithinMapSec == 0 ? HEAL_LOCATION_EVER_GRANDE_CITY_POKEMON_LEAGUE : HEAL_LOCATION_EVER_GRANDE_CITY);
+        return HEAL_LOCATION_EVER_GRANDE_CITY_POKEMON_LEAGUE;
     case MAPSEC_ROUTE_104:
         if (regionMap->posWithinMapSec == 2)
             return HEAL_LOCATION_MR_BRINEYS_HOUSE;

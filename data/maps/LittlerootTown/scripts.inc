@@ -47,10 +47,27 @@ LittlerootTown_OnTransition:
 	call_if_eq VAR_LITTLEROOT_RIVAL_STATE, 3, LittlerootTown_EventScript_SetRivalLeftForRoute103
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_HideMapNamePopup
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 2, LittlerootTown_EventScript_LeftLabAfterDexUpgrade
+	call LittlerootTown_EventScript_SetRivalHouseShuppetFlags
 	end
 
 LittlerootTown_EventScript_LeftLabAfterDexUpgrade::
 	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 3
+	return
+
+LittlerootTown_EventScript_SetRivalHouseShuppetFlags::
+	checkplayergender
+	goto_if_eq VAR_RESULT, MALE, LittlerootTown_EventScript_SetRivalHouseShuppetFlagsMale
+	goto_if_eq VAR_RESULT, FEMALE, LittlerootTown_EventScript_SetRivalHouseShuppetFlagsFemale
+	return
+
+LittlerootTown_EventScript_SetRivalHouseShuppetFlagsMale::
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_SHUPPET_AT_BRENDANS_HOUSE
+	clearflag FLAG_HIDE_LITTLEROOT_TOWN_SHUPPET_AT_MAYS_HOUSE
+	return
+
+LittlerootTown_EventScript_SetRivalHouseShuppetFlagsFemale::
+	clearflag FLAG_HIDE_LITTLEROOT_TOWN_SHUPPET_AT_BRENDANS_HOUSE
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_SHUPPET_AT_MAYS_HOUSE
 	return
 
 LittlerootTown_EventScript_HideMapNamePopup::

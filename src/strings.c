@@ -1347,3 +1347,11 @@ const u8 gText_ScottStolenPokemon[] = _("Another incredible battle! But… \nSom
 
 // Scott's note to the player to make sure they still receive a TM even if they've disappointed him and stolen
 const u8 gText_ScottPityHM[] = _("Oh?\nThere's a note on the ground…\pDear {PLAYER},\nYou may be a thief, but I\pcan't help but root for you a\nlittle bit.\pTake this, and good luck!$");
+
+const u8 gText_GhostTown_Shuppet0[] = _("SHUPPET is cheering you on!$");
+const u8 gText_GhostTown_Shuppet1[] = _("SHUPPET floats eerily nearby…$");
+const u8 gText_GhostTown_Shuppet2[] = _("SHUPPET watches you silently.$");
+const u8 gText_GhostTown_Shuppet3[] = _("SHUPPET seems to like you!$");
+const u8 gText_GhostTown_Shuppet4[] = _("SHUPPET whispers something…$");
+
+const u8 gText_GymShuppet[] = _("BANETTE guards the way…\nYou've already beaten this gym!$");

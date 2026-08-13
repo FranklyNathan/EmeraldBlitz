@@ -113,6 +113,7 @@ PetalburgCity_EventScript_WalkDown::
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkDown
 	waitmovement 0
 	call_if_set FLAG_SCOTT_DISAPPOINTED, PetalburgCity_EventScript_FlygonOvercame
+	setflag FLAG_GYM_SHUPPET_PETALBURG
 	forcesave
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
 	releaseall

@@ -152,6 +152,61 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "LavaridgeTown_EventScript_EggWoman",
       "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_LAVARIDGE_SHUPPET_1",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 9,
+      "y": 1,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_LAVARIDGE_SHUPPET_2",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 16,
+      "y": 16,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_LAVARIDGE_SHUPPET_3",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 15,
+      "y": 6,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(BANETTE)",
+      "x": 5,
+      "y": 16,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GymShuppetInteract",
+      "flag": "FLAG_GYM_SHUPPET_LAVARIDGE"
     }
   ],
   "warp_events": [

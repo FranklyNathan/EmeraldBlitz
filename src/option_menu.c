@@ -1,6 +1,7 @@
 #include "global.h"
 #include "option_menu.h"
 #include "bg.h"
+#include "event_data.h"
 #include "gpu_regs.h"
 #include "international_string_util.h"
 #include "main.h"
@@ -18,7 +19,7 @@
 
 #define tMenuSelection data[0]
 #define tTextSpeed data[1]
-#define tBattleSceneOff data[2]
+#define tShuppetGuides data[2]
 #define tBattleStyle data[3]
 #define tSound data[4]
 #define tButtonMode data[5]
@@ -27,7 +28,7 @@
 enum
 {
     MENUITEM_TEXTSPEED,
-    MENUITEM_BATTLESCENE,
+    MENUITEM_SHUPPET_GUIDES,
     MENUITEM_BATTLESTYLE,
     MENUITEM_SOUND,
     MENUITEM_BUTTONMODE,
@@ -42,12 +43,12 @@ enum
     WIN_OPTIONS
 };
 
-#define YPOS_TEXTSPEED    (MENUITEM_TEXTSPEED * 16)
-#define YPOS_BATTLESCENE  (MENUITEM_BATTLESCENE * 16)
-#define YPOS_BATTLESTYLE  (MENUITEM_BATTLESTYLE * 16)
-#define YPOS_SOUND        (MENUITEM_SOUND * 16)
-#define YPOS_BUTTONMODE   (MENUITEM_BUTTONMODE * 16)
-#define YPOS_FRAMETYPE    (MENUITEM_FRAMETYPE * 16)
+#define YPOS_TEXTSPEED       (MENUITEM_TEXTSPEED * 16)
+#define YPOS_SHUPPET_GUIDES  (MENUITEM_SHUPPET_GUIDES * 16)
+#define YPOS_BATTLESTYLE     (MENUITEM_BATTLESTYLE * 16)
+#define YPOS_SOUND           (MENUITEM_SOUND * 16)
+#define YPOS_BUTTONMODE      (MENUITEM_BUTTONMODE * 16)
+#define YPOS_FRAMETYPE       (MENUITEM_FRAMETYPE * 16)
 
 static void Task_OptionMenuFadeIn(u8 taskId);
 static void Task_OptionMenuProcessInput(u8 taskId);
@@ -56,8 +57,8 @@ static void Task_OptionMenuFadeOut(u8 taskId);
 static void HighlightOptionMenuItem(u8 selection);
 static u8 TextSpeed_ProcessInput(u8 selection);
 static void TextSpeed_DrawChoices(u8 selection);
-static u8 BattleScene_ProcessInput(u8 selection);
-static void BattleScene_DrawChoices(u8 selection);
+static u8 ShuppetGuides_ProcessInput(u8 selection);
+static void ShuppetGuides_DrawChoices(u8 selection);
 static u8 BattleStyle_ProcessInput(u8 selection);
 static void BattleStyle_DrawChoices(u8 selection);
 static u8 Sound_ProcessInput(u8 selection);
@@ -76,8 +77,8 @@ static const u8 gText_Option[]             = _("OPTION");
 static const u8 gText_TextSpeedSlow[]      = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SLOW");
 static const u8 gText_TextSpeedMid[]       = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MID");
 static const u8 gText_TextSpeedFast[]      = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FAST");
-static const u8 gText_BattleSceneOn[]      = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
-static const u8 gText_BattleSceneOff[]     = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
+static const u8 gText_ShuppetGuidesOn[]     = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
+static const u8 gText_ShuppetGuidesOff[]    = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
 static const u8 gText_FlygonDustOn[]       = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
 static const u8 gText_FlygonDustOff[]      = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
 static const u8 gText_SoundMono[]          = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MONO");
@@ -95,7 +96,7 @@ static const u8 sEqualSignGfx[] = INCBIN_U8("graphics/interface/option_menu_equa
 static const u8 *const sOptionMenuItemsNames[MENUITEM_COUNT] =
 {
     [MENUITEM_TEXTSPEED]   = COMPOUND_STRING("TEXT SPEED"),
-    [MENUITEM_BATTLESCENE] = COMPOUND_STRING("BATTLE SCENE"),
+    [MENUITEM_SHUPPET_GUIDES] = COMPOUND_STRING("SHUPPET GUIDES"),
     [MENUITEM_BATTLESTYLE] = COMPOUND_STRING("FLYGON DUST"),
     [MENUITEM_SOUND]       = COMPOUND_STRING("SOUND"),
     [MENUITEM_BUTTONMODE]  = COMPOUND_STRING("BUTTON MODE"),
@@ -245,14 +246,14 @@ void CB2_InitOptionMenu(void)
 
         gTasks[taskId].tMenuSelection = 0;
         gTasks[taskId].tTextSpeed = gSaveBlock2Ptr->optionsTextSpeed;
-        gTasks[taskId].tBattleSceneOff = gSaveBlock2Ptr->optionsBattleSceneOff;
+        gTasks[taskId].tShuppetGuides = FlagGet(FLAG_GHOST_TOWN) ? 0 : 1;
         gTasks[taskId].tBattleStyle = gSaveBlock2Ptr->optionsBattleStyle;
         gTasks[taskId].tSound = gSaveBlock2Ptr->optionsSound;
         gTasks[taskId].tButtonMode = gSaveBlock2Ptr->optionsButtonMode;
         gTasks[taskId].tWindowFrameType = gSaveBlock2Ptr->optionsWindowFrameType;
 
         TextSpeed_DrawChoices(gTasks[taskId].tTextSpeed);
-        BattleScene_DrawChoices(gTasks[taskId].tBattleSceneOff);
+        ShuppetGuides_DrawChoices(gTasks[taskId].tShuppetGuides);
         BattleStyle_DrawChoices(gTasks[taskId].tBattleStyle);
         Sound_DrawChoices(gTasks[taskId].tSound);
         ButtonMode_DrawChoices(gTasks[taskId].tButtonMode);
@@ -317,12 +318,12 @@ static void Task_OptionMenuProcessInput(u8 taskId)
             if (previousOption != gTasks[taskId].tTextSpeed)
                 TextSpeed_DrawChoices(gTasks[taskId].tTextSpeed);
             break;
-        case MENUITEM_BATTLESCENE:
-            previousOption = gTasks[taskId].tBattleSceneOff;
-            gTasks[taskId].tBattleSceneOff = BattleScene_ProcessInput(gTasks[taskId].tBattleSceneOff);
+        case MENUITEM_SHUPPET_GUIDES:
+            previousOption = gTasks[taskId].tShuppetGuides;
+            gTasks[taskId].tShuppetGuides = ShuppetGuides_ProcessInput(gTasks[taskId].tShuppetGuides);
 
-            if (previousOption != gTasks[taskId].tBattleSceneOff)
-                BattleScene_DrawChoices(gTasks[taskId].tBattleSceneOff);
+            if (previousOption != gTasks[taskId].tShuppetGuides)
+                ShuppetGuides_DrawChoices(gTasks[taskId].tShuppetGuides);
             break;
         case MENUITEM_BATTLESTYLE:
             previousOption = gTasks[taskId].tBattleStyle;
@@ -367,7 +368,10 @@ static void Task_OptionMenuProcessInput(u8 taskId)
 static void Task_OptionMenuSave(u8 taskId)
 {
     gSaveBlock2Ptr->optionsTextSpeed = gTasks[taskId].tTextSpeed;
-    gSaveBlock2Ptr->optionsBattleSceneOff = gTasks[taskId].tBattleSceneOff;
+    if (!gTasks[taskId].tShuppetGuides)
+        FlagSet(FLAG_GHOST_TOWN);
+    else
+        FlagClear(FLAG_GHOST_TOWN);
     gSaveBlock2Ptr->optionsBattleStyle = gTasks[taskId].tBattleStyle;
     gSaveBlock2Ptr->optionsSound = gTasks[taskId].tSound;
     gSaveBlock2Ptr->optionsButtonMode = gTasks[taskId].tButtonMode;
@@ -457,7 +461,7 @@ static void TextSpeed_DrawChoices(u8 selection)
     DrawOptionMenuChoice(gText_TextSpeedFast, GetStringRightAlignXOffset(FONT_NORMAL, gText_TextSpeedFast, 198), YPOS_TEXTSPEED, styles[2]);
 }
 
-static u8 BattleScene_ProcessInput(u8 selection)
+static u8 ShuppetGuides_ProcessInput(u8 selection)
 {
     if (JOY_NEW(DPAD_LEFT | DPAD_RIGHT))
     {
@@ -468,7 +472,7 @@ static u8 BattleScene_ProcessInput(u8 selection)
     return selection;
 }
 
-static void BattleScene_DrawChoices(u8 selection)
+static void ShuppetGuides_DrawChoices(u8 selection)
 {
     u8 styles[2];
 
@@ -476,8 +480,8 @@ static void BattleScene_DrawChoices(u8 selection)
     styles[1] = 0;
     styles[selection] = 1;
 
-    DrawOptionMenuChoice(gText_BattleSceneOn, 104, YPOS_BATTLESCENE, styles[0]);
-    DrawOptionMenuChoice(gText_BattleSceneOff, GetStringRightAlignXOffset(FONT_NORMAL, gText_BattleSceneOff, 198), YPOS_BATTLESCENE, styles[1]);
+    DrawOptionMenuChoice(gText_ShuppetGuidesOn, 104, YPOS_SHUPPET_GUIDES, styles[0]);
+    DrawOptionMenuChoice(gText_ShuppetGuidesOff, GetStringRightAlignXOffset(FONT_NORMAL, gText_ShuppetGuidesOff, 198), YPOS_SHUPPET_GUIDES, styles[1]);
 }
 
 static u8 BattleStyle_ProcessInput(u8 selection)

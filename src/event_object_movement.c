@@ -21,6 +21,7 @@
 #include "fieldmap.h"
 #include "follower_npc.h"
 #include "follower_helper.h"
+#include "ghost_town.h"
 #include "gpu_regs.h"
 #include "graphics.h"
 #include "mauville_old_man.h"
@@ -45,6 +46,7 @@
 #include "constants/abilities.h"
 #include "constants/battle.h"
 #include "constants/event_objects.h"
+#include "constants/flags.h"
 #include "constants/field_effects.h"
 #include "constants/items.h"
 #include "constants/mauville_old_man.h"
@@ -2811,6 +2813,10 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 
             if (top <= npcY && bottom >= npcY && left <= npcX && right >= npcX && !FlagGet(template->flagId))
             {
+                if (GhostTownIsGhostTemplate(template))
+                    continue; // GhostTown system handles spawning of ghost shuppets
+                if (GhostTownIsGymGhostTemplate(template))
+                    continue; // GhostTown system handles spawning of gym ghost shuppets
                 if (template->graphicsId == OBJ_EVENT_GFX_LIGHT_SPRITE)
                     SpawnLightSprite(npcX, npcY, cameraX, cameraY, template->trainerRange_berryTreeId); // light sprite instead
                 else

@@ -363,6 +363,34 @@
       "trainer_sight_or_berry_tree_id": "VAR_TEMP_1",
       "script": "NULL",
       "flag": "FLAG_TEMP_2"
+    },
+    {
+      "local_id": "LOCALID_117_SHUPPET_1",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 11,
+      "y": 13,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_UP",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_117_SHUPPET_2",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 12,
+      "y": 13,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_UP",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
     }
   ],
   "warp_events": [

@@ -42357,6 +42357,7 @@
       "MOVE_FURY_CUTTER"
     ],
     "TutorMoves": [
+      "MOVE_FURY_CUTTER",
       "MOVE_SKITTER_SMACK",
       "MOVE_STEEL_ROLLER"
     ]
@@ -42456,6 +42457,7 @@
       "MOVE_FURY_CUTTER"
     ],
     "TutorMoves": [
+      "MOVE_FURY_CUTTER",
       "MOVE_SKITTER_SMACK",
       "MOVE_STEEL_ROLLER"
     ]
@@ -42577,6 +42579,7 @@
       "MOVE_FURY_CUTTER"
     ],
     "TutorMoves": [
+      "MOVE_FURY_CUTTER",
       "MOVE_SKITTER_SMACK",
       "MOVE_STEEL_ROLLER"
     ]
@@ -54431,6 +54434,7 @@
     ],
     "TutorMoves": [
       "MOVE_COACHING",
+      "MOVE_FURY_CUTTER",
       "MOVE_LASH_OUT"
     ]
   },
@@ -54584,6 +54588,7 @@
     ],
     "TutorMoves": [
       "MOVE_COACHING",
+      "MOVE_FURY_CUTTER",
       "MOVE_LASH_OUT"
     ]
   },
@@ -57492,7 +57497,8 @@
     ],
     "TutorMoves": [
       "MOVE_COACHING",
-      "MOVE_DUAL_WINGBEAT"
+      "MOVE_DUAL_WINGBEAT",
+      "MOVE_FURY_CUTTER"
     ]
   },
   "DEDENNE": {
@@ -72237,6 +72243,7 @@
       "MOVE_STRUGGLE_BUG"
     ],
     "TutorMoves": [
+      "MOVE_FURY_CUTTER",
       "MOVE_SCORCHING_SANDS",
       "MOVE_SKITTER_SMACK"
     ]
@@ -72342,6 +72349,7 @@
       "MOVE_STRUGGLE_BUG"
     ],
     "TutorMoves": [
+      "MOVE_FURY_CUTTER",
       "MOVE_SCORCHING_SANDS",
       "MOVE_SKITTER_SMACK"
     ]
@@ -73949,6 +73957,7 @@
       "MOVE_SKY_ATTACK"
     ],
     "TutorMoves": [
+      "MOVE_FURY_CUTTER",
       "MOVE_GRASSY_GLIDE",
       "MOVE_COACHING",
       "MOVE_DUAL_WINGBEAT"

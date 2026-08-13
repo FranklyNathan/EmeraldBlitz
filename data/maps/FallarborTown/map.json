@@ -76,6 +76,62 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "FallarborTown_EventScript_Azurill",
       "flag": "FLAG_HIDE_FALLARBOR_AZURILL"
+    },
+    {
+      "local_id": "LOCALID_FALLARBOR_SHUPPET_1",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 8,
+      "y": 8,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_FALLARBOR_SHUPPET_2",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 6,
+      "y": 18,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_FALLARBOR_SHUPPET_3",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 15,
+      "y": 16,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_FALLARBOR_SHUPPET_4",
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(SHUPPET)",
+      "x": 14,
+      "y": 8,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "EventScript_GhostTown_ShuppetInteract",
+      "flag": "0"
     }
   ],
   "warp_events": [
