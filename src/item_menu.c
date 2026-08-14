@@ -345,8 +345,8 @@ static const u8 sContextMenuItems_TmHmPocket[] = {
 };
 
 static const u8 sContextMenuItems_BerriesPocket[] = {
-    ACTION_CHECK_TAG,   ACTION_GIVE_ALL,
-    ACTION_USE,         ACTION_GIVE,
+    ACTION_GIVE_ALL,    ACTION_CHECK_TAG,
+    ACTION_GIVE,        ACTION_USE,
     ACTION_TOSS,        ACTION_CANCEL
 };
 

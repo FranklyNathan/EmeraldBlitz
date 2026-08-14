@@ -25,6 +25,7 @@
 
 static u32 GetAIEffectGroup(enum BattleMoveEffects effect);
 static u32 GetAIEffectGroupFromMove(u32 battler, u32 move);
+static bool32 ShouldFailForIllusion(u32 illusionSpecies, u32 battlerId);
 
 // Functions
 static u32 AI_GetMoldBreakerSanitizedAbility(u32 battlerAtk, enum Ability abilityAtk, enum Ability abilityDef, u32 holdEffectDef, u32 move)
@@ -1742,6 +1743,22 @@ enum Ability AI_DecideKnownAbilityForTurn(u32 battlerId)
     // Abilities that prevent fleeing - treat as always known
     if (knownAbility == ABILITY_SHADOW_TAG || knownAbility == ABILITY_MAGNET_PULL || knownAbility == ABILITY_ARENA_TRAP)
         return knownAbility;
+
+    // If the AI is fooled by an Illusion, it assumes the ability of the disguised species.
+    // Only do this while the disguised species is actually on the field (don't confuse it with switch-in predictions).
+    if ((GetSpeciesAbility(gBattleMons[battlerId].species, 0) == ABILITY_ILLUSION
+      || GetSpeciesAbility(gBattleMons[battlerId].species, 1) == ABILITY_ILLUSION))
+    {
+        u32 illusionSpecies = GetIllusionMonSpecies(battlerId);
+        if (illusionSpecies != SPECIES_NONE && ShouldFailForIllusion(illusionSpecies, battlerId))
+        {
+            enum Ability illusionAbility0 = GetSpeciesAbility(illusionSpecies, 0);
+            enum Ability illusionAbility1 = GetSpeciesAbility(illusionSpecies, 1);
+            if (illusionAbility1 == ABILITY_NONE || illusionAbility1 == illusionAbility0)
+                return illusionAbility0;
+            return ABILITY_NONE; // The disguised species can have one of two abilities, so it can't be known for sure.
+        }
+    }
 
     for (i = 0; i < NUM_ABILITY_SLOTS; i++)
     {

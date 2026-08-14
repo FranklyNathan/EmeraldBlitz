@@ -112,6 +112,7 @@ static void SetDefaultOptions(void)
     gSaveBlock2Ptr->optionsBattleStyle = 0; // Set to off
     gSaveBlock2Ptr->optionsBattleSceneOff = FALSE;
     gSaveBlock2Ptr->regionMapZoom = FALSE;
+    gSaveBlock2Ptr->optionsShuppetGuides = OPTIONS_SHUPPET_GUIDES_OFF;
 }
 
 static void ClearPokedexFlags(void)
@@ -263,7 +264,6 @@ void NewGameInitData(void)
         FlagClear(FLAG_HIDE_LITTLEROOT_TOWN_FAT_MAN);
         FlagClear(FLAG_HIDE_MAP_NAME_POPUP);
         FlagSet(FLAG_SYS_PC_LANETTE); 
-        FlagSet(FLAG_GHOST_TOWN);
 
     SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
     ResetItemFlags();

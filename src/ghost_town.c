@@ -268,8 +268,8 @@ void GhostTownUpdate(void)
     templates = gSaveBlock1Ptr->objectEventTemplates;
     count = gMapHeader.events->objectEventCount;
 
-    // Remove regular ghosts if FLAG_GHOST_TOWN is cleared
-    if (!FlagGet(FLAG_GHOST_TOWN))
+    // Remove regular ghosts if SHUPPET GUIDES is enabled
+    if (gSaveBlock2Ptr->optionsShuppetGuides)
     {
         for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
         {
@@ -279,7 +279,7 @@ void GhostTownUpdate(void)
     }
     else
     {
-        // Spawn regular ghosts (controlled by FLAG_GHOST_TOWN)
+        // Spawn regular ghosts (controlled by SHUPPET GUIDES)
         u8 shuppetCount = 0;
         for (i = 0; i < count; i++)
         {

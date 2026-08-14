@@ -22,6 +22,9 @@ static u16 GetEnergyGuruEvolutionTarget(struct Pokemon *mon, u32 partyId)
     u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
     const struct Evolution *evolutions = GetSpeciesEvolutions(species);
 
+    if (GetMonData(mon, MON_DATA_HP, NULL) == 0)
+        return SPECIES_NONE;
+
     if (evolutions == NULL)
         return SPECIES_NONE;
 
@@ -190,6 +193,9 @@ static u16 GetEffortRibbonEvolutionTarget(struct Pokemon *mon, u32 partyId)
     int i;
     const struct Evolution *evolutions;
     u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+
+    if (GetMonData(mon, MON_DATA_HP, NULL) == 0)
+        return SPECIES_NONE;
 
     // Condition 1: Current form didn't evolve from any pokemon
     if (GetSpeciesPreEvolution(species) != SPECIES_NONE)

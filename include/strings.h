@@ -1542,6 +1542,7 @@ extern const u8 gText_PkmnSentToPCAfterCatch[];
 extern const u8 gText_LeagueChamp[];
 extern const u8 gText_LeagueChampNTS[];
 extern const u8 gText_LeagueChampFB[];
+extern const u8 gText_TooScaredForRace[];
 extern const u8 gText_HOFNumber[];
 extern const u8 gText_PickNextCancel[];
 extern const u8 gText_PickCancel[];

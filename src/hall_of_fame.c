@@ -782,7 +782,9 @@ static void Task_Hof_WaitAndPrintPlayerInfo(u8 taskId)
         DrawDialogueFrame(0, FALSE);
 
 
-        if (FlagGet(FLAG_FRESH_BREATH))
+        if (gSaveBlock2Ptr->playTimeHours == 0 && gSaveBlock2Ptr->playTimeMinutes < 20)
+            text = gText_TooScaredForRace;
+        else if (FlagGet(FLAG_FRESH_BREATH))
             text = gText_LeagueChampFB;
         else if (FlagGet(FLAG_NOTHING_TO_SEE_HERE))
             text = gText_LeagueChampNTS;

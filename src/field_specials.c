@@ -4608,15 +4608,15 @@ static const u8 sOrange_4[] = _("daily community races!");
 
 // Fab Mail: "Flygon Controls"
 static const u8 sFab_0[] = _("Flygon Controls:");
-static const u8 sFab_1[] = _("B to accelerate");
-static const u8 sFab_2[] = _("L to Fly");
+static const u8 sFab_1[] = _("Press B to accelerate");
+static const u8 sFab_2[] = _("Press L to Fly");
 
 // Harbor Mail: "Select Shortcuts"
 static const u8 sHarbor_0[] = _("Press Select...");
-static const u8 sHarbor_1[] = _("To use a registered key item");
-static const u8 sHarbor_2[] = _("During Fly to snap to Slateport");
-static const u8 sHarbor_3[] = _("In Scott's Shop to preview TMs");
-static const u8 sHarbor_4[] = _("While leveling to delay evolution");
+static const u8 sHarbor_1[] = _("To level up your POKéMON");
+static const u8 sHarbor_2[] = _("To use a registered key item");
+static const u8 sHarbor_3[] = _("During Fly to snap to Slateport");
+static const u8 sHarbor_4[] = _("In Scott's Shop to preview TMs");
 
 // Pro Letter pool
 static const u8 sKCH42[] = _("KCH42");

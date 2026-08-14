@@ -2484,7 +2484,7 @@ static u32 GetNextMonInParty(struct Pokemon *party, int firstId, int lastId, u32
     return PARTY_SIZE;
 }
 
-u32 GetMostSuitableMonToSwitchInto(u32 battler, enum SwitchType switchType)
+static u32 GetMostSuitableMonToSwitchIntoInternal(u32 battler, enum SwitchType switchType)
 {
     u32 opposingBattler = 0;
     u32 bestMonId = PARTY_SIZE;
@@ -2597,6 +2597,31 @@ u32 GetMostSuitableMonToSwitchInto(u32 battler, enum SwitchType switchType)
 
         return PARTY_SIZE;
     }
+}
+
+u32 GetMostSuitableMonToSwitchInto(u32 battler, enum SwitchType switchType)
+{
+    u32 opposingBattler;
+    u32 result;
+    struct BattlePokemon savedMon;
+
+    if (IsDoubleBattle())
+    {
+        opposingBattler = BATTLE_OPPOSITE(battler);
+        if (gAbsentBattlerFlags & (1u << opposingBattler))
+            opposingBattler ^= BIT_FLANK;
+    }
+    else
+    {
+        opposingBattler = GetOppositeBattler(battler);
+    }
+
+    savedMon = gBattleMons[opposingBattler];
+    AI_SimulateIllusion(opposingBattler);
+    result = GetMostSuitableMonToSwitchIntoInternal(battler, switchType);
+    gBattleMons[opposingBattler] = savedMon;
+
+    return result;
 }
 
 static bool32 AiExpectsToFaintPlayer(u32 battler)

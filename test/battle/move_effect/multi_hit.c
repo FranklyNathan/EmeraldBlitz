@@ -284,3 +284,35 @@ SINGLE_BATTLE_TEST("Multi Hit moves will not disrupt Destiny Bond flag")
         MESSAGE("The opposing Wobbuffet fainted!");
     }
 }
+
+SINGLE_BATTLE_TEST("Multi hit moves print the hit count exactly once when KOing on the first hit")
+{
+    GIVEN {
+        PLAYER(SPECIES_WOBBUFFET) { Ability(ABILITY_SKILL_LINK); };
+        OPPONENT(SPECIES_WOBBUFFET) { HP(1); };
+        OPPONENT(SPECIES_WOBBUFFET);
+    } WHEN {
+        TURN { MOVE(player, MOVE_BULLET_SEED); SEND_OUT(opponent, 1); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BULLET_SEED, player);
+        MESSAGE("The opposing Wobbuffet fainted!");
+        MESSAGE("The Pokémon was hit 1 time(s)!");
+    }
+}
+
+SINGLE_BATTLE_TEST("Multi hit moves print the hit count exactly once when KOing on a later hit")
+{
+    GIVEN {
+        PLAYER(SPECIES_WOBBUFFET) { Ability(ABILITY_SKILL_LINK); };
+        OPPONENT(SPECIES_WOBBUFFET) { Ability(ABILITY_STURDY); };
+        OPPONENT(SPECIES_WOBBUFFET);
+    } WHEN {
+        TURN { MOVE(player, MOVE_BULLET_SEED); SEND_OUT(opponent, 1); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BULLET_SEED, player);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BULLET_SEED, player);
+        MESSAGE("The opposing Wobbuffet endured the hit using Sturdy!");
+        MESSAGE("The opposing Wobbuffet fainted!");
+        MESSAGE("The Pokémon was hit 2 time(s)!");
+    }
+}

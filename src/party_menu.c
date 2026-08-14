@@ -7554,6 +7554,17 @@ void ItemUseCB_EvolutionStone(u8 taskId, TaskFunc task)
     u16 targetSpecies;
 
     gCB2_AfterEvolution = gPartyMenu.exitCallback;
+
+    if (GetMonData(mon, MON_DATA_HP) == 0)
+    {
+        PlaySE(SE_SELECT);
+        gPartyMenuUseExitCallback = FALSE;
+        DisplayPartyMenuMessage(gText_WontHaveEffect, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = task;
+        return;
+    }
+
     targetSpecies = GetEvolutionTargetSpecies(mon, EVO_MODE_ITEM_CHECK, item, NULL, &canStopEvo, CHECK_EVO);
 
     if (targetSpecies != SPECIES_NONE)
@@ -8456,8 +8467,9 @@ static bool8 IsInEliteFourBuilding(void)
         return FALSE;
 
     // E4 member chambers (0-3), Champion's room (4),
+    // Frontier Brain chambers (15-18),
     // hallways (5-9), Pokemon League entrance 1F (10), 2F (14)
-    return (mapNum <= 10 || mapNum == 14);
+    return (mapNum <= 10 || mapNum == 14 || mapNum >= 15);
 }
 
 void CB2_PartyMenuFromStartMenu(void)

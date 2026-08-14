@@ -40336,7 +40336,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15549
-                MOVE_SUPERSONIC,
+                MOVE_REFLECT,
                 MOVE_SHOCK_WAVE,
                 MOVE_THUNDER_WAVE,
                 MOVE_MAGNET_BOMB,
@@ -40449,7 +40449,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15599
-                MOVE_SUPERSONIC,
+                MOVE_REFLECT,
                 MOVE_SHOCK_WAVE,
                 MOVE_THUNDER_WAVE,
                 MOVE_MIRROR_SHOT,
@@ -40562,7 +40562,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15649
-                MOVE_SUPERSONIC,
+                MOVE_REFLECT,
                 MOVE_SHOCK_WAVE,
                 MOVE_TRI_ATTACK,
                 MOVE_MIRROR_SHOT,
@@ -40675,7 +40675,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15699
-                MOVE_SUPERSONIC,
+                MOVE_REFLECT,
                 MOVE_SHOCK_WAVE,
                 MOVE_TRI_ATTACK,
                 MOVE_FLASH_CANNON,
@@ -40810,7 +40810,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15759
-                MOVE_SUPERSONIC,
+                MOVE_REFLECT,
                 MOVE_SHOCK_WAVE,
                 MOVE_TRI_ATTACK,
                 MOVE_FLASH_CANNON,
@@ -40945,7 +40945,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 15819
-                MOVE_SUPERSONIC,
+                MOVE_REFLECT,
                 MOVE_SHOCK_WAVE,
                 MOVE_TRI_ATTACK,
                 MOVE_FLASH_CANNON,
@@ -43015,7 +43015,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 16709
                 MOVE_WATER_GUN,
-                MOVE_SUPERSONIC,
+                MOVE_TWISTER,
                 MOVE_QUICK_ATTACK,
                 MOVE_AERIAL_ACE,
             },
@@ -43110,7 +43110,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 16749
                 MOVE_WATER_PULSE,
-                MOVE_SUPERSONIC,
+                MOVE_TWISTER,
                 MOVE_QUICK_ATTACK,
                 MOVE_AERIAL_ACE,
             },
@@ -43227,7 +43227,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 16799
                 MOVE_WATER_PULSE,
-                MOVE_SUPERSONIC,
+                MOVE_TWISTER,
                 MOVE_QUICK_ATTACK,
                 MOVE_AERIAL_ACE,
             },
@@ -43489,7 +43489,7 @@ F_TRAINER_FEMALE |
                 MOVE_QUICK_ATTACK,
                 MOVE_AERIAL_ACE,
                 MOVE_PLUCK,
-                MOVE_DOUBLE_TEAM,
+                MOVE_STEEL_WING,
             },
             },
             {
