@@ -113,3 +113,23 @@ AI_SINGLE_BATTLE_TEST("Levitate is seen correctly by switch AI")
     }
 }
 
+AI_SINGLE_BATTLE_TEST("AI avoids Ground moves against Levitate after the ability is revealed")
+{
+    PASSES_RANDOMLY(2, 3, RNG_AI_ABILITY);
+    GIVEN {
+        ASSUME(GetMoveType(MOVE_EARTHQUAKE) == TYPE_GROUND);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
+        PLAYER(SPECIES_BRONZONG) { Ability(ABILITY_LEVITATE); }
+        OPPONENT(SPECIES_SWAMPERT) { Moves(MOVE_EARTHQUAKE, MOVE_SURF); }
+    } WHEN {
+        // The AI doesn't know the ability and may guess wrong, using a Ground move that gets blocked.
+        TURN { EXPECT_MOVE(opponent, MOVE_EARTHQUAKE); }
+        // Once Levitate is revealed it must stop spamming Earthquake.
+        TURN { EXPECT_MOVE(opponent, MOVE_SURF); }
+        TURN { EXPECT_MOVE(opponent, MOVE_SURF); }
+        TURN { EXPECT_MOVE(opponent, MOVE_SURF); }
+    } SCENE {
+        MESSAGE("Bronzong makes Ground-type moves miss with Levitate!");
+    }
+}
+

@@ -4648,7 +4648,7 @@ static const u8 sProLetter3_3[] = _("good luck to your run!");
 static const u8 sProLetter3_4[] = _("Double water Double grass!");
 
 // Letter 4: Dream - Mountain Drew
-static const u8 sMountainDrew[] = _("Mountain Drew");
+static const u8 sMountainDrew[] = _("Mtn. Drew");
 static const u8 sProLetter4_0[] = _("From King's Rock");
 static const u8 sProLetter4_1[] = _("Everything evolves into me.");
 static const u8 sProLetter4_2[] = _("For I am the Ultimate Evolution!");

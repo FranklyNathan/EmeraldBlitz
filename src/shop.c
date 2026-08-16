@@ -1193,7 +1193,7 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
     }
 }
 
-static bool8 IsInEliteFourArea(void)
+bool8 IsInEliteFourArea(void)
 {
     u8 mapGroup = gSaveBlock1Ptr->location.mapGroup;
     u8 mapNum = gSaveBlock1Ptr->location.mapNum;

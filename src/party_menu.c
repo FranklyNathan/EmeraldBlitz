@@ -58,6 +58,7 @@
 #include "reshow_battle_screen.h"
 #include "scanline_effect.h"
 #include "script.h"
+#include "shop.h"
 #include "sound.h"
 #include "sprite.h"
 #include "start_menu.h"
@@ -413,7 +414,7 @@ static void DisplayPartyPokemonMaxHP(u16, struct PartyMenuBox *);
 static void DisplayPartyPokemonHPBar(u16, u16, struct PartyMenuBox *);
 static void CreatePartyMonIconSpriteParameterized(u16, u32, struct PartyMenuBox *, u8);
 static void CreatePartyMonHeldItemSpriteParameterized(u16, u16, struct PartyMenuBox *);
-static void CreatePartyMonPokeballSpriteParameterized(u16, u8, struct PartyMenuBox *);
+static void CreatePartyMonPokeballSpriteParameterized(u16, u8, struct PartyMenuBox *, bool32);
 static void CreatePartyMonStatusSpriteParameterized(u16, u8, struct PartyMenuBox *);
 // These next 4 functions are essentially redundant with the above 4
 // The only difference is that rather than receive the data directly they retrieve it from the mon struct
@@ -1486,7 +1487,7 @@ static void CreatePartyMonSprites(u8 slot)
             u16 species = GetBoxMonData(boxMon, MON_DATA_SPECIES);
             u32 personality = GetBoxMonData(boxMon, MON_DATA_PERSONALITY);
             CreatePartyMonIconSpriteParameterized(species, personality, &sPartyMenuBoxes[slot], 1);
-            CreatePartyMonPokeballSpriteParameterized(species, GetBoxMonData(boxMon, MON_DATA_LEVEL), &sPartyMenuBoxes[slot]);
+            CreatePartyMonPokeballSpriteParameterized(species, GetBoxMonData(boxMon, MON_DATA_LEVEL), &sPartyMenuBoxes[slot], GetBoxMonData(boxMon, MON_DATA_HP) == 0);
             gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.priority = 1;
             if (GetBoxMonData(boxMon, MON_DATA_HP) == 0)
                 MakeMonIconSpriteFainted(&gSprites[sPartyMenuBoxes[slot].monSpriteId]);
@@ -1505,7 +1506,7 @@ static void CreatePartyMonSprites(u8 slot)
         {
             CreatePartyMonIconSpriteParameterized(gMultiPartnerParty[actualSlot].species, gMultiPartnerParty[actualSlot].personality, &sPartyMenuBoxes[slot], 0);
             CreatePartyMonHeldItemSpriteParameterized(gMultiPartnerParty[actualSlot].species, gMultiPartnerParty[actualSlot].heldItem, &sPartyMenuBoxes[slot]);
-            CreatePartyMonPokeballSpriteParameterized(gMultiPartnerParty[actualSlot].species, gMultiPartnerParty[actualSlot].level, &sPartyMenuBoxes[slot]);
+            CreatePartyMonPokeballSpriteParameterized(gMultiPartnerParty[actualSlot].species, gMultiPartnerParty[actualSlot].level, &sPartyMenuBoxes[slot], gMultiPartnerParty[actualSlot].hp == 0);
             if (gMultiPartnerParty[actualSlot].hp == 0)
                 status = AILMENT_FNT;
             else
@@ -1592,7 +1593,8 @@ void AnimatePartySlot(u8 slot, u8 animNum)
                 if (boxPos != 0xFF)
                 {
                     struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
-                    if (PartyMonCanEvolve(GetBoxMonData(boxMon, MON_DATA_SPECIES), GetBoxMonData(boxMon, MON_DATA_LEVEL)))
+                    if (GetBoxMonData(boxMon, MON_DATA_HP) != 0
+                        && PartyMonCanEvolve(GetBoxMonData(boxMon, MON_DATA_SPECIES), GetBoxMonData(boxMon, MON_DATA_LEVEL)))
                         pokeballTag = TAG_POKEBALL_EVO;
                 }
             }
@@ -2877,9 +2879,11 @@ static const u8 sPartyBoxPurplePalIds2[] = {28, 68, 68};
 static const u8 sPartyBoxCurrSelectionPurplePalIds1[] = {70, 72, 72};
 static const u8 sPartyBoxCurrSelectionPurplePalIds2[] = {8, 72, 72};
 
-// Returns TRUE if the pokemon (by species and level, either in the party or in the
-// PC box) can currently evolve, which turns the party box background light green
-// and the PC pokeball top light green.
+// Returns TRUE if the pokemon (by species, either in the party or in the PC box)
+// can currently evolve, which turns the party box background light green and the
+// PC pokeball top light green. Levels are ignored because every pokemon in Blitz
+// is obtained at level 15 or higher, so any level-based gate could only ever
+// fail due to GetBoxMonData(MON_DATA_LEVEL) returning 0 for box mons.
 static bool8 PartyMonCanEvolve(u16 species, u8 level)
 {
     return ((VarGet(VAR_BADGE_COUNT) >= 8 && (
@@ -2996,7 +3000,7 @@ static bool8 PartyMonCanEvolve(u16 species, u8 level)
          //|| species == SPECIES_DEINO
          || species == SPECIES_TYNAMO
          || species == SPECIES_SWINUB
-        )) || (level >= 9 && (
+        )) || (VarGet(VAR_BADGE_COUNT) >= 0 && (
             GET_BASE_SPECIES_ID(species) == SPECIES_SCATTERBUG
          || GET_BASE_SPECIES_ID(species) == SPECIES_SPEWPA
          || species == SPECIES_PIKIPEK
@@ -3624,7 +3628,8 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SWITCH);
         if (gPlayerPartyCount > 1
             && !GetMonData(&mons[slotId], MON_DATA_IS_EGG)
-            && GetMonData(&mons[slotId], MON_DATA_HP) == 0)
+            && GetMonData(&mons[slotId], MON_DATA_HP) == 0
+            && !IsInEliteFourArea())
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_DEPOSIT);
         if (ItemIsMail(GetMonData(&mons[slotId], MON_DATA_HELD_ITEM)))
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_MAIL);
@@ -3633,7 +3638,7 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
         if (MonNeedsHealing(&mons[slotId]) && GetMonData(&mons[slotId], MON_DATA_HP) != 0)
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_HEAL);
     }
-        if (targetSpecies != SPECIES_NONE)
+        if (targetSpecies != SPECIES_NONE && GetMonData(&mons[slotId], MON_DATA_HP) != 0)
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_EVOLUTION);
 
     AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL1);
@@ -5710,13 +5715,13 @@ static void CreatePartyMonPokeballSprite(struct Pokemon *mon, struct PartyMenuBo
         menuBox->pokeballSpriteId = CreateSprite(&sSpriteTemplate_MenuPokeball, menuBox->spriteCoords[6], menuBox->spriteCoords[7], 8);
 }
 
-static void CreatePartyMonPokeballSpriteParameterized(u16 species, u8 level, struct PartyMenuBox *menuBox)
+static void CreatePartyMonPokeballSpriteParameterized(u16 species, u8 level, struct PartyMenuBox *menuBox, bool32 isFainted)
 {
     if (species != SPECIES_NONE)
     {
         const struct SpriteTemplate *template = &sSpriteTemplate_MenuPokeball;
 
-        if (PartyMonCanEvolve(species, level))
+        if (!isFainted && PartyMonCanEvolve(species, level))
             template = &sSpriteTemplate_MenuPokeballEvo;
 
         menuBox->pokeballSpriteId = CreateSprite(template, menuBox->spriteCoords[6], menuBox->spriteCoords[7], 8);
@@ -5841,7 +5846,9 @@ void CB2_ShowPartyMenuForItemUse(void)
     else
     {
         menuType = PARTY_MENU_TYPE_FIELD;
-        if (GetItemPocket(gSpecialVar_ItemId) == POCKET_TM_HM && !IsInEliteFourBuilding())
+        if (!IsInEliteFourBuilding()
+            && (GetItemPocket(gSpecialVar_ItemId) == POCKET_TM_HM
+                || CheckIfItemIsTMHMOrEvolutionStone(gSpecialVar_ItemId) == 2))
             partyLayout = PARTY_LAYOUT_SINGLE_PC;
         else
             partyLayout = PARTY_LAYOUT_SINGLE;
@@ -7546,12 +7553,104 @@ static void Task_SacredAshDisplayHPRestored(u8 taskId)
 #undef tHadEffect
 #undef tLastSlotUsed
 
+static bool8 sEvoStoneDidSwap;
+static u8 sEvoStoneOriginalBoxPos;
+static u8 sEvoStoneSwapPartySlot;
+static u8 sEvoStoneOriginalSlotId;
+static struct Pokemon sEvoStoneSwappedPartyMon;
+static MainCallback sEvoStoneOriginalExitCallback;
+
+// Swaps a Pokemon withdrawn from a PC slot back into Box 1.
+static void EvoStone_DoSwapBack(void)
+{
+    if (sEvoStoneDidSwap)
+    {
+        struct BoxPokemon monBox = gPlayerParty[sEvoStoneSwapPartySlot].box;
+        gPlayerParty[sEvoStoneSwapPartySlot] = sEvoStoneSwappedPartyMon;
+        gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][sEvoStoneOriginalBoxPos] = monBox;
+        sEvoStoneDidSwap = FALSE;
+        gPartyMenu.slotId = sEvoStoneOriginalSlotId;
+    }
+}
+
+// Temporarily withdraws the Pokemon selected from a PC slot into the party so it
+// can be acted upon, swapping it with the last party member if the party is full.
+// Returns TRUE if the slot wasn't a PC slot or the withdrawal succeeded.
+static bool8 EvoStone_WithdrawPcMon(void)
+{
+    u8 partySlot;
+    u8 boxPos;
+
+    sEvoStoneDidSwap = FALSE;
+
+    if (!IsPcSlot(gPartyMenu.slotId))
+        return TRUE;
+
+    sEvoStoneOriginalSlotId = gPartyMenu.slotId;
+
+    boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+    if (boxPos == 0xFF)
+        return FALSE;
+
+    partySlot = GetFirstEmptyPartySlot();
+    if (partySlot >= PARTY_SIZE)
+    {
+        partySlot = PARTY_SIZE - 1;
+        sEvoStoneSwappedPartyMon = gPlayerParty[partySlot];
+        BoxMonToMon(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &gPlayerParty[partySlot]);
+        gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos] = sEvoStoneSwappedPartyMon.box;
+    }
+    else
+    {
+        BoxMonToMon(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &gPlayerParty[partySlot]);
+        ZeroBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos]);
+    }
+    CalculatePlayerPartyCount();
+    gPartyMenu.slotId = partySlot;
+    sEvoStoneOriginalBoxPos = boxPos;
+    sEvoStoneSwapPartySlot = partySlot;
+    sEvoStoneDidSwap = TRUE;
+    return TRUE;
+}
+
+// CB2 run after the evolution scene of a Pokemon withdrawn from a PC slot: swaps
+// the evolved Pokemon back into the PC and returns to where the item was used.
+static void EvoStone_SwapBackAndReturn(void)
+{
+    EvoStone_DoSwapBack();
+    if (sEvoStoneOriginalExitCallback != NULL)
+        sEvoStoneOriginalExitCallback();
+    else
+        CB2_ReturnToBagMenu();
+}
+
 void ItemUseCB_EvolutionStone(u8 taskId, TaskFunc task)
 {
-    struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
+    struct Pokemon *mon;
+    struct Pokemon tempMon;
     u16 item = gSpecialVar_ItemId;
     bool32 canStopEvo = TRUE;
     u16 targetSpecies;
+
+    if (IsPcSlot(gPartyMenu.slotId))
+    {
+        u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+        if (boxPos == 0xFF)
+        {
+            PlaySE(SE_SELECT);
+            gPartyMenuUseExitCallback = FALSE;
+            DisplayPartyMenuMessage(gText_WontHaveEffect, TRUE);
+            ScheduleBgCopyTilemapToVram(2);
+            gTasks[taskId].func = task;
+            return;
+        }
+        BoxMonToMon(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &tempMon);
+        mon = &tempMon;
+    }
+    else
+    {
+        mon = &gPlayerParty[gPartyMenu.slotId];
+    }
 
     gCB2_AfterEvolution = gPartyMenu.exitCallback;
 
@@ -7569,9 +7668,25 @@ void ItemUseCB_EvolutionStone(u8 taskId, TaskFunc task)
 
     if (targetSpecies != SPECIES_NONE)
     {
+        if (IsPcSlot(gPartyMenu.slotId))
+        {
+            if (!EvoStone_WithdrawPcMon())
+            {
+                PlaySE(SE_SELECT);
+                gPartyMenuUseExitCallback = FALSE;
+                DisplayPartyMenuMessage(gText_WontHaveEffect, TRUE);
+                ScheduleBgCopyTilemapToVram(2);
+                gTasks[taskId].func = task;
+                return;
+            }
+            sEvoStoneOriginalExitCallback = gPartyMenu.exitCallback;
+            gCB2_AfterEvolution = EvoStone_SwapBackAndReturn;
+        }
+
         PlaySE(SE_USE_ITEM);
         if (GetItemPocket(item) != POCKET_KEY_ITEMS)
             RemoveBagItem(item, 1);
+        mon = &gPlayerParty[gPartyMenu.slotId];
         GetEvolutionTargetSpecies(mon, EVO_MODE_ITEM_USE, item, NULL, &canStopEvo, DO_EVO);
         FreePartyPointers();
         BeginEvolutionScene(mon, targetSpecies, canStopEvo, gPartyMenu.slotId);
