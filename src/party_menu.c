@@ -324,6 +324,26 @@ u8 GetPcSlotBoxPosition(s8 slotId)
     return 0xFF;
 }
 
+//Returns the PC slot ID that displays the given Box 1 position, or -1 if that position is not showin in any PC slot
+static s8 GetPcSlotForBoxPosition(u8 boxPos)
+{
+    u8 index = 0;
+    u8 boxPos2;
+
+    for (boxPos2 = 0; boxPos2 < IN_BOX_COUNT; boxPos2++)
+    {
+        if (GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos2], MON_DATA_SANITY_HAS_SPECIES))
+        {
+            if (boxPos2 == boxPos && index < PARTY_PC_SLOT_COUNT)
+                return PARTY_PC_SLOT_START + index;
+            index++;
+            if (index >= PARTY_PC_SLOT_COUNT)
+                break;
+        }
+    }
+    return -1;
+}
+
 static bool8 IsPcSlotSelectable(s8 slotId)
 {
     return IsPcSlot(slotId) && GetPcSlotBoxPosition(slotId) != 0xFF;
@@ -3887,7 +3907,15 @@ static void CB2_ShowPokemonSummaryScreen(void)
 void CB2_ReturnToPartyMenuFromSummaryScreen(void)
 {
     gPaletteFade.bufferTransferDisabled = TRUE;
-    gPartyMenu.slotId = sSummaryReturnSlot;
+    if (IsPcSlot(sSummaryReturnSlot))
+    {
+        s8 pcSlot = GetPcSlotForBoxPosition(gLastViewedMonIndex);
+        gPartyMenu.slotId = (pcSlot != -1) ? pcSlot : 0;
+    }
+    else
+    {
+        gPartyMenu.slotId = gLastViewedMonIndex;
+    }
     InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_DO_WHAT_WITH_MON, Task_TryCreateSelectionWindow, gPartyMenu.exitCallback);
 }
 
