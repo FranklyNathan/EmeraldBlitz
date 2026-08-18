@@ -113,7 +113,7 @@ static void SetDefaultOptions(void)
     gSaveBlock2Ptr->optionsBattleStyle = 0; // Set to off
     gSaveBlock2Ptr->optionsBattleSceneOff = FALSE;
     gSaveBlock2Ptr->regionMapZoom = FALSE;
-    gSaveBlock2Ptr->optionsShuppetGuides = OPTIONS_SHUPPET_GUIDES_OFF;
+    gSaveBlock2Ptr->optionsShuppetGuides = OPTIONS_SHUPPET_GUIDES_ON;
 }
 
 static void ClearPokedexFlags(void)

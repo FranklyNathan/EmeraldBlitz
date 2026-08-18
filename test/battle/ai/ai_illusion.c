@@ -27,6 +27,6 @@ AI_SINGLE_BATTLE_TEST("AI does not fall for Illusion if it already knows the abi
         TURN { MOVE(player, MOVE_CELEBRATE); MOVE(opponent, MOVE_IRON_HEAD); }
     } THEN {
         // Illusion is broken once the AI sees a move that does not match the disguise.
-        EXPECT(gBattleHistory->abilities[player] != ABILITY_ILLUSION);
+        EXPECT(gBattleHistory->abilities[0] != ABILITY_ILLUSION);
     }
 }

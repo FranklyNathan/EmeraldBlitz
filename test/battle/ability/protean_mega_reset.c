@@ -7,7 +7,7 @@ SINGLE_BATTLE_TEST("Protean resets when Mega Evolving")
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
         TURN { MOVE(player, MOVE_QUICK_ATTACK); } // Greninja becomes Normal type
-        TURN { MOVE(player, MOVE_MEGA_EVOLUTION); MOVE(opponent, MOVE_CELEBRATE); } // Mega Evolve
+        TURN { MOVE(player, MOVE_WATER_SHURIKEN, gimmick: GIMMICK_MEGA); MOVE(opponent, MOVE_CELEBRATE); } // Mega Evolve
         TURN { MOVE(player, MOVE_WATER_SHURIKEN); } // Should become Water type again
     } SCENE {
         // After first move, Protean should have activated
@@ -16,7 +16,7 @@ SINGLE_BATTLE_TEST("Protean resets when Mega Evolving")
         MESSAGE("Greninja's Protean transformed it into the Normal type!");
 
         // Mega evolution happens
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_MEGA_EVOLUTION, player);
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_MEGA_EVOLUTION, player);
 
         // After mega evolution, Protean should reset and activate again
         ANIMATION(ANIM_TYPE_MOVE, MOVE_WATER_SHURIKEN, player);
@@ -32,7 +32,7 @@ SINGLE_BATTLE_TEST("Protean resets when de-Mega Evolving")
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
         TURN { MOVE(player, MOVE_QUICK_ATTACK); } // Greninja becomes Normal type
-        TURN { MOVE(player, MOVE_MEGA_EVOLUTION); MOVE(opponent, MOVE_CELEBRATE); } // Mega Evolve
+        TURN { MOVE(player, MOVE_WATER_SHURIKEN, gimmick: GIMMICK_MEGA); MOVE(opponent, MOVE_CELEBRATE); } // Mega Evolve
         TURN { MOVE(player, MOVE_WATER_SHURIKEN); } // Should become Water type again
         TURN { MOVE(player, MOVE_CELEBRATE); MOVE(opponent, MOVE_CELEBRATE); } // End of battle, de-mega
         TURN { MOVE(player, MOVE_TACKLE); } // Should become Normal type again
@@ -43,7 +43,7 @@ SINGLE_BATTLE_TEST("Protean resets when de-Mega Evolving")
         MESSAGE("Greninja's Protean transformed it into the Normal type!");
 
         // Mega evolution happens
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_MEGA_EVOLUTION, player);
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_MEGA_EVOLUTION, player);
 
         // After mega evolution, Protean should reset and activate again
         ANIMATION(ANIM_TYPE_MOVE, MOVE_WATER_SHURIKEN, player);
