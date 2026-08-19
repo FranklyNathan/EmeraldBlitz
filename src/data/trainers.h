@@ -41032,7 +41032,7 @@ F_TRAINER_FEMALE |
 #line 15856
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 15858
-            .ability = ABILITY_SOLID_ROCK,
+            .ability = ABILITY_FLAME_BODY,
 #line 15855
             .lvl = 12,
 #line 15857

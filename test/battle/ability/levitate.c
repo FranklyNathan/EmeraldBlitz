@@ -139,13 +139,32 @@ AI_SINGLE_BATTLE_TEST("AI avoids Ground moves against Levitate when the attacker
     GIVEN {
         ASSUME(GetMoveType(MOVE_EARTHQUAKE) == TYPE_GROUND);
         AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
-        PLAYER(SPECIES_BRONZONG) { Ability(ABILITY_LEVITATE); Speed(2); HP(200); }
-        OPPONENT(SPECIES_FLYGON) { Moves(MOVE_EARTHQUAKE); Speed(3); HP(1); } // Faster so it uses EQ first, then dies to Bronzong
+        PLAYER(SPECIES_BRONZONG) { Ability(ABILITY_LEVITATE); Speed(2); HP(200); Moves(MOVE_IRON_HEAD, MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_FLYGON) { Moves(MOVE_EARTHQUAKE); Speed(3); HP(1); }
         OPPONENT(SPECIES_RHYPERIOR) { Moves(MOVE_EARTHQUAKE, MOVE_STONE_EDGE); Speed(1); }
     } WHEN {
-        // Turn 1: Flygon uses Earthquake (misses due to Levitate), then Bronzong KOs Flygon
-        TURN { MOVE(player, MOVE_IRON_HEAD); EXPECT_MOVE(opponent, MOVE_EARTHQUAKE); }
+        // Turn 1: Flygon uses Earthquake (misses due to Levitate), then Bronzong KOs Flygon, Rhyperior comes in
+        TURN { MOVE(player, MOVE_IRON_HEAD); EXPECT_MOVE(opponent, MOVE_EARTHQUAKE); EXPECT_SEND_OUT(opponent, 1); }
         // Turn 2: Rhyperior comes in - must avoid Earthquake now that Levitate is revealed.
+        TURN { MOVE(player, MOVE_CELEBRATE); EXPECT_MOVE(opponent, MOVE_STONE_EDGE); }
+        TURN { MOVE(player, MOVE_CELEBRATE); EXPECT_MOVE(opponent, MOVE_STONE_EDGE); }
+    } SCENE {
+        MESSAGE("Bronzong makes Ground-type moves miss with Levitate!");
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("AI avoids Ground moves against Levitate when attacker has EQ and Stone Edge (no faint)")
+{
+    PASSES_RANDOMLY(2, 3, RNG_AI_ABILITY);
+    GIVEN {
+        ASSUME(GetMoveType(MOVE_EARTHQUAKE) == TYPE_GROUND);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
+        PLAYER(SPECIES_BRONZONG) { Ability(ABILITY_LEVITATE); Speed(1); HP(200); }
+        OPPONENT(SPECIES_RHYPERIOR) { Moves(MOVE_EARTHQUAKE, MOVE_STONE_EDGE); Speed(3); }
+    } WHEN {
+        // Turn 1: AI doesn't know Levitate, may guess wrong.
+        TURN { EXPECT_MOVE(opponent, MOVE_EARTHQUAKE); }
+        // Turn 2+: Once Levitate is revealed, must avoid Earthquake.
         TURN { EXPECT_MOVE(opponent, MOVE_STONE_EDGE); }
         TURN { EXPECT_MOVE(opponent, MOVE_STONE_EDGE); }
     } SCENE {

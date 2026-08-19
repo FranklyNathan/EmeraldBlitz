@@ -465,6 +465,7 @@ static bool32 HandleEndTurnLeechSeed(u32 battler)
         }
         else if (gBattleMons[gBattlerTarget].volatiles.healBlock)
         {
+            SetPassiveDamageAmount(gBattlerAttacker, drainAmount);
             BattleScriptExecute(BattleScript_LeechSeedTurnDrainHealBlock);
         }
         else
