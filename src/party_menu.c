@@ -2207,7 +2207,10 @@ static s8 GetPcSlotGridTarget(s8 slotId, s8 movementDir)
         if (idx >= 3)
         {
             if (IsPcSlotSelectable(PARTY_PC_SLOT_START + idx - 3))
+            {
+                sLastPartySlotBeforePc = 0;
                 return PARTY_PC_SLOT_START + idx - 3;
+            }
         }
         sLastPcSlot = slotId;
         sLastPartySlotBeforePc = 0;
@@ -2216,7 +2219,10 @@ static s8 GetPcSlotGridTarget(s8 slotId, s8 movementDir)
         if (idx < 3)
         {
             if (IsPcSlotSelectable(PARTY_PC_SLOT_START + idx + 3))
+            {
+                sLastPartySlotBeforePc = 0;
                 return PARTY_PC_SLOT_START + idx + 3;
+            }
         }
         return -1;
     case MENU_DIR_LEFT:
