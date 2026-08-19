@@ -4546,6 +4546,7 @@ BattleScript_LocalBattleWonLoseTexts::
 	printstring STRINGID_TRAINER2LOSETEXT
 BattleScript_LocalBattleWonReward::
 	getmoneyreward
+	jumpifword CMP_EQUAL, gBattleTextBuff1 + 4, 0, BattleScript_PayDayMoneyAndPickUpItems
 	printstring STRINGID_PLAYERGOTMONEY
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_PayDayMoneyAndPickUpItems::

@@ -265,6 +265,9 @@ struct PartyMenuBox
     u8 statusSpriteId;
 };
 
+static IWRAM_DATA s8 sLastPartySlotBeforePc = 0;
+static IWRAM_DATA s8 sLastPcSlot = 0;
+
 // EWRAM vars
 static EWRAM_DATA struct PartyMenuInternal *sPartyMenuInternal = NULL;
 EWRAM_DATA struct PartyMenu gPartyMenu = {0};
@@ -2206,6 +2209,8 @@ static s8 GetPcSlotGridTarget(s8 slotId, s8 movementDir)
             if (IsPcSlotSelectable(PARTY_PC_SLOT_START + idx - 3))
                 return PARTY_PC_SLOT_START + idx - 3;
         }
+        sLastPcSlot = slotId;
+        sLastPartySlotBeforePc = 0;
         return 0; // lead party mon
     case MENU_DIR_DOWN:
         if (idx < 3)
@@ -2226,6 +2231,16 @@ static s8 GetPcSlotGridTarget(s8 slotId, s8 movementDir)
             return PARTY_PC_SLOT_START + idx + 1;
         // No selectable slot to the right, so this is the rightmost PC mon of
         // its row: head to the matching right-column party mon.
+        if (sLastPartySlotBeforePc >= 4 && sLastPartySlotBeforePc <= 5
+            && GetPartyMenuPartyCount() > sLastPartySlotBeforePc
+            && ((idx < 3 && sLastPartySlotBeforePc == 5)
+             || (idx >= 3 && sLastPartySlotBeforePc == 4)))
+        {
+            s8 target = sLastPartySlotBeforePc;
+            sLastPartySlotBeforePc = 0;
+            return target;
+        }
+        sLastPartySlotBeforePc = 0;
         if (idx < 3 && GetPartyMenuPartyCount() > 4)
             return 4; // top row to the 5th party mon
         if (idx >= 3 && GetPartyMenuPartyCount() > 5)
@@ -2250,9 +2265,16 @@ static void UpdatePartySelectionSinglePcLayout(s8 *slotPtr, s8 movementDir)
     // DOWN from the lead party mon enters the PC box grid
     if (movementDir == MENU_DIR_DOWN && *slotPtr == 0 && !sPartyMenuInternal->chooseHalf)
     {
+        if (sLastPcSlot != 0 && IsPcSlotSelectable(sLastPcSlot))
+        {
+            sLastPartySlotBeforePc = *slotPtr;
+            *slotPtr = sLastPcSlot;
+            return;
+        }
         pcSlot = GetFirstSelectablePcSlot();
         if (pcSlot >= 0)
         {
+            sLastPartySlotBeforePc = *slotPtr;
             *slotPtr = pcSlot;
             return;
         }
@@ -2262,11 +2284,22 @@ static void UpdatePartySelectionSinglePcLayout(s8 *slotPtr, s8 movementDir)
     if (movementDir == MENU_DIR_LEFT && *slotPtr >= 4 && *slotPtr <= 5)
     {
         pcSlot = GetRightmostSelectablePcSlot(*slotPtr - 4);
+        if (pcSlot < 0 && *slotPtr == 5)
+        {
+            pcSlot = GetRightmostSelectablePcSlot(0);
+        }
         if (pcSlot >= 0)
         {
+            sLastPartySlotBeforePc = *slotPtr;
             *slotPtr = pcSlot;
             return;
         }
+        if (GetFirstSelectablePcSlot() < 0)
+        {
+            UpdatePartySelectionSingleLayout(slotPtr, movementDir);
+            return;
+        }
+        return;
     }
 
     UpdatePartySelectionSingleLayout(slotPtr, movementDir);
