@@ -852,6 +852,8 @@ struct
     [MENU_CHANGE_ABILITY]  = {COMPOUND_STRING("Change Ability"),  CursorCb_ChangeAbility},
     [MENU_WITHDRAW]        = {COMPOUND_STRING("WITHDRAW"),        CursorCb_Withdraw},
     [MENU_DEPOSIT]         = {COMPOUND_STRING("DEPOSIT"),         CursorCb_Deposit},
+    [MENU_BERRY_GIVE]      = {COMPOUND_STRING("GIVE"),            CursorCb_GiveBerry},
+    [MENU_GIVE_ALL]        = {COMPOUND_STRING("GIVE ALL"),        CursorCb_GiveAllBerries},
 };
 
 static const u8 sPartyMenuAction_SummarySwitchCancel[] = {MENU_SUMMARY, MENU_SWITCH, MENU_CANCEL1};
@@ -870,6 +872,7 @@ static const u8 sPartyMenuAction_TakeItemTossCancel[] = {MENU_TAKE_ITEM, MENU_TO
 static const u8 sPartyMenuAction_RotomCatalog[] = {MENU_CATALOG_BULB, MENU_CATALOG_OVEN, MENU_CATALOG_WASHING, MENU_CATALOG_FRIDGE, MENU_CATALOG_FAN, MENU_CATALOG_MOWER, MENU_CANCEL1};
 static const u8 sPartyMenuAction_BurmyBinder[] = {MENU_CATALOG_PLANT, MENU_CATALOG_SANDY, MENU_CATALOG_TRASH, MENU_CANCEL1};
 static const u8 sPartyMenuAction_ZygardeCube[] = {MENU_CHANGE_FORM, MENU_CHANGE_ABILITY, MENU_CANCEL1};
+static const u8 sPartyMenuAction_BerryGiveCancel[] = {MENU_BERRY_GIVE, MENU_GIVE_ALL, MENU_CANCEL1};
 
 
 
@@ -892,6 +895,7 @@ static const u8 *const sPartyMenuActions[] =
     [ACTIONS_ROTOM_CATALOG] = sPartyMenuAction_RotomCatalog,
     [ACTIONS_BURMY_BINDER] = sPartyMenuAction_BurmyBinder,
     [ACTIONS_ZYGARDE_CUBE]  = sPartyMenuAction_ZygardeCube,
+    [ACTIONS_BERRY]        = sPartyMenuAction_BerryGiveCancel,
 };
 
 static const u8 sPartyMenuActionCounts[] =
@@ -913,6 +917,7 @@ static const u8 sPartyMenuActionCounts[] =
     [ACTIONS_ROTOM_CATALOG] = ARRAY_COUNT(sPartyMenuAction_RotomCatalog),
     [ACTIONS_BURMY_BINDER] = ARRAY_COUNT(sPartyMenuAction_BurmyBinder),
     [ACTIONS_ZYGARDE_CUBE]  = ARRAY_COUNT(sPartyMenuAction_ZygardeCube),
+    [ACTIONS_BERRY]        = ARRAY_COUNT(sPartyMenuAction_BerryGiveCancel),
 };
 
 static const u8 *const sUnionRoomTradeMessages[] =
@@ -1060,6 +1065,46 @@ static const struct SpriteTemplate sSpriteTemplate_MenuPokeballEvo =
     .paletteTag = TAG_POKEBALL_EVO,
     .oam = &sOamData_MenuPokeball,
     .anims = sSpriteAnimTable_MenuPokeball,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+static const union AnimCmd sBasketAnim_Closed[] =
+{
+    ANIMCMD_FRAME(0, 0),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sBasketAnim_Open[] =
+{
+    ANIMCMD_FRAME(16, 0),
+    ANIMCMD_END
+};
+
+static const union AnimCmd *const sSpriteAnimTable_MenuBasket[] =
+{
+    sBasketAnim_Closed,
+    sBasketAnim_Open
+};
+
+static const struct CompressedSpriteSheet sSpriteSheet_MenuBasket =
+{
+    gPartyMenuBasket_Gfx, 0x400, TAG_BASKET
+};
+
+static const struct SpritePalette sSpritePalette_MenuBasket =
+{
+    gPartyMenuBasket_Pal, TAG_BASKET
+};
+
+// Used for the basket sprite behind berries in the party menu berry view
+static const struct SpriteTemplate sSpriteTemplate_MenuBasket =
+{
+    .tileTag = TAG_BASKET,
+    .paletteTag = TAG_BASKET,
+    .oam = &sOamData_MenuPokeball,
+    .anims = sSpriteAnimTable_MenuBasket,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCallbackDummy,

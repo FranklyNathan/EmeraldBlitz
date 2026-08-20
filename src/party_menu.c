@@ -33,6 +33,7 @@
 #include "graphics.h"
 #include "international_string_util.h"
 #include "item.h"
+#include "item_icon.h"
 #include "item_menu.h"
 #include "item_use.h"
 #include "caps.h"
@@ -153,6 +154,8 @@ enum {
     MENU_CLEAR,
     MENU_WITHDRAW,
     MENU_DEPOSIT,
+    MENU_BERRY_GIVE,
+    MENU_GIVE_ALL,
     MENU_FIELD_MOVES
 };
 
@@ -176,6 +179,7 @@ enum {
     ACTIONS_ROTOM_CATALOG,
     ACTIONS_BURMY_BINDER,
     ACTIONS_ZYGARDE_CUBE,
+    ACTIONS_BERRY,
 };
 
 enum {
@@ -189,6 +193,8 @@ enum {
     TAG_STATUS_ICONS,
     TAG_POKEBALL_EVO,
     TAG_POKEBALL_SWITCH,
+    TAG_BASKET,
+    TAG_PARTY_BERRY_ICON,
 };
 
 #define TAG_HELD_ITEM 55120
@@ -267,6 +273,14 @@ struct PartyMenuBox
 
 static IWRAM_DATA s8 sLastPartySlotBeforePc = 0;
 static IWRAM_DATA s8 sLastPcSlot = 0;
+static IWRAM_DATA bool8 sBerryMode = FALSE;
+static IWRAM_DATA bool8 sBerryTransitionActive = FALSE;
+static IWRAM_DATA u16 sBerryItemIds[PARTY_PC_SLOT_COUNT] = {0};
+static IWRAM_DATA u8 sBerryCount = 0;
+static IWRAM_DATA s8 sBerryGiveTarget = 0;
+static IWRAM_DATA s8 sBerryGiveFromSlot = 0;
+static IWRAM_DATA bool8 sBerryGiving = FALSE;
+static IWRAM_DATA bool8 sPendingSwitchAfterBerryExit = FALSE;
 
 // EWRAM vars
 static EWRAM_DATA struct PartyMenuInternal *sPartyMenuInternal = NULL;
@@ -276,6 +290,7 @@ static EWRAM_DATA u8 *sPartyBgGfxTilemap = NULL;
 static EWRAM_DATA u8 *sPartyBgTilemapBuffer = NULL;
 EWRAM_DATA bool8 gPartyMenuUseExitCallback = 0;
 EWRAM_DATA u8 gSelectedMonPartyId = 0;
+static EWRAM_DATA u8 sBerryItemSpriteIds[PARTY_PC_SLOT_COUNT] = {0};
 EWRAM_DATA MainCallback gPostMenuFieldCallback = NULL;
 static EWRAM_DATA u16 *sSlot1TilemapBuffer = 0; // for switching party slots
 static EWRAM_DATA u16 *sSlot2TilemapBuffer = 0; //
@@ -349,7 +364,14 @@ static s8 GetPcSlotForBoxPosition(u8 boxPos)
 
 static bool8 IsPcSlotSelectable(s8 slotId)
 {
-    return IsPcSlot(slotId) && GetPcSlotBoxPosition(slotId) != 0xFF;
+    if (!IsPcSlot(slotId))
+        return FALSE;
+    if (sBerryMode)
+    {
+        u8 index = slotId - PARTY_PC_SLOT_START;
+        return index < sBerryCount;
+    }
+    return GetPcSlotBoxPosition(slotId) != 0xFF;
 }
 
 static s8 GetFirstSelectablePcSlot(void)
@@ -453,6 +475,7 @@ static void PartyMenuStartSpriteAnim(u8, u8);
 static void Task_HandlePcSwitchAnimation(u8 taskId);
 static void StartPartyMenuSwitchSpriteShrink(u8 spriteId);
 static void StartPartyMenuSwitchSpriteGrow(u8 spriteId);
+static bool8 IsPartyMenuSwitchSpriteAnimDone(u8 spriteId);
 static void RefreshPartyMenuBoxAfterSwitchWithGrow(u8 slot);
 static u8 GetPartyBoxPaletteFlags(u8, u8);
 static bool8 PartyBoxPal_ParnterOrDisqualifiedInArena(u8);
@@ -476,6 +499,7 @@ static void TryGiveItemOrMailToSelectedMon(u8);
 static void SwitchSelectedMons(u8);
 static void TryEnterMonForMinigame(u8, u8);
 static void Task_TryCreateSelectionWindow(u8);
+static bool8 CreateSelectionWindow(u8);
 static void FinishTwoMonAction(u8);
 static void CancelParticipationPrompt(u8);
 static bool8 DisplayCancelChooseMonYesNo(u8);
@@ -522,6 +546,7 @@ static void Task_SlideSelectedSlotsOffscreen(u8);
 static void SwitchPartyMon(void);
 static void SwitchPcAndPartyMon(u8, u8);
 static void DestroyPartyMenuBoxSprites(u8);
+static void CreatePartyMonSprites(u8);
 static void RefreshPartyMenuBoxAfterSwitch(u8);
 static void Task_SlideSelectedSlotsOnscreen(u8);
 static void CB2_SelectBagItemToGive(void);
@@ -672,6 +697,14 @@ static void CursorCb_ChangeAbility(u8);
 static void CursorCb_Clear(u8 taskId);
 static void CursorCb_Withdraw(u8 taskId);
 static void CursorCb_Deposit(u8 taskId);
+static void CursorCb_GiveBerry(u8 taskId);
+static void CursorCb_GiveAllBerries(u8 taskId);
+static void CollectPartyBerries(void);
+static void CreateBerrySlotSprites(void);
+static void DestroyBerrySlotSprites(void);
+static void ToggleBerryMode(u8 taskId);
+static void Task_SlidePcBerriesTransition(u8 taskId);
+static void Task_HandleBerryGiveAnimation(u8 taskId);
 static void Task_UpdateHeldItemSpritesAndReturn(u8 taskId);
 bool32 SetUpFieldMove_Surf(void);
 bool32 SetUpFieldMove_Fly(void);
@@ -714,6 +747,256 @@ static void FieldCallback_RockClimb(void);
 
 // static const data
 #include "data/party_menu.h"
+
+static void CollectPartyBerries(void)
+{
+    struct BagPocket *pocket = &gBagPockets[POCKET_BERRIES];
+    sBerryCount = 0;
+    for (u16 i = 0; i < pocket->capacity && sBerryCount < PARTY_PC_SLOT_COUNT; i++)
+    {
+        if (pocket->itemSlots[i].itemId != ITEM_NONE && pocket->itemSlots[i].quantity > 0)
+        {
+            sBerryItemIds[sBerryCount] = pocket->itemSlots[i].itemId;
+            sBerryCount++;
+        }
+    }
+}
+
+static void SpriteCB_BerryBob(struct Sprite *sprite)
+{
+    sprite->data[0]++;
+    if (sprite->data[0] >= 16)
+        sprite->data[0] = 0;
+    if (sprite->data[0] < 8)
+        sprite->y2 = -1;
+    else
+        sprite->y2 = 0;
+}
+
+static void CreateBerrySlotSprites(void)
+{
+    u8 i;
+    for (i = 0; i < sBerryCount && i < PARTY_PC_SLOT_COUNT; i++)
+    {
+        u8 slot = PARTY_PC_SLOT_START + i;
+        u16 tag = TAG_PARTY_BERRY_ICON + i;
+        struct Sprite *sprite;
+
+        sPartyMenuBoxes[slot].pokeballSpriteId = CreateSprite(&sSpriteTemplate_MenuBasket, sPcSlotSpriteCoords[i][6], sPcSlotSpriteCoords[i][7], 8);
+        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.priority = 1;
+
+        sBerryItemSpriteIds[i] = AddItemIconSprite(tag, tag, sBerryItemIds[i]);
+        sprite = &gSprites[sBerryItemSpriteIds[i]];
+        sprite->x = sPcSlotSpriteCoords[i][0] + 3;
+        sprite->y = sPcSlotSpriteCoords[i][1] + 4;
+        sprite->oam.priority = 0;
+        sprite->callback = SpriteCB_BerryBob;
+    }
+}
+
+static void DestroyBerrySlotSprites(void)
+{
+    u8 i;
+    for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+    {
+        if (sBerryItemSpriteIds[i] != SPRITE_NONE)
+        {
+            struct Sprite *sprite = &gSprites[sBerryItemSpriteIds[i]];
+            if (sprite->oam.affineMode & ST_OAM_AFFINE_ON_MASK)
+            {
+                FreeOamMatrix(sprite->oam.matrixNum);
+                sprite->oam.affineMode = ST_OAM_AFFINE_OFF;
+                sprite->oam.matrixNum = 0;
+            }
+            DestroySprite(sprite);
+            sBerryItemSpriteIds[i] = SPRITE_NONE;
+            FreeSpriteTilesByTag(TAG_PARTY_BERRY_ICON + i);
+            FreeSpritePaletteByTag(TAG_PARTY_BERRY_ICON + i);
+        }
+        u8 slot = PARTY_PC_SLOT_START + i;
+        if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
+        {
+            DestroySprite(&gSprites[sPartyMenuBoxes[slot].pokeballSpriteId]);
+            sPartyMenuBoxes[slot].pokeballSpriteId = SPRITE_NONE;
+        }
+    }
+}
+
+#define BERRY_SLIDE_FRAMES 8
+#define BERRY_SLIDE_STEP   4
+
+static void Task_SlidePcBerriesTransition(u8 taskId)
+{
+    u8 frame = gTasks[taskId].data[0];
+    u8 phase = gTasks[taskId].data[1];
+    bool8 entering = !gTasks[taskId].data[2];
+    u8 i;
+    s16 offset;
+
+    if (phase == 0)
+    {
+        offset = (frame + 1) * BERRY_SLIDE_STEP;
+        if (entering)
+        {
+            for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+            {
+                u8 slot = PARTY_PC_SLOT_START + i;
+                if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
+                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] + offset;
+                if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
+                    gSprites[sPartyMenuBoxes[slot].monSpriteId].y = sPcSlotSpriteCoords[i][1] + offset;
+            }
+        }
+        else
+        {
+            for (i = 0; i < sBerryCount; i++)
+            {
+                u8 slot = PARTY_PC_SLOT_START + i;
+                if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
+                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] + offset;
+                if (sBerryItemSpriteIds[i] != SPRITE_NONE)
+                    gSprites[sBerryItemSpriteIds[i]].y = sPcSlotSpriteCoords[i][1] + 4 + offset;
+            }
+        }
+        if (frame >= BERRY_SLIDE_FRAMES - 1)
+        {
+            if (entering)
+            {
+                for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+                    DestroyPartyMenuBoxSprites(PARTY_PC_SLOT_START + i);
+                CreateBerrySlotSprites();
+                for (i = 0; i < sBerryCount; i++)
+                {
+                    gSprites[sBerryItemSpriteIds[i]].y = sPcSlotSpriteCoords[i][1] + 4 - (BERRY_SLIDE_FRAMES * BERRY_SLIDE_STEP);
+                    gSprites[sBerryItemSpriteIds[i]].invisible = TRUE;
+                    u8 slot = PARTY_PC_SLOT_START + i;
+                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] - (BERRY_SLIDE_FRAMES * BERRY_SLIDE_STEP);
+                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].invisible = TRUE;
+                }
+            }
+            else
+            {
+                DestroyBerrySlotSprites();
+                for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+                {
+                    u8 slot = PARTY_PC_SLOT_START + i;
+                    CreatePartyMonSprites(slot);
+                    if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
+                    {
+                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] - (BERRY_SLIDE_FRAMES * BERRY_SLIDE_STEP);
+                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].invisible = TRUE;
+                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.priority = 1;
+                    }
+                    if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
+                    {
+                        gSprites[sPartyMenuBoxes[slot].monSpriteId].y = sPcSlotSpriteCoords[i][1] - (BERRY_SLIDE_FRAMES * BERRY_SLIDE_STEP);
+                        gSprites[sPartyMenuBoxes[slot].monSpriteId].invisible = TRUE;
+                    }
+                }
+            }
+            gTasks[taskId].data[0] = 0;
+            gTasks[taskId].data[1] = 1;
+            return;
+        }
+    }
+    else
+    {
+        offset = (BERRY_SLIDE_FRAMES - 1 - frame) * BERRY_SLIDE_STEP;
+        if (entering)
+        {
+            for (i = 0; i < sBerryCount; i++)
+            {
+                if (sBerryItemSpriteIds[i] != SPRITE_NONE)
+                {
+                    gSprites[sBerryItemSpriteIds[i]].y = sPcSlotSpriteCoords[i][1] + 4 - offset;
+                    gSprites[sBerryItemSpriteIds[i]].invisible = FALSE;
+                }
+                u8 slot = PARTY_PC_SLOT_START + i;
+                if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
+                {
+                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] - offset;
+                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].invisible = FALSE;
+                }
+            }
+        }
+        else
+        {
+            for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+            {
+                u8 slot = PARTY_PC_SLOT_START + i;
+                if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
+                {
+                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] - offset;
+                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].invisible = FALSE;
+                }
+                if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
+                {
+                    gSprites[sPartyMenuBoxes[slot].monSpriteId].y = sPcSlotSpriteCoords[i][1] - offset;
+                    gSprites[sPartyMenuBoxes[slot].monSpriteId].invisible = FALSE;
+                }
+            }
+        }
+        if (frame >= BERRY_SLIDE_FRAMES - 1)
+        {
+            if (entering)
+            {
+                for (i = 0; i < sBerryCount; i++)
+                {
+                    if (sBerryItemSpriteIds[i] != SPRITE_NONE)
+                        gSprites[sBerryItemSpriteIds[i]].y = sPcSlotSpriteCoords[i][1] + 4;
+                    u8 slot = PARTY_PC_SLOT_START + i;
+                    if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
+                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7];
+                }
+            }
+            else
+            {
+                for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+                {
+                    u8 slot = PARTY_PC_SLOT_START + i;
+                    if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
+                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7];
+                    if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
+                        gSprites[sPartyMenuBoxes[slot].monSpriteId].y = sPcSlotSpriteCoords[i][1];
+                }
+            }
+            sBerryTransitionActive = FALSE;
+            AnimatePartySlot(gPartyMenu.slotId, 1);
+            DestroyTask(taskId);
+            return;
+        }
+    }
+    gTasks[taskId].data[0]++;
+}
+
+#undef BERRY_SLIDE_FRAMES
+#undef BERRY_SLIDE_STEP
+
+static void ToggleBerryMode(u8 taskId)
+{
+    if (sBerryTransitionActive)
+        return;
+    if (!sBerryMode)
+    {
+        CollectPartyBerries();
+        if (sBerryCount == 0)
+        {
+            PlaySE(SE_FAILURE);
+            return;
+        }
+        sBerryMode = TRUE;
+    }
+    else
+    {
+        sBerryMode = FALSE;
+    }
+    PlaySE(SE_SELECT);
+    sBerryTransitionActive = TRUE;
+    u8 animTaskId = CreateTask(Task_SlidePcBerriesTransition, 4);
+    gTasks[animTaskId].data[0] = 0;
+    gTasks[animTaskId].data[1] = 0;
+    gTasks[animTaskId].data[2] = !sBerryMode; // 0 = entering, 1 = exiting
+}
 
 // code
 static void InitPartyMenu(u8 menuType, u8 layout, u8 partyAction, bool8 keepCursorPos, u8 messageId, TaskFunc task, MainCallback callback)
@@ -1066,6 +1349,15 @@ static void ResetPartyMenu(void)
     sPartyMenuBoxes = NULL;
     sPartyBgGfxTilemap = NULL;
     sReturnToPartyMenuAfterEvo = FALSE;
+    sBerryMode = FALSE;
+    sBerryTransitionActive = FALSE;
+    sBerryGiving = FALSE;
+    sBerryGiveTarget = 0;
+    sBerryGiveFromSlot = -1;
+    sPendingSwitchAfterBerryExit = FALSE;
+    sBerryCount = 0;
+    for (u8 i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+        sBerryItemSpriteIds[i] = SPRITE_NONE;
 }
 
 static bool8 AllocPartyMenuBg(void)
@@ -1603,14 +1895,14 @@ void AnimatePartySlot(u8 slot, u8 animNum)
     case PARTY_PC_SLOT_START + 5:
         if (IsPcSlotSelectable(slot))
         {
-            u16 pokeballTag = TAG_POKEBALL;
+            u16 pokeballTag = sBerryMode ? TAG_BASKET : TAG_POKEBALL;
             if (gPartyMenu.action == PARTY_ACTION_SWITCH
                 && slot == gPartyMenu.slotId
                 && gPartyMenu.slotId2 != gPartyMenu.slotId)
             {
-                pokeballTag = TAG_POKEBALL_SWITCH;
+                pokeballTag = sBerryMode ? TAG_BASKET : TAG_POKEBALL_SWITCH;
             }
-            else
+            else if (!sBerryMode)
             {
                 u8 boxPos = GetPcSlotBoxPosition(slot);
                 if (boxPos != 0xFF)
@@ -1622,7 +1914,8 @@ void AnimatePartySlot(u8 slot, u8 animNum)
                 }
             }
             gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.paletteNum = IndexOfSpritePaletteTag(pokeballTag);
-            AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum, TRUE);
+            if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
+                AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum, TRUE);
             PartyMenuStartSpriteAnim(sPartyMenuBoxes[slot].pokeballSpriteId, animNum);
         }
         return;
@@ -1763,9 +2056,30 @@ void Task_HandleChooseMonInput(u8 taskId)
     {
         s8 *slotPtr = GetCurrentPartySlotPtr();
 
-        if (JOY_NEW(SELECT_BUTTON) && (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
+        if (sBerryTransitionActive)
+            return;
+
+        if (sPendingSwitchAfterBerryExit)
+        {
+            sPendingSwitchAfterBerryExit = FALSE;
+            CursorCb_Switch(taskId);
+            return;
+        }
+
+        if (sBerryGiving)
+        {
+            // Don't allow L button to toggle berry mode while selecting a target
+        }
+        else if (JOY_NEW(L_BUTTON) && (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
             || gPartyMenu.menuType == PARTY_MENU_TYPE_IN_BATTLE))
         {
+            if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC)
+            {
+                if (*slotPtr < PARTY_SIZE)
+                    sBerryGiveTarget = *slotPtr;
+                ToggleBerryMode(taskId);
+                return;
+            }
             if (gPartyMenu.action != PARTY_ACTION_USE_ITEM)
             {
                 gSpecialVar_ItemId = ITEM_RARE_CANDY;
@@ -1777,11 +2091,39 @@ void Task_HandleChooseMonInput(u8 taskId)
 
         switch (PartyMenuButtonHandler(slotPtr))
         {
-        case A_BUTTON: // Selected mon
+        case A_BUTTON:
             HandleChooseMonSelection(taskId, slotPtr);
             break;
-        case B_BUTTON: // Selected Cancel / pressed B
-            HandleChooseMonCancel(taskId, slotPtr);
+        case B_BUTTON:
+            if (sBerryGiving)
+            {
+                PlaySE(SE_SELECT);
+                sBerryGiving = FALSE;
+                u8 berryIndex = gPartyMenu.slotId - PARTY_PC_SLOT_START;
+                u16 count = CountTotalItemQuantityInBag(sBerryItemIds[berryIndex]);
+                u8 *str = CopyItemName(sBerryItemIds[berryIndex], gStringVar4);
+                *str++ = CHAR_SPACE;
+                *str++ = CHAR_LEFT_PAREN;
+                str = ConvertIntToDecimalStringN(str, count, STR_CONV_MODE_LEFT_ALIGN, 3);
+                *str++ = CHAR_RIGHT_PAREN;
+                *str = EOS;
+                u8 *windowPtr = &sPartyMenuInternal->windowId[1];
+                if (*windowPtr != WINDOW_NONE)
+                    PartyMenuRemoveWindow(windowPtr);
+                *windowPtr = AddWindow(&sDoWhatWithMonMsgWindowTemplate);
+                DrawStdFrameWithCustomTileAndPalette(*windowPtr, FALSE, 0x4F, 13);
+                AddTextPrinterParameterized(*windowPtr, FONT_NORMAL, gStringVar4, 0, 1, 0, 0);
+                ScheduleBgCopyTilemapToVram(2);
+            }
+            else if (sBerryMode && gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC)
+            {
+                PlaySE(SE_SELECT);
+                Task_ClosePartyMenu(taskId);
+            }
+            else
+            {
+                HandleChooseMonCancel(taskId, slotPtr);
+            }
             break;
         case START_BUTTON:
             if (sPartyMenuInternal->chooseHalf)
@@ -1802,11 +2144,74 @@ static s8 *GetCurrentPartySlotPtr(void)
         return &gPartyMenu.slotId;
 }
 
+static void Task_HandleBerryGiveAnimation(u8 taskId)
+{
+    u8 berryIndex = gTasks[taskId].data[1];
+
+    if (berryIndex < PARTY_PC_SLOT_COUNT
+        && !IsPartyMenuSwitchSpriteAnimDone(sBerryItemSpriteIds[berryIndex]))
+        return;
+
+    sBerryGiveFromSlot = -1;
+    if (sBerryCount > 0)
+    {
+        DestroyBerrySlotSprites();
+        CreateBerrySlotSprites();
+    }
+    else
+    {
+        ToggleBerryMode(taskId);
+    }
+    gTasks[taskId].func = Task_HandleChooseMonInput;
+}
+
 static void HandleChooseMonSelection(u8 taskId, s8 *slotPtr)
 {
     if (*slotPtr == PARTY_SIZE)
     {
         gPartyMenu.task(taskId);
+    }
+    else if (sBerryGiving)
+    {
+        if (*slotPtr < PARTY_SIZE
+            && GetMonData(&gPlayerParty[*slotPtr], MON_DATA_HELD_ITEM) == ITEM_NONE
+            && !GetMonData(&gPlayerParty[*slotPtr], MON_DATA_IS_EGG))
+        {
+            PlaySE(SE_SELECT);
+            PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+            u16 berryItemId = gPartyMenu.bagItem;
+            RemoveBagItem(berryItemId, 1);
+            SetMonData(&gPlayerParty[*slotPtr], MON_DATA_HELD_ITEM, &berryItemId);
+            UpdatePartyMonHeldItemSprite(&gPlayerParty[*slotPtr], &sPartyMenuBoxes[*slotPtr]);
+            sBerryGiving = FALSE;
+            CollectPartyBerries();
+            if (CheckBagHasItem(berryItemId, 1))
+            {
+                DestroyBerrySlotSprites();
+                if (sBerryCount > 0)
+                    CreateBerrySlotSprites();
+            }
+            else if (sBerryGiveFromSlot >= 0 && sBerryGiveFromSlot < PARTY_PC_SLOT_COUNT
+                && sBerryItemSpriteIds[sBerryGiveFromSlot] != SPRITE_NONE)
+            {
+                StartPartyMenuSwitchSpriteShrink(sBerryItemSpriteIds[sBerryGiveFromSlot]);
+                gTasks[taskId].data[0] = 0;
+                gTasks[taskId].data[1] = sBerryGiveFromSlot;
+                gTasks[taskId].func = Task_HandleBerryGiveAnimation;
+            }
+            else
+            {
+                DestroyBerrySlotSprites();
+                if (sBerryCount > 0)
+                    CreateBerrySlotSprites();
+                else
+                    ToggleBerryMode(taskId);
+            }
+        }
+        else
+        {
+            PlaySE(SE_FAILURE);
+        }
     }
     else
     {
@@ -3425,6 +3830,7 @@ void DisplayPartyMenuStdMessage(u32 stringId)
         switch (stringId)
         {
         case PARTY_MSG_DO_WHAT_WITH_MON:
+        case PARTY_MSG_GIVE_TO_WHICH_MON:
             *windowPtr = AddWindow(&sDoWhatWithMonMsgWindowTemplate);
             break;
         case PARTY_MSG_DO_WHAT_WITH_ITEM:
@@ -3798,13 +4204,27 @@ static bool8 CreateSelectionWindow(u8 taskId)
     if (IsPcSlot(gPartyMenu.slotId))
     {
         u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
-        if (boxPos == 0xFF)
+        if (!sBerryMode && boxPos == 0xFF)
             return FALSE;
 
-        GetBoxMonNickname(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], gStringVar1);
+        if (!sBerryMode)
+            GetBoxMonNickname(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], gStringVar1);
+        else
+        {
+            u8 berryIndex = gPartyMenu.slotId - PARTY_PC_SLOT_START;
+            if (berryIndex >= sBerryCount)
+                return FALSE;
+            StringCopy(gStringVar1, GetItemName(sBerryItemIds[berryIndex]));
+        }
         PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
         sPartyMenuInternal->numActions = 0;
-        if (gPartyMenu.menuType == PARTY_MENU_TYPE_DAYCARE)
+        if (sBerryMode)
+        {
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_BERRY_GIVE);
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_GIVE_ALL);
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL1);
+        }
+        else if (gPartyMenu.menuType == PARTY_MENU_TYPE_DAYCARE)
         {
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_STORE);
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
@@ -3819,7 +4239,28 @@ static bool8 CreateSelectionWindow(u8 taskId)
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL1);
         }
         DisplaySelectionWindow(SELECTWINDOW_ACTIONS);
-        DisplayPartyMenuStdMessage(PARTY_MSG_DO_WHAT_WITH_MON);
+        if (sBerryMode)
+        {
+            u8 berryIndex = gPartyMenu.slotId - PARTY_PC_SLOT_START;
+            u16 count = CountTotalItemQuantityInBag(sBerryItemIds[berryIndex]);
+            u8 *str = CopyItemName(sBerryItemIds[berryIndex], gStringVar4);
+            *str++ = CHAR_SPACE;
+            *str++ = CHAR_LEFT_PAREN;
+            str = ConvertIntToDecimalStringN(str, count, STR_CONV_MODE_LEFT_ALIGN, 3);
+            *str++ = CHAR_RIGHT_PAREN;
+            *str = EOS;
+            u8 *windowPtr = &sPartyMenuInternal->windowId[1];
+            if (*windowPtr != WINDOW_NONE)
+                PartyMenuRemoveWindow(windowPtr);
+            *windowPtr = AddWindow(&sDoWhatWithMonMsgWindowTemplate);
+            DrawStdFrameWithCustomTileAndPalette(*windowPtr, FALSE, 0x4F, 13);
+            AddTextPrinterParameterized(*windowPtr, FONT_NORMAL, gStringVar4, 0, 1, 0, 0);
+            ScheduleBgCopyTilemapToVram(2);
+        }
+        else
+        {
+            DisplayPartyMenuStdMessage(PARTY_MSG_DO_WHAT_WITH_MON);
+        }
         return TRUE;
     }
 
@@ -3960,6 +4401,16 @@ void CB2_ReturnToPartyMenuFromSummaryScreen(void)
 
 static void CursorCb_Switch(u8 taskId)
 {
+    if (sBerryMode)
+    {
+        PlaySE(SE_SELECT);
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+        sPendingSwitchAfterBerryExit = TRUE;
+        gTasks[taskId].func = Task_HandleChooseMonInput;
+        ToggleBerryMode(taskId);
+        return;
+    }
     // Reset follower steps when the party leader is changed
     if (gPartyMenu.slotId == 0 || gPartyMenu.slotId2 == 0)
         gFollowerSteps = 0;
@@ -4583,6 +5034,69 @@ static void CursorCb_Deposit(u8 taskId)
     gTasks[taskId].data[0] = 0;
     gTasks[taskId].func = Task_HandlePcDepositAnimation;
     StartPartyMenuSwitchSpriteShrink(sPartyMenuBoxes[partySlot].monSpriteId);
+}
+
+static void CursorCb_GiveBerry(u8 taskId)
+{
+    u8 pcSlotIndex = gPartyMenu.slotId - PARTY_PC_SLOT_START;
+
+    if (pcSlotIndex >= sBerryCount)
+        return;
+
+    u16 berryItemId = sBerryItemIds[pcSlotIndex];
+    struct BagPocket *pocket = &gBagPockets[POCKET_BERRIES];
+
+    for (u8 i = 0; i < pocket->capacity; i++)
+    {
+        if (pocket->itemSlots[i].itemId == berryItemId && pocket->itemSlots[i].quantity > 0)
+        {
+            PlaySE(SE_SELECT);
+            PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+            PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+            sBerryGiving = TRUE;
+            sBerryGiveTarget = -1;
+            sBerryGiveFromSlot = pcSlotIndex;
+            gPartyMenu.bagItem = berryItemId;
+            gPartyMenu.action = PARTY_ACTION_GIVE_PC_ITEM;
+            DisplayPartyMenuStdMessage(PARTY_MSG_GIVE_TO_WHICH_MON);
+            gTasks[taskId].func = Task_HandleChooseMonInput;
+            return;
+        }
+    }
+    PlaySE(SE_FAILURE);
+}
+
+static void CursorCb_GiveAllBerries(u8 taskId)
+{
+    u8 partySlot;
+    u8 i;
+
+    for (partySlot = 0; partySlot < PARTY_SIZE; partySlot++)
+    {
+        if (GetMonData(&gPlayerParty[partySlot], MON_DATA_HELD_ITEM) != ITEM_NONE)
+            continue;
+        if (GetMonData(&gPlayerParty[partySlot], MON_DATA_IS_EGG))
+            continue;
+        for (i = 0; i < sBerryCount; i++)
+        {
+            u16 berryItemId = sBerryItemIds[i];
+            if (CheckBagHasItem(berryItemId, 1))
+            {
+                PlaySE(SE_SELECT);
+                RemoveBagItem(berryItemId, 1);
+                SetMonData(&gPlayerParty[partySlot], MON_DATA_HELD_ITEM, &berryItemId);
+                UpdatePartyMonHeldItemSprite(&gPlayerParty[partySlot], &sPartyMenuBoxes[partySlot]);
+                break;
+            }
+        }
+    }
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+    CollectPartyBerries();
+    DestroyBerrySlotSprites();
+    if (sBerryCount > 0)
+        CreateBerrySlotSprites();
+    else
+        ToggleBerryMode(taskId);
 }
 
 #undef tSlot1Left
@@ -5843,6 +6357,8 @@ static void LoadPartyMenuPokeballGfx(void)
     LoadSpritePalette(&sSpritePalette_MenuPokeball);
     LoadSpritePalette(&sSpritePalette_MenuPokeballEvo);
     LoadSpritePalette(&sSpritePalette_MenuPokeballSwitch);
+    LoadCompressedSpriteSheet(&sSpriteSheet_MenuBasket);
+    LoadSpritePalette(&sSpritePalette_MenuBasket);
 }
 
 static void CreatePartyMonStatusSprite(struct Pokemon *mon, struct PartyMenuBox *menuBox)
