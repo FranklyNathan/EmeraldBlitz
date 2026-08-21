@@ -44417,7 +44417,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17309
-                MOVE_CONFUSION,
+                MOVE_PSYCHIC,
                 MOVE_ROCK_SLIDE,
                 MOVE_CALM_MIND,
                 MOVE_INCINERATE,
@@ -47061,8 +47061,8 @@ F_TRAINER_FEMALE |
 #line 18457
                 MOVE_EARTHQUAKE,
                 MOVE_MUDDY_WATER,
+                MOVE_POISON_JAB,
                 MOVE_PROTECT,
-                MOVE_ROCK_SLIDE,
             },
             },
             {

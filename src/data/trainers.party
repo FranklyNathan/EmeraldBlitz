@@ -17306,7 +17306,7 @@ Level: 32
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Levitate
-- Confusion
+- Psychic
 - Rock Slide
 - Calm Mind
 - Incinerate
@@ -18456,8 +18456,8 @@ Nature: Serious
 Ability: Torrent
 - Earthquake
 - Muddy Water
+- Poison Jab
 - Protect
-- Rock Slide
 
 Flygon (M)
 Level: 53

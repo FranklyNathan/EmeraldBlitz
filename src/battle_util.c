@@ -4307,9 +4307,13 @@ u32 AbilityBattleEffects(enum AbilityEffect caseID, u32 battler, enum Ability ab
 
                         TrySaveExchangedItem(target, gLastUsedItem);
                         stoleItem = TRUE;
-                        
+
                         gBattlerAttacker = battler;
                         gBattlerTarget = target;
+                        // Set the battler whose item is stolen for the item steal animation
+                        gEffectBattler = target;
+                        // So the ability pop-up shows the Frisk user
+                        gBattlerAbility = battler;
                         PREPARE_MON_NICK_WITH_PREFIX_BUFFER(gBattleTextBuff1, battler, gBattlerPartyIndexes[battler])
                         PREPARE_MON_NICK_WITH_PREFIX_BUFFER(gBattleTextBuff2, target, gBattlerPartyIndexes[target])
                         PREPARE_ITEM_BUFFER(gBattleTextBuff3, gLastUsedItem)

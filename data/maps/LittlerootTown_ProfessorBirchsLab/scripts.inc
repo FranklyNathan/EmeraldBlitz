@@ -121,6 +121,8 @@ LittlerootTown_ProfessorBirchsLab_EventScript_GiveStarterEvent::
     setvar VAR_GYM_LOCKED, 1
 	setvar VAR_SLATEPORT_RENTAL_STATE, 0
 
+	setflag FLAG_RECEIVED_POTION_OLDALE
+
 	@ Petalburg Woods Flags
 	setvar VAR_PETALBURG_WOODS_STATE, 1  //First set of speedchoice variables to set
 	setflag FLAG_HIDE_PETALBURG_WOODS_DEVON_EMPLOYEE

@@ -11248,7 +11248,7 @@ static const struct LevelUpMove sFloatzelLevelUpLearnset[] = {
 static const struct LevelUpMove sCherubiLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 1, MOVE_GROWTH),
     LEVEL_UP_MOVE( 1, MOVE_MORNING_SUN),
-    LEVEL_UP_MOVE( 1, MOVE_TACKLE),
+    //LEVEL_UP_MOVE( 1, MOVE_TACKLE),
     LEVEL_UP_MOVE(10, MOVE_LEECH_SEED),
     LEVEL_UP_MOVE(13, MOVE_HELPING_HAND),
     LEVEL_UP_MOVE(19, MOVE_MAGICAL_LEAF),
@@ -11264,6 +11264,7 @@ static const struct LevelUpMove sCherubiLevelUpLearnset[] = {
 static const struct LevelUpMove sCherrimLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 0, MOVE_PETAL_DANCE),
     //LEVEL_UP_MOVE( 1, MOVE_PETAL_DANCE),
+    LEVEL_UP_MOVE( 1, MOVE_WORRY_SEED),
     LEVEL_UP_MOVE( 1, MOVE_MORNING_SUN),
     //LEVEL_UP_MOVE( 1, MOVE_TACKLE),
     //LEVEL_UP_MOVE( 1, MOVE_GROWTH),
@@ -11273,7 +11274,6 @@ static const struct LevelUpMove sCherrimLevelUpLearnset[] = {
     LEVEL_UP_MOVE(13, MOVE_HELPING_HAND),
     LEVEL_UP_MOVE(19, MOVE_MAGICAL_LEAF),
     LEVEL_UP_MOVE(22, MOVE_SUNNY_DAY),
-    LEVEL_UP_MOVE(30, MOVE_WORRY_SEED),
     //LEVEL_UP_MOVE(35, MOVE_TAKE_DOWN),
     LEVEL_UP_MOVE(43, MOVE_SOLAR_BEAM),
     //LEVEL_UP_MOVE(48, MOVE_LUCKY_CHANT),
