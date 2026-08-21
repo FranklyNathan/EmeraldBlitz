@@ -97,6 +97,33 @@ TEST("Berries are sorted correctly in the bag")
     EXPECT_EQ(pocket->itemSlots[8].itemId, ITEM_NONE);
 }
 
+TEST("Tossing a whole stack in the berry pocket doesn't hide later berries")
+{
+    struct BagPocket *pocket = &gBagPockets[POCKET_BERRIES];
+    memset(pocket->itemSlots, 0, sizeof(gSaveBlock1Ptr->bag.berries));
+
+    ASSUME(GetItemPocket(ITEM_CHERI_BERRY) == POCKET_BERRIES);
+    ASSUME(GetItemPocket(ITEM_ORAN_BERRY) == POCKET_BERRIES);
+    ASSUME(GetItemPocket(ITEM_SITRUS_BERRY) == POCKET_BERRIES);
+
+    RUN_OVERWORLD_SCRIPT(
+        additem ITEM_CHERI_BERRY;
+        additem ITEM_ORAN_BERRY;
+        additem ITEM_SITRUS_BERRY;
+    );
+
+    // Simulate tossing the whole Oran stack, which leaves an empty slot
+    // between two used slots
+    RemoveBagItemFromSlot(pocket, 1, GetBagItemQuantity(POCKET_BERRIES, 1));
+    EXPECT_EQ(pocket->itemSlots[1].itemId, ITEM_NONE);
+
+    SortItemsInBag(pocket, SORT_BY_INDEX);
+
+    EXPECT_EQ(pocket->itemSlots[0].itemId, ITEM_CHERI_BERRY);
+    EXPECT_EQ(pocket->itemSlots[1].itemId, ITEM_SITRUS_BERRY);
+    EXPECT_EQ(pocket->itemSlots[2].itemId, ITEM_NONE);
+}
+
 TEST("Items are correctly sorted and compacted in the bag")
 {
     struct BagPocket *pocket = &gBagPockets[POCKET_ITEMS];

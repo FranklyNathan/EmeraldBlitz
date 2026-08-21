@@ -531,6 +531,20 @@ static const struct WindowTemplate sDoWhatWithMonMsgWindowTemplate =
     .baseBlock = 0x279,
 };
 
+// Same geometry as sDefaultPartyMsgWindowTemplate; used for short
+// confirmation notices ("Items Cleared", "Received the X.", etc.). Never open
+// alongside the other bottom-left prompt windows.
+static const struct WindowTemplate sPartyMenuNoticeWindowTemplate =
+{
+    .bg = 2,
+    .tilemapLeft = 1,
+    .tilemapTop = 17,
+    .width = 21,
+    .height = 2,
+    .paletteNum = 15,
+    .baseBlock = 0x279,
+};
+
 static const struct WindowTemplate sDoWhatWithItemMsgWindowTemplate =
 {
     .bg = 2,
@@ -1037,15 +1051,8 @@ static const struct SpritePalette sSpritePalette_MenuPokeball =
     gPartyMenuPokeball_Pal, TAG_POKEBALL
 };
 
-static const struct SpritePalette sSpritePalette_MenuPokeballEvo =
-{
-    gPartyMenuPokeballEvo_Pal, TAG_POKEBALL_EVO
-};
-
-static const struct SpritePalette sSpritePalette_MenuPokeballSwitch =
-{
-    gPartyMenuPokeballSwitch_Pal, TAG_POKEBALL_SWITCH
-};
+// The evo/switch ball variants use identical palette data to the base ball,
+// so they share its palette tag instead of wasting object palette slots.
 
 // Used for the Poké Ball sprite on each party slot / Cancel button
 static const struct SpriteTemplate sSpriteTemplate_MenuPokeball =
@@ -1062,7 +1069,7 @@ static const struct SpriteTemplate sSpriteTemplate_MenuPokeball =
 static const struct SpriteTemplate sSpriteTemplate_MenuPokeballEvo =
 {
     .tileTag = TAG_POKEBALL,
-    .paletteTag = TAG_POKEBALL_EVO,
+    .paletteTag = TAG_POKEBALL,
     .oam = &sOamData_MenuPokeball,
     .anims = sSpriteAnimTable_MenuPokeball,
     .images = NULL,

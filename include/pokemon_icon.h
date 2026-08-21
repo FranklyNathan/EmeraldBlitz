@@ -25,6 +25,7 @@ void SpriteCB_MonIcon(struct Sprite *sprite);
 void SetPartyHPBarSprite(struct Sprite *sprite, u8 animNum);
 void MakeMonIconSpriteFainted(struct Sprite *sprite);
 void FreeMonIconSpriteFaintedPalette(struct Sprite *sprite);
+void FreeTransientMonIconPalettes(void);
 u8 GetMonIconPaletteIndexFromSpecies(u16 species);
 void SafeFreeMonIconPalette(u16 species);
 

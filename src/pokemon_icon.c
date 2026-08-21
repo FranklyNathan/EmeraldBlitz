@@ -457,3 +457,35 @@ void FreeMonIconSpriteFaintedPalette(struct Sprite *sprite)
         sprite->data[7] = 0;
     }
 }
+
+// Frees every loaded fainted-icon palette (POKE_ICON_BASE_PAL_TAG+200+n) and
+// points affected icons back at their normal palettes. These palettes are
+// recreated as needed the next time a mon faints, so they can be evicted when
+// object palette slots are scarce.
+void FreeTransientMonIconPalettes(void)
+{
+    u8 i;
+
+    for (i = 0; i < 6; i++)
+    {
+        if (IndexOfSpritePaletteTag(POKE_ICON_BASE_PAL_TAG + 200 + i) != 0xFF)
+        {
+            sFaintedPaletteRefCount[i] = 0;
+            FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 200 + i);
+        }
+    }
+
+    for (i = 0; i < MAX_SPRITES; i++)
+    {
+        struct Sprite *sprite = &gSprites[i];
+        u16 tag = sprite->data[7];
+
+        if (tag >= POKE_ICON_BASE_PAL_TAG + 200 && tag < POKE_ICON_BASE_PAL_TAG + 206)
+        {
+            u8 origPalNum = IndexOfSpritePaletteTag(POKE_ICON_BASE_PAL_TAG + (tag - POKE_ICON_BASE_PAL_TAG - 200));
+            if (origPalNum != 0xFF)
+                sprite->oam.paletteNum = origPalNum;
+            sprite->data[7] = 0;
+        }
+    }
+}

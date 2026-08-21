@@ -130,6 +130,44 @@ u8 AddItemIconSprite(u16 tilesTag, u16 paletteTag, u16 itemId)
     }
 }
 
+// Like AddItemIconSprite, but expects a palette slot to have been reserved
+// for paletteTag beforehand (e.g. via AllocSpritePalette). The icon's palette
+// data is always written into that slot, even if the tag was already
+// registered. Returns MAX_SPRITES if no slot is registered for paletteTag.
+u8 AddItemIconSpriteWithReservedPal(u16 tilesTag, u16 paletteTag, u16 itemId)
+{
+    u8 palSlot = IndexOfSpritePaletteTag(paletteTag);
+    u8 spriteId;
+    struct SpriteSheet spriteSheet;
+    struct SpritePalette spritePalette;
+    struct SpriteTemplate *spriteTemplate;
+
+    if (palSlot == 0xFF || !AllocItemIconTemporaryBuffers())
+        return MAX_SPRITES;
+
+    DecompressDataWithHeaderWram(GetItemIconPic(itemId), gItemIconDecompressionBuffer);
+    CopyItemIconPicTo4x4Buffer(gItemIconDecompressionBuffer, gItemIcon4x4Buffer);
+    spriteSheet.data = gItemIcon4x4Buffer;
+    spriteSheet.size = 0x200;
+    spriteSheet.tag = tilesTag;
+    LoadSpriteSheet(&spriteSheet);
+
+    spritePalette.data = GetItemIconPalette(itemId);
+    spritePalette.tag = paletteTag;
+    LoadSpritePaletteInSlot(&spritePalette, palSlot);
+
+    spriteTemplate = Alloc(sizeof(*spriteTemplate));
+    CpuCopy16(&gItemIconSpriteTemplate, spriteTemplate, sizeof(*spriteTemplate));
+    spriteTemplate->tileTag = tilesTag;
+    spriteTemplate->paletteTag = paletteTag;
+    spriteId = CreateSprite(spriteTemplate, 0, 0, 0);
+
+    FreeItemIconTemporaryBuffers();
+    Free(spriteTemplate);
+
+    return spriteId;
+}
+
 u8 AddCustomItemIconSprite(const struct SpriteTemplate *customSpriteTemplate, u16 tilesTag, u16 paletteTag, u16 itemId)
 {
     if (!AllocItemIconTemporaryBuffers())

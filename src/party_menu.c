@@ -99,7 +99,9 @@ extern void DisplayAbilityOption(u8 index, u16 ability);
 extern u8 GetPlayerAbilityChoice(void);
 
 static const u8 sText_Clear[] = _("CLEAR");
-static const u8 sText_ItemsTaken[] = _("Items were taken from the party.{PAUSE_UNTIL_PRESS}");
+static const u8 sText_ItemsCleared[] = _("Items Cleared");
+static const u8 sText_ReceivedTheItem[] = _("Received the {STR_VAR_2}.");
+static const u8 sText_SwapTheItems[] = _("Swap the items?");
 static const u8 sText_ItemsTakenBagFull[] = _("Items taken. The BAG is full.{PAUSE_UNTIL_PRESS}");
 static const u8 sText_BagFull[] = _("The BAG is full.{PAUSE_UNTIL_PRESS}");
 static const u8 sText_NoItemsHeld[] = _("No items to take.{PAUSE_UNTIL_PRESS}");
@@ -397,6 +399,26 @@ static s8 GetRightmostSelectablePcSlot(u8 row)
             return PARTY_PC_SLOT_START + 3 * row + col;
     }
     return -1;
+}
+
+// After toggling berry mode, the cursor may sit on a PC slot that has no
+// counterpart in the new display. Move it to the last selectable PC slot,
+// or to the first party member if none exist at all.
+static void ClampCursorAfterBerryToggle(void)
+{
+    s8 i;
+
+    if (!IsPcSlot(gPartyMenu.slotId) || IsPcSlotSelectable(gPartyMenu.slotId))
+        return;
+    for (i = PARTY_PC_SLOT_COUNT - 1; i >= 0; i--)
+    {
+        if (IsPcSlotSelectable(PARTY_PC_SLOT_START + i))
+        {
+            gPartyMenu.slotId = PARTY_PC_SLOT_START + i;
+            return;
+        }
+    }
+    gPartyMenu.slotId = 0;
 }
 
 static u32 GetPartyMenuBoxCount(void)
@@ -705,6 +727,12 @@ static void DestroyBerrySlotSprites(void);
 static void ToggleBerryMode(u8 taskId);
 static void Task_SlidePcBerriesTransition(u8 taskId);
 static void Task_HandleBerryGiveAnimation(u8 taskId);
+static void DisplayGaveBerriesNotice(u16 itemId, u32 quantity);
+static void Task_AfterBerryGiveNotice(u8 taskId);
+static void DisplayBerryNotice(const u8 *str);
+static void Task_BerrySwapYesNo(u8 taskId);
+static void Task_HandleBerrySwapYesNoInput(u8 taskId);
+static void Task_ReturnToBerryGiveTargetAfterText(u8 taskId);
 static void Task_UpdateHeldItemSpritesAndReturn(u8 taskId);
 bool32 SetUpFieldMove_Surf(void);
 bool32 SetUpFieldMove_Fly(void);
@@ -773,9 +801,37 @@ static void SpriteCB_BerryBob(struct Sprite *sprite)
         sprite->y2 = 0;
 }
 
+// Object palette RAM only has 16 slots and the party menu uses most of them,
+// so berry icons claim their slots up front. If slots run out, regenerable
+// fainted-icon palettes are evicted first.
+static void ReserveBerryPalettes(u8 count)
+{
+    u8 i;
+
+    for (i = 0; i < count; i++)
+    {
+        if (IndexOfSpritePaletteTag(TAG_PARTY_BERRY_ICON + i) == 0xFF
+            && AllocSpritePalette(TAG_PARTY_BERRY_ICON + i) == 0xFF)
+            break;
+    }
+
+    if (i != count)
+    {
+        FreeTransientMonIconPalettes();
+        for (i = 0; i < count; i++)
+        {
+            if (IndexOfSpritePaletteTag(TAG_PARTY_BERRY_ICON + i) == 0xFF)
+                AllocSpritePalette(TAG_PARTY_BERRY_ICON + i);
+        }
+    }
+}
+
 static void CreateBerrySlotSprites(void)
 {
     u8 i;
+
+    ReserveBerryPalettes(min(sBerryCount, PARTY_PC_SLOT_COUNT));
+
     for (i = 0; i < sBerryCount && i < PARTY_PC_SLOT_COUNT; i++)
     {
         u8 slot = PARTY_PC_SLOT_START + i;
@@ -785,11 +841,18 @@ static void CreateBerrySlotSprites(void)
         sPartyMenuBoxes[slot].pokeballSpriteId = CreateSprite(&sSpriteTemplate_MenuBasket, sPcSlotSpriteCoords[i][6], sPcSlotSpriteCoords[i][7], 8);
         gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.priority = 1;
 
-        sBerryItemSpriteIds[i] = AddItemIconSprite(tag, tag, sBerryItemIds[i]);
+        sBerryItemSpriteIds[i] = AddItemIconSpriteWithReservedPal(tag, tag, sBerryItemIds[i]);
+        if (sBerryItemSpriteIds[i] == MAX_SPRITES)
+        {
+            DestroySprite(&gSprites[sPartyMenuBoxes[slot].pokeballSpriteId]);
+            sPartyMenuBoxes[slot].pokeballSpriteId = SPRITE_NONE;
+            sBerryItemSpriteIds[i] = SPRITE_NONE;
+            continue;
+        }
         sprite = &gSprites[sBerryItemSpriteIds[i]];
         sprite->x = sPcSlotSpriteCoords[i][0] + 3;
         sprite->y = sPcSlotSpriteCoords[i][1] + 4;
-        sprite->oam.priority = 0;
+        sprite->oam.priority = 1;
         sprite->callback = SpriteCB_BerryBob;
     }
 }
@@ -822,154 +885,113 @@ static void DestroyBerrySlotSprites(void)
     }
 }
 
-#define BERRY_SLIDE_FRAMES 8
-#define BERRY_SLIDE_STEP   4
+// While in berry mode, re-scans the bag for berry types to display and
+// rebuilds the berry slots if the set of displayed berries changed (e.g. a
+// berry was taken from a party mon and is newly available).
+static void TryRefreshBerryDisplay(void)
+{
+    u8 i;
+    u8 prevCount = sBerryCount;
+    u16 prevIds[PARTY_PC_SLOT_COUNT];
 
+    if (!sBerryMode || sBerryTransitionActive)
+        return;
+
+    for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+        prevIds[i] = sBerryItemIds[i];
+
+    CollectPartyBerries();
+
+    for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+    {
+        if (i >= prevCount || i >= sBerryCount || sBerryItemIds[i] != prevIds[i])
+        {
+            DestroyBerrySlotSprites();
+            CreateBerrySlotSprites();
+            return;
+        }
+    }
+}
+
+#define BERRY_SLIDE_STEP   8
+#define BERRY_SLIDE_TRAVEL 160
+#define BERRY_SLIDE_STEPS  (BERRY_SLIDE_TRAVEL / BERRY_SLIDE_STEP)
+
+// Shifts every sprite of one PC-slot display (berries or box mons) by xOffset.
+static void SlidePcDisplaySprites(s16 xOffset, bool8 berryDisplay)
+{
+    u8 i;
+
+    for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
+    {
+        u8 slot = PARTY_PC_SLOT_START + i;
+        if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
+            gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].x2 = xOffset;
+        if (berryDisplay)
+        {
+            if (sBerryItemSpriteIds[i] != SPRITE_NONE)
+                gSprites[sBerryItemSpriteIds[i]].x2 = xOffset;
+        }
+        else if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
+        {
+            gSprites[sPartyMenuBoxes[slot].monSpriteId].x2 = xOffset;
+        }
+    }
+}
+
+// Slides the current bottom-left display offscreen to the left, swaps it for
+// the other display, then slides the new display in from the left, using the
+// same per-frame movement as the party menu's Switch animation.
 static void Task_SlidePcBerriesTransition(u8 taskId)
 {
-    u8 frame = gTasks[taskId].data[0];
-    u8 phase = gTasks[taskId].data[1];
-    bool8 entering = !gTasks[taskId].data[2];
-    u8 i;
-    s16 offset;
+    bool8 entering = !gTasks[taskId].data[2]; // 0 = entering berry mode, 1 = exiting
+    s16 *phase = &gTasks[taskId].data[0];
+    s16 *step = &gTasks[taskId].data[1];
 
-    if (phase == 0)
+    if (*phase == 0)
     {
-        offset = (frame + 1) * BERRY_SLIDE_STEP;
-        if (entering)
+        // Slide the old display out to the left
+        (*step)++;
+        SlidePcDisplaySprites(-((s16)*step * BERRY_SLIDE_STEP), entering ? FALSE : TRUE);
+        if (*step >= BERRY_SLIDE_STEPS)
         {
-            for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
-            {
-                u8 slot = PARTY_PC_SLOT_START + i;
-                if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
-                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] + offset;
-                if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
-                    gSprites[sPartyMenuBoxes[slot].monSpriteId].y = sPcSlotSpriteCoords[i][1] + offset;
-            }
-        }
-        else
-        {
-            for (i = 0; i < sBerryCount; i++)
-            {
-                u8 slot = PARTY_PC_SLOT_START + i;
-                if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
-                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] + offset;
-                if (sBerryItemSpriteIds[i] != SPRITE_NONE)
-                    gSprites[sBerryItemSpriteIds[i]].y = sPcSlotSpriteCoords[i][1] + 4 + offset;
-            }
-        }
-        if (frame >= BERRY_SLIDE_FRAMES - 1)
-        {
+            // Swap the display contents while nothing is visible
+            u8 i;
             if (entering)
             {
                 for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
                     DestroyPartyMenuBoxSprites(PARTY_PC_SLOT_START + i);
                 CreateBerrySlotSprites();
-                for (i = 0; i < sBerryCount; i++)
-                {
-                    gSprites[sBerryItemSpriteIds[i]].y = sPcSlotSpriteCoords[i][1] + 4 - (BERRY_SLIDE_FRAMES * BERRY_SLIDE_STEP);
-                    gSprites[sBerryItemSpriteIds[i]].invisible = TRUE;
-                    u8 slot = PARTY_PC_SLOT_START + i;
-                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] - (BERRY_SLIDE_FRAMES * BERRY_SLIDE_STEP);
-                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].invisible = TRUE;
-                }
             }
             else
             {
                 DestroyBerrySlotSprites();
                 for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
-                {
-                    u8 slot = PARTY_PC_SLOT_START + i;
-                    CreatePartyMonSprites(slot);
-                    if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
-                    {
-                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] - (BERRY_SLIDE_FRAMES * BERRY_SLIDE_STEP);
-                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].invisible = TRUE;
-                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.priority = 1;
-                    }
-                    if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
-                    {
-                        gSprites[sPartyMenuBoxes[slot].monSpriteId].y = sPcSlotSpriteCoords[i][1] - (BERRY_SLIDE_FRAMES * BERRY_SLIDE_STEP);
-                        gSprites[sPartyMenuBoxes[slot].monSpriteId].invisible = TRUE;
-                    }
-                }
+                    CreatePartyMonSprites(PARTY_PC_SLOT_START + i);
             }
-            gTasks[taskId].data[0] = 0;
-            gTasks[taskId].data[1] = 1;
-            return;
+            SlidePcDisplaySprites(-BERRY_SLIDE_TRAVEL, entering ? TRUE : FALSE);
+            *phase = 1;
+            *step = 0;
         }
     }
     else
     {
-        offset = (BERRY_SLIDE_FRAMES - 1 - frame) * BERRY_SLIDE_STEP;
-        if (entering)
+        // Slide the new display in from the left
+        s16 xOffset = -BERRY_SLIDE_TRAVEL + ((s16)*step * BERRY_SLIDE_STEP);
+        (*step)++;
+        SlidePcDisplaySprites(xOffset, entering ? TRUE : FALSE);
+        if (*step >= BERRY_SLIDE_STEPS)
         {
-            for (i = 0; i < sBerryCount; i++)
-            {
-                if (sBerryItemSpriteIds[i] != SPRITE_NONE)
-                {
-                    gSprites[sBerryItemSpriteIds[i]].y = sPcSlotSpriteCoords[i][1] + 4 - offset;
-                    gSprites[sBerryItemSpriteIds[i]].invisible = FALSE;
-                }
-                u8 slot = PARTY_PC_SLOT_START + i;
-                if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
-                {
-                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] - offset;
-                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].invisible = FALSE;
-                }
-            }
-        }
-        else
-        {
-            for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
-            {
-                u8 slot = PARTY_PC_SLOT_START + i;
-                if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
-                {
-                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7] - offset;
-                    gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].invisible = FALSE;
-                }
-                if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
-                {
-                    gSprites[sPartyMenuBoxes[slot].monSpriteId].y = sPcSlotSpriteCoords[i][1] - offset;
-                    gSprites[sPartyMenuBoxes[slot].monSpriteId].invisible = FALSE;
-                }
-            }
-        }
-        if (frame >= BERRY_SLIDE_FRAMES - 1)
-        {
-            if (entering)
-            {
-                for (i = 0; i < sBerryCount; i++)
-                {
-                    if (sBerryItemSpriteIds[i] != SPRITE_NONE)
-                        gSprites[sBerryItemSpriteIds[i]].y = sPcSlotSpriteCoords[i][1] + 4;
-                    u8 slot = PARTY_PC_SLOT_START + i;
-                    if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
-                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7];
-                }
-            }
-            else
-            {
-                for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
-                {
-                    u8 slot = PARTY_PC_SLOT_START + i;
-                    if (sPartyMenuBoxes[slot].pokeballSpriteId != SPRITE_NONE)
-                        gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].y = sPcSlotSpriteCoords[i][7];
-                    if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
-                        gSprites[sPartyMenuBoxes[slot].monSpriteId].y = sPcSlotSpriteCoords[i][1];
-                }
-            }
+            SlidePcDisplaySprites(0, entering ? TRUE : FALSE);
             sBerryTransitionActive = FALSE;
             AnimatePartySlot(gPartyMenu.slotId, 1);
             DestroyTask(taskId);
-            return;
         }
     }
-    gTasks[taskId].data[0]++;
 }
 
-#undef BERRY_SLIDE_FRAMES
+#undef BERRY_SLIDE_STEPS
+#undef BERRY_SLIDE_TRAVEL
 #undef BERRY_SLIDE_STEP
 
 static void ToggleBerryMode(u8 taskId)
@@ -990,6 +1012,7 @@ static void ToggleBerryMode(u8 taskId)
     {
         sBerryMode = FALSE;
     }
+    ClampCursorAfterBerryToggle();
     PlaySE(SE_SELECT);
     sBerryTransitionActive = TRUE;
     u8 animTaskId = CreateTask(Task_SlidePcBerriesTransition, 4);
@@ -1896,23 +1919,6 @@ void AnimatePartySlot(u8 slot, u8 animNum)
         if (IsPcSlotSelectable(slot))
         {
             u16 pokeballTag = sBerryMode ? TAG_BASKET : TAG_POKEBALL;
-            if (gPartyMenu.action == PARTY_ACTION_SWITCH
-                && slot == gPartyMenu.slotId
-                && gPartyMenu.slotId2 != gPartyMenu.slotId)
-            {
-                pokeballTag = sBerryMode ? TAG_BASKET : TAG_POKEBALL_SWITCH;
-            }
-            else if (!sBerryMode)
-            {
-                u8 boxPos = GetPcSlotBoxPosition(slot);
-                if (boxPos != 0xFF)
-                {
-                    struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
-                    if (GetBoxMonData(boxMon, MON_DATA_HP) != 0
-                        && PartyMonCanEvolve(GetBoxMonData(boxMon, MON_DATA_SPECIES), GetBoxMonData(boxMon, MON_DATA_LEVEL)))
-                        pokeballTag = TAG_POKEBALL_EVO;
-                }
-            }
             gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.paletteNum = IndexOfSpritePaletteTag(pokeballTag);
             if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
                 AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum, TRUE);
@@ -2075,9 +2081,14 @@ void Task_HandleChooseMonInput(u8 taskId)
         {
             if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC)
             {
-                if (*slotPtr < PARTY_SIZE)
-                    sBerryGiveTarget = *slotPtr;
-                ToggleBerryMode(taskId);
+                // Berries are only accessible from the overworld pause menu,
+                // not when the party menu was opened for item use, daycare, etc.
+                if (gPartyMenu.exitCallback == CB2_ReturnToFieldWithOpenMenu)
+                {
+                    if (*slotPtr < PARTY_SIZE)
+                        sBerryGiveTarget = *slotPtr;
+                    ToggleBerryMode(taskId);
+                }
                 return;
             }
             if (gPartyMenu.action != PARTY_ACTION_USE_ITEM)
@@ -2099,21 +2110,9 @@ void Task_HandleChooseMonInput(u8 taskId)
             {
                 PlaySE(SE_SELECT);
                 sBerryGiving = FALSE;
-                u8 berryIndex = gPartyMenu.slotId - PARTY_PC_SLOT_START;
-                u16 count = CountTotalItemQuantityInBag(sBerryItemIds[berryIndex]);
-                u8 *str = CopyItemName(sBerryItemIds[berryIndex], gStringVar4);
-                *str++ = CHAR_SPACE;
-                *str++ = CHAR_LEFT_PAREN;
-                str = ConvertIntToDecimalStringN(str, count, STR_CONV_MODE_LEFT_ALIGN, 3);
-                *str++ = CHAR_RIGHT_PAREN;
-                *str = EOS;
-                u8 *windowPtr = &sPartyMenuInternal->windowId[1];
-                if (*windowPtr != WINDOW_NONE)
-                    PartyMenuRemoveWindow(windowPtr);
-                *windowPtr = AddWindow(&sDoWhatWithMonMsgWindowTemplate);
-                DrawStdFrameWithCustomTileAndPalette(*windowPtr, FALSE, 0x4F, 13);
-                AddTextPrinterParameterized(*windowPtr, FONT_NORMAL, gStringVar4, 0, 1, 0, 0);
-                ScheduleBgCopyTilemapToVram(2);
+                sBerryGiveFromSlot = -1;
+                gPartyMenu.action = PARTY_ACTION_CHOOSE_MON;
+                DisplayPartyMenuStdMessage(PARTY_MSG_CHOOSE_MON);
             }
             else if (sBerryMode && gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC)
             {
@@ -2162,7 +2161,7 @@ static void Task_HandleBerryGiveAnimation(u8 taskId)
     {
         ToggleBerryMode(taskId);
     }
-    gTasks[taskId].func = Task_HandleChooseMonInput;
+    gTasks[taskId].func = Task_AfterBerryGiveNotice;
 }
 
 static void HandleChooseMonSelection(u8 taskId, s8 *slotPtr)
@@ -2184,12 +2183,15 @@ static void HandleChooseMonSelection(u8 taskId, s8 *slotPtr)
             SetMonData(&gPlayerParty[*slotPtr], MON_DATA_HELD_ITEM, &berryItemId);
             UpdatePartyMonHeldItemSprite(&gPlayerParty[*slotPtr], &sPartyMenuBoxes[*slotPtr]);
             sBerryGiving = FALSE;
+            gPartyMenu.action = PARTY_ACTION_CHOOSE_MON;
+            DisplayGaveBerriesNotice(berryItemId, 1);
             CollectPartyBerries();
             if (CheckBagHasItem(berryItemId, 1))
             {
                 DestroyBerrySlotSprites();
                 if (sBerryCount > 0)
                     CreateBerrySlotSprites();
+                gTasks[taskId].func = Task_AfterBerryGiveNotice;
             }
             else if (sBerryGiveFromSlot >= 0 && sBerryGiveFromSlot < PARTY_PC_SLOT_COUNT
                 && sBerryItemSpriteIds[sBerryGiveFromSlot] != SPRITE_NONE)
@@ -2206,7 +2208,17 @@ static void HandleChooseMonSelection(u8 taskId, s8 *slotPtr)
                     CreateBerrySlotSprites();
                 else
                     ToggleBerryMode(taskId);
+                gTasks[taskId].func = Task_AfterBerryGiveNotice;
             }
+        }
+        else if (*slotPtr < PARTY_SIZE
+            && GetMonData(&gPlayerParty[*slotPtr], MON_DATA_HELD_ITEM) != ITEM_NONE
+            && !GetMonData(&gPlayerParty[*slotPtr], MON_DATA_IS_EGG))
+        {
+            PlaySE(SE_SELECT);
+            sBerryGiveTarget = *slotPtr;
+            DisplayBerryNotice(sText_SwapTheItems);
+            gTasks[taskId].func = Task_BerrySwapYesNo;
         }
         else
         {
@@ -2916,15 +2928,6 @@ static void DisplayGaveHeldItemMessage(struct Pokemon *mon, u16 item, bool8 keep
     GetMonNickname(mon, gStringVar1);
     CopyItemName(item, gStringVar2);
     StringExpandPlaceholders(gStringVar4, gText_PkmnWasGivenItem);
-    DisplayPartyMenuMessage(gStringVar4, keepOpen);
-    ScheduleBgCopyTilemapToVram(2);
-}
-
-static void DisplayTookHeldItemMessage(struct Pokemon *mon, u16 item, bool8 keepOpen)
-{
-    GetMonNickname(mon, gStringVar1);
-    CopyItemName(item, gStringVar2);
-    StringExpandPlaceholders(gStringVar4, gText_ReceivedItemFromPkmn);
     DisplayPartyMenuMessage(gStringVar4, keepOpen);
     ScheduleBgCopyTilemapToVram(2);
 }
@@ -4303,6 +4306,125 @@ static void Task_TryCreateSelectionWindow(u8 taskId)
     }
 }
 
+static void Task_ReturnToBerrySelectionAfterText(u8 taskId)
+{
+    if (IsPartyMenuTextPrinterActive() != TRUE)
+    {
+        ClearStdWindowAndFrameToTransparent(WIN_MSG, FALSE);
+        ClearWindowTilemap(WIN_MSG);
+        Task_TryCreateSelectionWindow(taskId);
+    }
+}
+
+// Prints a short notice into the small info window (the same box used for the
+// berry name/count display) instead of the full-width message box.
+static void DisplayBerryNotice(const u8 *str)
+{
+    u8 *windowPtr = &sPartyMenuInternal->windowId[1];
+
+    if (*windowPtr != WINDOW_NONE)
+        PartyMenuRemoveWindow(windowPtr);
+    *windowPtr = AddWindow(&sPartyMenuNoticeWindowTemplate);
+    DrawStdFrameWithCustomTileAndPalette(*windowPtr, FALSE, 0x4F, 13);
+    AddTextPrinterParameterized(*windowPtr, FONT_NORMAL, str, 0, 1, 0, 0);
+    ScheduleBgCopyTilemapToVram(2);
+}
+
+static void Task_ReturnToBerrySelectionOnDismiss(u8 taskId)
+{
+    if (JOY_NEW(A_BUTTON | B_BUTTON))
+    {
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+        Task_TryCreateSelectionWindow(taskId);
+    }
+}
+
+// Prints "Gave X Berry"/"Gave X Berries" into the small info window after a
+// successful give, pluralizing the berry name based on how many were given.
+static void DisplayGaveBerriesNotice(u16 itemId, u32 quantity)
+{
+    u8 *str = StringCopy(gStringVar4, COMPOUND_STRING("Gave "));
+    CopyItemNameHandlePlural(itemId, str, quantity);
+    DisplayBerryNotice(gStringVar4);
+}
+
+static void Task_AfterBerryGiveNotice(u8 taskId)
+{
+    if (JOY_NEW(A_BUTTON | B_BUTTON))
+    {
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+        DisplayPartyMenuStdMessage(PARTY_MSG_CHOOSE_MON);
+        gTasks[taskId].func = Task_HandleChooseMonInput;
+    }
+}
+
+static void Task_BerrySwapYesNo(u8 taskId)
+{
+    PartyMenuDisplayYesNoMenu();
+    gTasks[taskId].func = Task_HandleBerrySwapYesNoInput;
+}
+
+static void Task_HandleBerrySwapYesNoInput(u8 taskId)
+{
+    switch (Menu_ProcessInputNoWrapClearOnChoose())
+    {
+    case 0: // Yes - swap items
+    {
+        struct Pokemon *mon = &gPlayerParty[sBerryGiveTarget];
+        u16 heldItem = GetMonData(mon, MON_DATA_HELD_ITEM);
+        u16 berryItemId = gPartyMenu.bagItem;
+
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+        RemoveBagItem(berryItemId, 1);
+        // No room to return held item to bag - undo
+        if (AddBagItem(heldItem, 1) == FALSE)
+        {
+            AddBagItem(berryItemId, 1);
+            BufferBagFullCantTakeItemMessage(heldItem);
+            DisplayPartyMenuMessage(gStringVar4, TRUE);
+            ScheduleBgCopyTilemapToVram(2);
+            gTasks[taskId].func = Task_ReturnToBerryGiveTargetAfterText;
+            break;
+        }
+        SetMonData(mon, MON_DATA_HELD_ITEM, &berryItemId);
+        TryItemHoldFormChange(mon, sBerryGiveTarget);
+        UpdatePartyMonHeldItemSprite(mon, &sPartyMenuBoxes[sBerryGiveTarget]);
+        sBerryGiving = FALSE;
+        sBerryGiveFromSlot = -1;
+        sBerryGiveTarget = -1;
+        gPartyMenu.action = PARTY_ACTION_CHOOSE_MON;
+        CollectPartyBerries();
+        DestroyBerrySlotSprites();
+        if (sBerryCount > 0)
+            CreateBerrySlotSprites();
+        else
+            ToggleBerryMode(taskId);
+        DisplayGaveBerriesNotice(berryItemId, 1);
+        gTasks[taskId].func = Task_AfterBerryGiveNotice;
+        break;
+    }
+    case MENU_B_PRESSED:
+        PlaySE(SE_SELECT);
+        // fallthrough
+    case 1: // No
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+        DisplayPartyMenuStdMessage(PARTY_MSG_GIVE_TO_WHICH_MON);
+        gTasks[taskId].func = Task_HandleChooseMonInput;
+        break;
+    }
+}
+
+static void Task_ReturnToBerryGiveTargetAfterText(u8 taskId)
+{
+    if (IsPartyMenuTextPrinterActive() != TRUE)
+    {
+        ClearStdWindowAndFrameToTransparent(WIN_MSG, FALSE);
+        ClearWindowTilemap(WIN_MSG);
+        DisplayPartyMenuStdMessage(PARTY_MSG_GIVE_TO_WHICH_MON);
+        gTasks[taskId].func = Task_HandleChooseMonInput;
+    }
+}
+
 static void Task_HandleSelectionMenuInput(u8 taskId)
 {
     if (!gPaletteFade.active && MenuHelpers_ShouldWaitForLinkRecv() != TRUE)
@@ -5068,35 +5190,61 @@ static void CursorCb_GiveBerry(u8 taskId)
 
 static void CursorCb_GiveAllBerries(u8 taskId)
 {
-    u8 partySlot;
+    u8 berryIndex = gPartyMenu.slotId - PARTY_PC_SLOT_START;
+    u16 berryItemId;
+    u8 monsToGive = 0;
     u8 i;
 
-    for (partySlot = 0; partySlot < PARTY_SIZE; partySlot++)
+    if (berryIndex >= sBerryCount)
+        return;
+
+    berryItemId = sBerryItemIds[berryIndex];
+    for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gPlayerParty[partySlot], MON_DATA_HELD_ITEM) != ITEM_NONE)
-            continue;
-        if (GetMonData(&gPlayerParty[partySlot], MON_DATA_IS_EGG))
-            continue;
-        for (i = 0; i < sBerryCount; i++)
+        if (GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE
+            && !GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
+            monsToGive++;
+    }
+
+    PlaySE(SE_SELECT);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+
+    if (monsToGive == 0)
+    {
+        DisplayPartyMenuMessage(gText_NoPokemonToGiveItem, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = Task_ReturnToBerrySelectionAfterText;
+        return;
+    }
+
+    if (!CheckBagHasItem(berryItemId, monsToGive))
+    {
+        DisplayBerryNotice(gText_NotEnoughBerries);
+        gTasks[taskId].func = Task_ReturnToBerrySelectionOnDismiss;
+        return;
+    }
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE
+            && !GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
         {
-            u16 berryItemId = sBerryItemIds[i];
-            if (CheckBagHasItem(berryItemId, 1))
-            {
-                PlaySE(SE_SELECT);
-                RemoveBagItem(berryItemId, 1);
-                SetMonData(&gPlayerParty[partySlot], MON_DATA_HELD_ITEM, &berryItemId);
-                UpdatePartyMonHeldItemSprite(&gPlayerParty[partySlot], &sPartyMenuBoxes[partySlot]);
-                break;
-            }
+            SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &berryItemId);
+            UpdatePartyMonHeldItemSprite(&gPlayerParty[i], &sPartyMenuBoxes[i]);
         }
     }
-    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+    RemoveBagItem(berryItemId, monsToGive);
+
     CollectPartyBerries();
     DestroyBerrySlotSprites();
     if (sBerryCount > 0)
         CreateBerrySlotSprites();
     else
         ToggleBerryMode(taskId);
+    gPartyMenu.action = PARTY_ACTION_CHOOSE_MON;
+    DisplayGaveBerriesNotice(berryItemId, monsToGive);
+    gTasks[taskId].func = Task_AfterBerryGiveNotice;
 }
 
 #undef tSlot1Left
@@ -5312,6 +5460,7 @@ static void Task_UpdateHeldItemSprite(u8 taskId)
     if (IsPartyMenuTextPrinterActive() != TRUE)
     {
         UpdatePartyMonHeldItemSprite(mon, &sPartyMenuBoxes[gPartyMenu.slotId]);
+        TryRefreshBerryDisplay();
         if (gPartyMenu.menuType == PARTY_MENU_TYPE_STORE_PYRAMID_HELD_ITEMS)
         {
             if (GetMonData(mon, MON_DATA_HELD_ITEM) != ITEM_NONE)
@@ -5321,6 +5470,24 @@ static void Task_UpdateHeldItemSprite(u8 taskId)
         }
         Task_ReturnToChooseMonAfterText(taskId);
     }
+}
+
+// Like Task_UpdateHeldItemSprite, but ends by waiting for the player to
+// dismiss a small-box notice instead of a full-width message.
+static void Task_UpdateTakenItemSpriteAndAwaitNoticeDismiss(u8 taskId)
+{
+    struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
+
+    UpdatePartyMonHeldItemSprite(mon, &sPartyMenuBoxes[gPartyMenu.slotId]);
+    TryRefreshBerryDisplay();
+    if (gPartyMenu.menuType == PARTY_MENU_TYPE_STORE_PYRAMID_HELD_ITEMS)
+    {
+        if (GetMonData(mon, MON_DATA_HELD_ITEM) != ITEM_NONE)
+            DisplayPartyPokemonDescriptionText(PARTYBOX_DESC_HAVE, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
+        else
+            DisplayPartyPokemonDescriptionText(PARTYBOX_DESC_DONT_HAVE, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
+    }
+    gTasks[taskId].func = Task_AfterBerryGiveNotice;
 }
 
 static void CursorCb_TakeItem(u8 taskId)
@@ -5337,17 +5504,22 @@ static void CursorCb_TakeItem(u8 taskId)
         GetMonNickname(mon, gStringVar1);
         StringExpandPlaceholders(gStringVar4, gText_PkmnNotHolding);
         DisplayPartyMenuMessage(gStringVar4, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = Task_UpdateHeldItemSprite;
         break;
     case 1: // No room to take item
         BufferBagFullCantTakeItemMessage(item);
         DisplayPartyMenuMessage(gStringVar4, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = Task_UpdateHeldItemSprite;
         break;
     default: // Took item
-        DisplayTookHeldItemMessage(mon, item, TRUE);
+        CopyItemName(item, gStringVar2);
+        StringExpandPlaceholders(gStringVar4, sText_ReceivedTheItem);
+        DisplayBerryNotice(gStringVar4);
+        gTasks[taskId].func = Task_UpdateTakenItemSpriteAndAwaitNoticeDismiss;
         break;
     }
-    ScheduleBgCopyTilemapToVram(2);
-    gTasks[taskId].func = Task_UpdateHeldItemSprite;
 }
 
 static void CursorCb_Toss(u8 taskId)
@@ -6355,8 +6527,6 @@ static void LoadPartyMenuPokeballGfx(void)
     LoadCompressedSpriteSheet(&sSpriteSheet_MenuPokeball);
     LoadCompressedSpriteSheet(&sSpriteSheet_MenuPokeballSmall);
     LoadSpritePalette(&sSpritePalette_MenuPokeball);
-    LoadSpritePalette(&sSpritePalette_MenuPokeballEvo);
-    LoadSpritePalette(&sSpritePalette_MenuPokeballSwitch);
     LoadCompressedSpriteSheet(&sSpriteSheet_MenuBasket);
     LoadSpritePalette(&sSpritePalette_MenuBasket);
 }
@@ -10758,8 +10928,22 @@ static void Task_UpdateHeldItemSpritesAndReturn(u8 taskId)
         {
             UpdatePartyMonHeldItemSprite(&gPlayerParty[i], &sPartyMenuBoxes[i]);
         }
+        TryRefreshBerryDisplay();
         Task_ReturnToChooseMonAfterText(taskId);
     }
+}
+
+// Like the above, but ends by waiting for the player to dismiss a small-box
+// notice instead of a full-width message.
+static void Task_UpdateHeldItemSpritesAndAwaitNoticeDismiss(u8 taskId)
+{
+    u8 i;
+    for (i = 0; i < gPlayerPartyCount; i++)
+    {
+        UpdatePartyMonHeldItemSprite(&gPlayerParty[i], &sPartyMenuBoxes[i]);
+    }
+    TryRefreshBerryDisplay();
+    gTasks[taskId].func = Task_AfterBerryGiveNotice;
 }
 
 static void CursorCb_Clear(u8 taskId)
@@ -10797,21 +10981,29 @@ static void CursorCb_Clear(u8 taskId)
     {
         PlaySE(SE_USE_ITEM);
         if (bagFull)
+        {
             DisplayPartyMenuMessage(sText_ItemsTakenBagFull, TRUE);
+            ScheduleBgCopyTilemapToVram(2);
+            gTasks[taskId].func = Task_UpdateHeldItemSpritesAndReturn;
+        }
         else
-            DisplayPartyMenuMessage(sText_ItemsTaken, TRUE);
+        {
+            DisplayBerryNotice(sText_ItemsCleared);
+            gTasks[taskId].func = Task_UpdateHeldItemSpritesAndAwaitNoticeDismiss;
+        }
     }
     else if (bagFull)
     {
         DisplayPartyMenuMessage(sText_BagFull, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = Task_UpdateHeldItemSpritesAndReturn;
     }
     else
     {
         DisplayPartyMenuMessage(sText_NoItemsHeld, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = Task_UpdateHeldItemSpritesAndReturn;
     }
-    
-    ScheduleBgCopyTilemapToVram(2);
-    gTasks[taskId].func = Task_UpdateHeldItemSpritesAndReturn;
 }
 
 void ItemUseCB_BottleCap(u8 taskId, TaskFunc task)
