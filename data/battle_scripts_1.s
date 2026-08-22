@@ -5318,6 +5318,7 @@ BattleScript_SeedSowerActivates::
 	setseeded
 	printfromtable gLeechSeedStringIds
 	waitmessage B_WAIT_TIME_LONG
+	swapattackerwithtarget @ restore the battlers, just in case
 	return
 
 BattleScript_BerserkActivates::
@@ -5475,6 +5476,7 @@ BattleScript_DoFutureAttackHit::
 BattleScript_DoFutureAttackResult:
 	resultmessage
 	waitmessage B_WAIT_TIME_LONG
+	tryactivateitem BS_TARGET, ACTIVATION_ON_HP_THRESHOLD
 	tryfaintmon BS_TARGET
 	checkteamslost BattleScript_FutureAttackEnd
 BattleScript_FutureAttackEnd::

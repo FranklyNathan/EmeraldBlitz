@@ -16,6 +16,27 @@ SINGLE_BATTLE_TEST("Seed Sower sets up Grassy Terrain when hit by an attack")
     }
 }
 
+SINGLE_BATTLE_TEST("Seed Sower does not prevent Knock Off from removing the target's item")
+{
+    GIVEN {
+        ASSUME(GetMoveEffect(MOVE_KNOCK_OFF) == EFFECT_KNOCK_OFF);
+        PLAYER(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_ARBOLIVA) { Ability(ABILITY_SEED_SOWER); Item(ITEM_LEFTOVERS); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_KNOCK_OFF); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_KNOCK_OFF, player);
+        HP_BAR(opponent);
+        ABILITY_POPUP(opponent, ABILITY_SEED_SOWER);
+        MESSAGE("Wobbuffet was seeded!");
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_ITEM_KNOCKOFF);
+        MESSAGE("Wobbuffet knocked off the opposing Arboliva's Leftovers!");
+    } THEN {
+        EXPECT(player->volatiles.leechSeed);
+        EXPECT(opponent->item == ITEM_NONE);
+    }
+}
+
 #define ABILITY_PARAM(n)(abilities[n] = (k == n) ? ABILITY_SEED_SOWER : ABILITY_HARVEST)
 #define MOVE_HIT(target, position)                      \
 {                                                       \

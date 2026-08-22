@@ -30,6 +30,8 @@ static bool32 ShouldFlipTypeIcon(bool32, u32, enum Type);
 static void SpriteCB_TypeIcon(struct Sprite*);
 static void DestroyTypeIcon(struct Sprite*);
 static void FreeAllTypeIconResources(void);
+static bool32 SpriteUsesTypeIconTags(struct Sprite*);
+static void DestroyExistingTypeIcons(void);
 static bool32 ShouldHideTypeIcon(u32);
 static s32 GetTypeIconHideMovement(bool32, u32);
 static s32 GetTypeIconSlideMovement(bool32, u32, s32);
@@ -248,6 +250,7 @@ void LoadTypeIcons(u32 battler)
         return;
 
     LoadTypeSpritesAndPalettes();
+    DestroyExistingTypeIcons();
 
     for (position = 0; position < gBattlersCount; ++position)
         LoadTypeIconsPerBattler(battler, position);
@@ -455,26 +458,55 @@ static const u32 typeIconTags[] =
 
 static void DestroyTypeIcon(struct Sprite* sprite)
 {
-    u32 spriteId, tag;
-
-    DestroySpriteAndFreeResources(sprite);
+    u32 spriteId;
+    bool32 otherIconsExist = FALSE;
 
     for (spriteId = 0; spriteId < MAX_SPRITES; ++spriteId)
     {
-        if (!gSprites[spriteId].inUse)
+        if (!gSprites[spriteId].inUse || &gSprites[spriteId] == sprite)
             continue;
 
-        for (tag = 0; tag < 2; tag++)
-        {
-            if (gSprites[spriteId].template->paletteTag == typeIconTags[tag])
-                return;
-
-            if (gSprites[spriteId].template->tileTag == typeIconTags[tag])
-                return;
-        }
+        if (SpriteUsesTypeIconTags(&gSprites[spriteId]))
+            otherIconsExist = TRUE;
     }
 
-    FreeAllTypeIconResources();
+    FreeSpriteOamMatrix(sprite);
+    DestroySprite(sprite);
+
+    if (!otherIconsExist)
+        FreeAllTypeIconResources();
+}
+
+static bool32 SpriteUsesTypeIconTags(struct Sprite* sprite)
+{
+    u32 tag;
+
+    for (tag = 0; tag < ARRAY_COUNT(typeIconTags); tag++)
+    {
+        if (sprite->template->paletteTag == typeIconTags[tag])
+            return TRUE;
+
+        if (sprite->template->tileTag == typeIconTags[tag])
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+static void DestroyExistingTypeIcons(void)
+{
+    u32 spriteId;
+
+    for (spriteId = 0; spriteId < MAX_SPRITES; ++spriteId)
+    {
+        struct Sprite *sprite = &gSprites[spriteId];
+
+        if (!sprite->inUse || !SpriteUsesTypeIconTags(sprite))
+            continue;
+
+        FreeSpriteOamMatrix(sprite);
+        DestroySprite(sprite);
+    }
 }
 
 static void FreeAllTypeIconResources(void)
