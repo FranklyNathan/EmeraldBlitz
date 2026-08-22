@@ -283,6 +283,7 @@ static IWRAM_DATA s8 sBerryGiveTarget = 0;
 static IWRAM_DATA s8 sBerryGiveFromSlot = 0;
 static IWRAM_DATA bool8 sBerryGiving = FALSE;
 static IWRAM_DATA bool8 sPendingSwitchAfterBerryExit = FALSE;
+static IWRAM_DATA bool8 sPendingDepositAfterBerryExit = FALSE;
 
 // EWRAM vars
 static EWRAM_DATA struct PartyMenuInternal *sPartyMenuInternal = NULL;
@@ -962,6 +963,17 @@ static void Task_SlidePcBerriesTransition(u8 taskId)
                 for (i = 0; i < PARTY_PC_SLOT_COUNT; i++)
                     DestroyPartyMenuBoxSprites(PARTY_PC_SLOT_START + i);
                 CreateBerrySlotSprites();
+                // ReserveBerryPalettes may have called FreeTransientMonIconPalettes,
+                // which resets all sprites with fainted palettes back to normal.
+                // Re-apply fainted status to party mon sprites (0..5) that were affected.
+                for (i = 0; i < PARTY_SIZE; i++)
+                {
+                    if (sPartyMenuBoxes[i].monSpriteId != SPRITE_NONE
+                        && GetMonData(&GetPartyMenuParty()[i], MON_DATA_HP) == 0)
+                    {
+                        MakeMonIconSpriteFainted(&gSprites[sPartyMenuBoxes[i].monSpriteId]);
+                    }
+                }
             }
             else
             {
@@ -1378,6 +1390,7 @@ static void ResetPartyMenu(void)
     sBerryGiveTarget = 0;
     sBerryGiveFromSlot = -1;
     sPendingSwitchAfterBerryExit = FALSE;
+    sPendingDepositAfterBerryExit = FALSE;
     sBerryCount = 0;
     for (u8 i = 0; i < PARTY_PC_SLOT_COUNT; i++)
         sBerryItemSpriteIds[i] = SPRITE_NONE;
@@ -2072,31 +2085,39 @@ void Task_HandleChooseMonInput(u8 taskId)
             return;
         }
 
+        if (sPendingDepositAfterBerryExit)
+        {
+            sPendingDepositAfterBerryExit = FALSE;
+            CursorCb_Deposit(taskId);
+            return;
+        }
+
         if (sBerryGiving)
         {
-            // Don't allow L button to toggle berry mode while selecting a target
+            // Don't allow Select or L shortcuts while selecting a berry target
         }
-        else if (JOY_NEW(L_BUTTON) && (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
+        else if (JOY_NEW(SELECT_BUTTON) && (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
             || gPartyMenu.menuType == PARTY_MENU_TYPE_IN_BATTLE))
         {
-            if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC)
-            {
-                // Berries are only accessible from the overworld pause menu,
-                // not when the party menu was opened for item use, daycare, etc.
-                if (gPartyMenu.exitCallback == CB2_ReturnToFieldWithOpenMenu)
-                {
-                    if (*slotPtr < PARTY_SIZE)
-                        sBerryGiveTarget = *slotPtr;
-                    ToggleBerryMode(taskId);
-                }
-                return;
-            }
             if (gPartyMenu.action != PARTY_ACTION_USE_ITEM)
             {
                 gSpecialVar_ItemId = ITEM_RARE_CANDY;
                 gItemUseCB = ItemUseCB_RareCandy;
             }
             HandleChooseMonSelect(taskId, slotPtr);
+            return;
+        }
+        else if (JOY_NEW(L_BUTTON) && gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
+            && gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC)
+        {
+            // Berries are only accessible from the overworld pause menu,
+            // not when the party menu was opened for item use, daycare, etc.
+            if (gPartyMenu.exitCallback == CB2_ReturnToFieldWithOpenMenu)
+            {
+                if (*slotPtr < PARTY_SIZE)
+                    sBerryGiveTarget = *slotPtr;
+                ToggleBerryMode(taskId);
+            }
             return;
         }
 
@@ -5134,6 +5155,17 @@ static void CursorCb_Withdraw(u8 taskId)
 
 static void CursorCb_Deposit(u8 taskId)
 {
+    if (sBerryMode)
+    {
+        PlaySE(SE_SELECT);
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+        sPendingDepositAfterBerryExit = TRUE;
+        gTasks[taskId].func = Task_HandleChooseMonInput;
+        ToggleBerryMode(taskId);
+        return;
+    }
+
     u8 boxPos = GetFirstEmptyBoxPosition(PARTY_PC_BOX_ID);
     u8 partySlot = gPartyMenu.slotId;
     u8 pcSlotIndex;
@@ -5201,7 +5233,9 @@ static void CursorCb_GiveAllBerries(u8 taskId)
     berryItemId = sBerryItemIds[berryIndex];
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE
+            && GetMonData(&gPlayerParty[i], MON_DATA_HP) != 0
+            && GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE
             && !GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
             monsToGive++;
     }
@@ -5227,7 +5261,9 @@ static void CursorCb_GiveAllBerries(u8 taskId)
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE
+            && GetMonData(&gPlayerParty[i], MON_DATA_HP) != 0
+            && GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE
             && !GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
         {
             SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &berryItemId);
@@ -5239,7 +5275,11 @@ static void CursorCb_GiveAllBerries(u8 taskId)
     CollectPartyBerries();
     DestroyBerrySlotSprites();
     if (sBerryCount > 0)
+    {
         CreateBerrySlotSprites();
+        if (gPartyMenu.slotId >= PARTY_PC_SLOT_START && gPartyMenu.slotId < PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT)
+            AnimatePartySlot(gPartyMenu.slotId, 1);
+    }
     else
         ToggleBerryMode(taskId);
     gPartyMenu.action = PARTY_ACTION_CHOOSE_MON;

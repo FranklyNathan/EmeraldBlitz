@@ -2161,7 +2161,9 @@ static void ItemMenu_GiveAll(u8 taskId)
     // Count Pokémon that can hold an item
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE && GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE)
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE
+            && GetMonData(&gPlayerParty[i], MON_DATA_HP) != 0
+            && GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE)
             monsToGive++;
     }
 
@@ -2184,7 +2186,9 @@ static void ItemMenu_GiveAll(u8 taskId)
     // Give berries
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE && GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE)
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE
+            && GetMonData(&gPlayerParty[i], MON_DATA_HP) != 0
+            && GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == ITEM_NONE)
             SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &itemId);
     }
 

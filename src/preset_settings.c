@@ -37,6 +37,13 @@ const struct PlayerNamePreset gPlayerNamePresets[] =
         .playerPalette = PRESET_PALETTE_BLUE,
     },
     {
+        .name = _("Alboy$"),
+        .shuppetGuides = OPTIONS_SHUPPET_GUIDES_OFF,
+        .flygonDust = 0, // Off
+        .windowFrameType = PRESET_FRAME(11),
+        .playerPalette = PRESET_PALETTE_SILVER,
+    },
+    {
         .name = _("Kagami$"),
         .shuppetGuides = OPTIONS_SHUPPET_GUIDES_OFF,
         .flygonDust = 0, // Off

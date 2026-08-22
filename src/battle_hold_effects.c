@@ -1274,7 +1274,7 @@ enum ItemEffect ItemBattleEffects(u32 itemBattler, u32 battler, enum HoldEffect 
             GetBattlerPartyState(itemBattler)->ateBerry = TRUE;
             if (IsOnPlayerSide(itemBattler) && GetBattlerAbilityIgnoreMoldBreaker(itemBattler) == ABILITY_GLUTTONY && CheckBagHasItem(ITEM_ORAN_BERRY, 1) && gBattleMons[itemBattler].hp < gBattleMons[itemBattler].maxHP)
             {
-                gBattleCommunication[1] = Random() % 3 + 3; // Initialized to 3, 4, or 5
+                gBattleCommunication[1] = Random() % 2 + 2; // Initialized to 2 or 3
                 BattleScriptPush(BattleScript_GluttonyOranBerry);
             }
         }
