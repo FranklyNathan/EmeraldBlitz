@@ -324,31 +324,59 @@ u32 GetIndicatorPalTag(u32 battler)
 
 #define INDICATOR_SIZE (8 * 16 / 2)
 
+static const struct SpritePalette *GetIndicatorSpritePalette(u16 palTag)
+{
+    switch (palTag)
+    {
+    case TAG_MEGA_INDICATOR_PAL:
+        return &sSpritePalette_MegaIndicator;
+    case TAG_MISC_INDICATOR_PAL:
+        return &sSpritePalette_MiscIndicator;
+    case TAG_TERA_INDICATOR_PAL:
+        return &sSpritePalette_TeraIndicator;
+    default:
+        return NULL;
+    }
+}
+
 void UpdateIndicatorVisibilityAndType(u32 healthboxId, bool32 invisible)
 {
     u32 battler = gSprites[healthboxId].hMain_Battler;
     u32 palTag = GetIndicatorPalTag(battler);
-    struct Sprite *sprite = &gSprites[GetIndicatorSpriteId(healthboxId)];
+    struct Sprite *sprite;
 
     if (GetIndicatorSpriteId(healthboxId) == 0) // safari zone means the player doesn't have an indicator sprite id
         return;
 
-    if (palTag != TAG_NONE)
-    {
-        sprite->oam.paletteNum = IndexOfSpritePaletteTag(palTag);
-        sprite->invisible = invisible;
+    sprite = &gSprites[GetIndicatorSpriteId(healthboxId)];
 
-        u32 *dst = (u32 *)(OBJ_VRAM0 + TILE_SIZE_4BPP * GetSpriteTileStartByTag(BATTLER_INDICATOR_TAG + battler));
-
-        const u32 *src = GetIndicatorSpriteSrc(battler);
-
-        for (u32 i = 0; i < INDICATOR_SIZE / 4; i++)
-            dst[i] = src[i];
-    }
-    else // in case of error
+    if (palTag == TAG_NONE) // in case of error
     {
         sprite->invisible = TRUE;
+        return;
     }
+
+    u32 paletteNum = IndexOfSpritePaletteTag(palTag);
+
+    if (paletteNum == 0xFF && GetIndicatorSpritePalette(palTag) != NULL)
+        paletteNum = LoadSpritePalette(GetIndicatorSpritePalette(palTag));
+
+    u32 tileStart = GetSpriteTileStartByTag(BATTLER_INDICATOR_TAG + battler);
+    const u32 *src = GetIndicatorSpriteSrc(battler);
+
+    if (paletteNum == 0xFF || tileStart == 0xFFFF || src == NULL)
+    {
+        sprite->invisible = TRUE;
+        return;
+    }
+
+    sprite->oam.paletteNum = paletteNum;
+    sprite->invisible = invisible;
+
+    u32 *dst = (u32 *)(OBJ_VRAM0 + TILE_SIZE_4BPP * tileStart);
+
+    for (u32 i = 0; i < INDICATOR_SIZE / 4; i++)
+        dst[i] = src[i];
 }
 
 #undef INDICATOR_SIZE
