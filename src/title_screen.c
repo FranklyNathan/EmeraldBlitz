@@ -29,9 +29,12 @@ enum {
     TAG_LOGO_SHINE,
 };
 
-#define VERSION_BANNER_RIGHT_TILEOFFSET 64
-#define VERSION_BANNER_LEFT_X 98
-#define VERSION_BANNER_RIGHT_X 162
+// Tile offsets are in OAM tile units (32 bytes); each 64x64 8bpp sprite consumes 128 units.
+#define VERSION_BANNER_MIDDLE_TILEOFFSET 128
+#define VERSION_BANNER_RIGHT_TILEOFFSET 256
+#define VERSION_BANNER_LEFT_X 24
+#define VERSION_BANNER_MIDDLE_X 88
+#define VERSION_BANNER_RIGHT_X 152
 #define VERSION_BANNER_Y 2
 #define VERSION_BANNER_Y_GOAL 66
 #define START_BANNER_X 128
@@ -53,7 +56,7 @@ static void CB2_GoToCopyrightScreen(void);
 static void UpdateLegendaryMarkingColor(u8);
 
 static void SpriteCB_VersionBannerLeft(struct Sprite *sprite);
-static void SpriteCB_VersionBannerRight(struct Sprite *sprite);
+static void SpriteCB_VersionBannerSegment(struct Sprite *sprite);
 static void SpriteCB_PressStartCopyrightBanner(struct Sprite *sprite);
 static void SpriteCB_PokemonLogoShine(struct Sprite *sprite);
 
@@ -113,10 +116,27 @@ static const struct OamData sVersionBannerLeftOamData =
     .objMode = ST_OAM_OBJ_NORMAL,
     .mosaic = FALSE,
     .bpp = ST_OAM_8BPP,
-    .shape = SPRITE_SHAPE(64x32),
+    .shape = SPRITE_SHAPE(64x64),
     .x = 0,
     .matrixNum = 0,
-    .size = SPRITE_SIZE(64x32),
+    .size = SPRITE_SIZE(64x64),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const struct OamData sVersionBannerMiddleOamData =
+{
+    .y = DISPLAY_HEIGHT,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_8BPP,
+    .shape = SPRITE_SHAPE(64x64),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(64x64),
     .tileNum = 0,
     .priority = 0,
     .paletteNum = 0,
@@ -130,10 +150,10 @@ static const struct OamData sVersionBannerRightOamData =
     .objMode = ST_OAM_OBJ_NORMAL,
     .mosaic = FALSE,
     .bpp = ST_OAM_8BPP,
-    .shape = SPRITE_SHAPE(64x32),
+    .shape = SPRITE_SHAPE(64x64),
     .x = 0,
     .matrixNum = 0,
-    .size = SPRITE_SIZE(64x32),
+    .size = SPRITE_SIZE(64x64),
     .tileNum = 0,
     .priority = 0,
     .paletteNum = 0,
@@ -146,6 +166,12 @@ static const union AnimCmd sVersionBannerLeftAnimSequence[] =
     ANIMCMD_END,
 };
 
+static const union AnimCmd sVersionBannerMiddleAnimSequence[] =
+{
+    ANIMCMD_FRAME(VERSION_BANNER_MIDDLE_TILEOFFSET, 30),
+    ANIMCMD_END,
+};
+
 static const union AnimCmd sVersionBannerRightAnimSequence[] =
 {
     ANIMCMD_FRAME(VERSION_BANNER_RIGHT_TILEOFFSET, 30),
@@ -155,6 +181,11 @@ static const union AnimCmd sVersionBannerRightAnimSequence[] =
 static const union AnimCmd *const sVersionBannerLeftAnimTable[] =
 {
     sVersionBannerLeftAnimSequence,
+};
+
+static const union AnimCmd *const sVersionBannerMiddleAnimTable[] =
+{
+    sVersionBannerMiddleAnimSequence,
 };
 
 static const union AnimCmd *const sVersionBannerRightAnimTable[] =
@@ -173,6 +204,17 @@ static const struct SpriteTemplate sVersionBannerLeftSpriteTemplate =
     .callback = SpriteCB_VersionBannerLeft,
 };
 
+static const struct SpriteTemplate sVersionBannerMiddleSpriteTemplate =
+{
+    .tileTag = TAG_VERSION,
+    .paletteTag = TAG_VERSION,
+    .oam = &sVersionBannerMiddleOamData,
+    .anims = sVersionBannerMiddleAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_VersionBannerSegment,
+};
+
 static const struct SpriteTemplate sVersionBannerRightSpriteTemplate =
 {
     .tileTag = TAG_VERSION,
@@ -181,14 +223,14 @@ static const struct SpriteTemplate sVersionBannerRightSpriteTemplate =
     .anims = sVersionBannerRightAnimTable,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = SpriteCB_VersionBannerRight,
+    .callback = SpriteCB_VersionBannerSegment,
 };
 
 static const struct CompressedSpriteSheet sSpriteSheet_EmeraldVersion[] =
 {
     {
         .data = gTitleScreenEmeraldVersionGfx,
-        .size = 0x1000,
+        .size = 0x3000, // 3 * (64x64 px @ 8bpp)
         .tag = TAG_VERSION
     },
     {},
@@ -367,7 +409,7 @@ static const struct CompressedSpriteSheet sPokemonLogoShineSpriteSheet[] =
 #define tBg2Y       data[3]
 #define tBg1Y       data[4]
 
-// Sprite data for sVersionBannerLeftSpriteTemplate / sVersionBannerRightSpriteTemplate
+// Sprite data for sVersionBannerLeftSpriteTemplate / sVersionBannerMiddleSpriteTemplate / sVersionBannerRightSpriteTemplate
 #define sAlphaBlendIdx data[0]
 #define sParentTaskId  data[1]
 
@@ -388,7 +430,7 @@ static void SpriteCB_VersionBannerLeft(struct Sprite *sprite)
     }
 }
 
-static void SpriteCB_VersionBannerRight(struct Sprite *sprite)
+static void SpriteCB_VersionBannerSegment(struct Sprite *sprite)
 {
     if (gTasks[sprite->sParentTaskId].tSkipToNext)
     {
@@ -711,12 +753,16 @@ static void Task_TitleScreenPhase1(u8 taskId)
         SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
         SetGpuReg(REG_OFFSET_BLDY, 0);
 
-        // Create left side of version banner
+        // Create left third of version banner
         spriteId = CreateSprite(&sVersionBannerLeftSpriteTemplate, VERSION_BANNER_LEFT_X, VERSION_BANNER_Y, 0);
         gSprites[spriteId].sAlphaBlendIdx = ARRAY_COUNT(gTitleScreenAlphaBlend);
         gSprites[spriteId].sParentTaskId = taskId;
 
-        // Create right side of version banner
+        // Create middle third of version banner
+        spriteId = CreateSprite(&sVersionBannerMiddleSpriteTemplate, VERSION_BANNER_MIDDLE_X, VERSION_BANNER_Y, 0);
+        gSprites[spriteId].sParentTaskId = taskId;
+
+        // Create right third of version banner
         spriteId = CreateSprite(&sVersionBannerRightSpriteTemplate, VERSION_BANNER_RIGHT_X, VERSION_BANNER_Y, 0);
         gSprites[spriteId].sParentTaskId = taskId;
 

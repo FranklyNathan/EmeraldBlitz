@@ -13,7 +13,36 @@
   "show_map_name": false,
   "battle_scene": "MAP_BATTLE_SCENE_GYM",
   "connections": null,
-  "object_events": [],
+  "object_events": [
+    {
+      "local_id": "LOCALID_SOOTOPOLIS_GYM_B1F_GABBY",
+      "graphics_id": "OBJ_EVENT_GFX_REPORTER_F",
+      "x": 10,
+      "y": 14,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "0x0",
+      "flag": "FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY"
+    },
+    {
+      "local_id": "LOCALID_SOOTOPOLIS_GYM_B1F_TY",
+      "graphics_id": "OBJ_EVENT_GFX_CAMERAMAN",
+      "x": 11,
+      "y": 14,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "0x0",
+      "flag": "FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY"
+    }
+  ],
   "warp_events": [
     {
       "x": 11,

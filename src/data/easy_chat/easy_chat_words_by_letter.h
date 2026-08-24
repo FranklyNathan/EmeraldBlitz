@@ -481,6 +481,7 @@ const u16 gEasyChatWordsByLetter_E[] = {
     EC_POKEMON(EXPLOUD),
     EC_MOVE(EXTRASENSORY),
     EC_MOVE(EXTREME_SPEED),
+    EC_WORD_EXTREMELY,
 };
 
 const u16 gEasyChatWordsByLetter_F[] = {

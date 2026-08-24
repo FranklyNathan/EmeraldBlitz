@@ -585,3 +585,7 @@ gSpecials::
 	def_special GetOffBike
 	def_special OpenScottTmShop
 	def_special Special_ReadScriptMail
+	def_special SootopolisGymB1F_SetupGabbyTy
+	def_special SetOptionsTextSpeed
+	def_special SootopolisGymB1F_StartAshPuffGabbyTy
+	def_special SootopolisGymB1F_ShowGabbyTy

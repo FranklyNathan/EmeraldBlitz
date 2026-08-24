@@ -58,6 +58,10 @@
 #include "constants/battle_frontier.h"
 #include "constants/battle_pyramid.h"
 #include "constants/battle_tower.h"
+#include "constants/field_effects.h"
+#include "constants/global.h"
+#include "constants/map_event_ids.h"
+#include "sprite.h"
 #include "constants/decorations.h"
 #include "constants/event_objects.h"
 #include "constants/event_object_movement.h"
@@ -4955,4 +4959,105 @@ void Special_ReadScriptMail(void)
         sender = gSaveBlock2Ptr->playerName;
     Mail_SetCustomSender(sender);
     Mail_SetCustomText(customLines, numLines);
+}
+
+static void HideGabbyTyObject(u32 localId);
+
+void SootopolisGymB1F_SetupGabbyTy(void)
+{
+    s16 playerX, playerY;
+    s16 gabbyX, gabbyY, tyX, tyY;
+    u8 elevation = gObjectEvents[gPlayerAvatar.objectEventId].currentElevation;
+    bool32 south;
+
+    PlayerGetDestCoords(&playerX, &playerY);
+
+    if (!MapGridGetCollisionAt(playerX, playerY - 1)
+        && MapGridGetElevationAt(playerX, playerY - 1) == elevation)
+    {
+        south = FALSE;
+        gabbyX = playerX;
+        gabbyY = playerY - 1;
+    }
+    else
+    {
+        south = TRUE;
+        gabbyX = playerX;
+        gabbyY = playerY + 1;
+    }
+
+    if (!MapGridGetCollisionAt(gabbyX - 1, gabbyY)
+        && MapGridGetElevationAt(gabbyX - 1, gabbyY) == elevation)
+    {
+        tyX = gabbyX - 1;
+        tyY = gabbyY;
+    }
+    else
+    {
+        tyX = gabbyX + 1;
+        tyY = gabbyY;
+    }
+
+    TryMoveObjectEventToMapCoords(LOCALID_SOOTOPOLIS_GYM_B1F_GABBY,
+                                  gSaveBlock1Ptr->location.mapNum,
+                                  gSaveBlock1Ptr->location.mapGroup,
+                                  gabbyX - MAP_OFFSET, gabbyY - MAP_OFFSET);
+    TryMoveObjectEventToMapCoords(LOCALID_SOOTOPOLIS_GYM_B1F_TY,
+                                  gSaveBlock1Ptr->location.mapNum,
+                                  gSaveBlock1Ptr->location.mapGroup,
+                                  tyX - MAP_OFFSET, tyY - MAP_OFFSET);
+    HideGabbyTyObject(LOCALID_SOOTOPOLIS_GYM_B1F_GABBY);
+    HideGabbyTyObject(LOCALID_SOOTOPOLIS_GYM_B1F_TY);
+
+    gSpecialVar_Result = south ? 0 : 1;
+}
+
+static void HideGabbyTyObject(u32 localId)
+{
+    u8 objectId = GetObjectEventIdByLocalIdAndMap(localId,
+                                                  gSaveBlock1Ptr->location.mapNum,
+                                                  gSaveBlock1Ptr->location.mapGroup);
+    if (objectId != OBJECT_EVENTS_COUNT)
+        gObjectEvents[objectId].invisible = TRUE;
+}
+
+static void ShowGabbyTyObject(u32 localId)
+{
+    u8 objectId = GetObjectEventIdByLocalIdAndMap(localId,
+                                                  gSaveBlock1Ptr->location.mapNum,
+                                                  gSaveBlock1Ptr->location.mapGroup);
+    if (objectId != OBJECT_EVENTS_COUNT)
+        gObjectEvents[objectId].invisible = FALSE;
+}
+
+void SootopolisGymB1F_ShowGabbyTy(void)
+{
+    ShowGabbyTyObject(LOCALID_SOOTOPOLIS_GYM_B1F_GABBY);
+    ShowGabbyTyObject(LOCALID_SOOTOPOLIS_GYM_B1F_TY);
+}
+
+static void StartAshPuffAtGabbyTy(u32 localId)
+{
+    u8 objectId = GetObjectEventIdByLocalIdAndMap(localId,
+                                                  gSaveBlock1Ptr->location.mapNum,
+                                                  gSaveBlock1Ptr->location.mapGroup);
+    struct ObjectEvent *objectEvent = &gObjectEvents[objectId];
+    struct Sprite *sprite = &gSprites[objectEvent->spriteId];
+
+    gFieldEffectArguments[0] = objectEvent->currentCoords.x;
+    gFieldEffectArguments[1] = objectEvent->currentCoords.y;
+    gFieldEffectArguments[2] = sprite->subpriority - 1;
+    gFieldEffectArguments[3] = sprite->oam.priority;
+    FieldEffectStart(FLDEFF_ASH_PUFF);
+}
+
+void SootopolisGymB1F_StartAshPuffGabbyTy(void)
+{
+    StartAshPuffAtGabbyTy(LOCALID_SOOTOPOLIS_GYM_B1F_GABBY);
+    StartAshPuffAtGabbyTy(LOCALID_SOOTOPOLIS_GYM_B1F_TY);
+}
+
+void SetOptionsTextSpeed(void)
+{
+    gSaveBlock2Ptr->optionsTextSpeed = gSpecialVar_0x8004;
 }

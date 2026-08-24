@@ -86,6 +86,7 @@
 #define FLAG_ELGYEM_USED_TELEPORT   FLAG_UNUSED_0x037
 #define FLAG_ESPURR_USED_TELEPORT    FLAG_UNUSED_0x038 // Unused Flag
 #define FLAG_UNUSED_0x043    0x43 // Unused Flag
+#define FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY FLAG_UNUSED_0x043
 #define FLAG_UNUSED_0x044    0x44 // Unused Flag
 #define FLAG_UNUSED_0x045    0x45 // Unused Flag
 #define FLAG_UNUSED_0x046    0x46 // Unused Flag

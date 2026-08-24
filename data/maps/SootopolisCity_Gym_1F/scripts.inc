@@ -150,6 +150,7 @@ SootopolisCity_Gym_1F_EventScript_FallThroughIce::
 	waitmovement 0
 	playse SE_FALL
 	delay 60
+	setvar VAR_SOOTOPOLIS_GYM_B1F_SCENE, 1
 	warphole MAP_SOOTOPOLIS_CITY_GYM_B1F
 	waitstate
 	end
