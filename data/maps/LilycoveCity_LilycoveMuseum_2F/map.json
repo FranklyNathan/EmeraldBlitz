@@ -68,15 +68,7 @@
       "flag": "FLAG_HIDE_LILYCOVE_MUSEUM_TOURISTS"
     }
   ],
-  "warp_events": [
-    {
-      "x": 13,
-      "y": 1,
-      "elevation": 0,
-      "dest_map": "MAP_LILYCOVE_CITY_LILYCOVE_MUSEUM_1F",
-      "dest_warp_id": "2"
-    }
-  ],
+  "warp_events": [],
   "coord_events": [],
   "bg_events": [
     {

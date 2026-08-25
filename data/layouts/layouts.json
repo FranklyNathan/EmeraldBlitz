@@ -4560,6 +4560,16 @@
       "secondary_tileset": "gTileset_RustboroGymViolaEdition",
       "border_filepath": "data/layouts/RustboroCity_Gym_Viola_Edition/border.bin",
       "blockdata_filepath": "data/layouts/RustboroCity_Gym_Viola_Edition/map.bin"
+    },
+    {
+      "id": "LAYOUT_LILYCOVE_CITY_LILYCOVE_MUSEUM_3F",
+      "name": "LilycoveCity_LilycoveMuseum_3F_Layout",
+      "width": 19,
+      "height": 18,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_BattlePalace",
+      "border_filepath": "data/layouts/LilycoveCity_LilycoveMuseum_3F/border.bin",
+      "blockdata_filepath": "data/layouts/LilycoveCity_LilycoveMuseum_3F/map.bin"
     }
   ]
 }

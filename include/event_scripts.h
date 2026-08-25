@@ -688,6 +688,7 @@ extern const u8 EventScript_LostSignal[];
 extern const u8 EventScript_TooDark[];
 extern const u8 EventScript_MovedTooFast[];
 extern const u8 EventScript_NoBackingOut[];
+extern const u8 EventScript_GymExitBlocked[];
 extern const u8 EventScript_WarpHomeRustboro[];
 extern const u8 EventScript_WarpHomeDewford[];
 extern const u8 EventScript_WarpHomeMauville[];

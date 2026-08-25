@@ -28,27 +28,95 @@ SootopolisCity_Gym_B1F_EventScript_InterviewScene::
 	goto_if_eq VAR_RESULT, 0, SootopolisCity_Gym_B1F_EventScript_InterviewBelow
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceDown
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_FaceDown
-	applymovement LOCALID_PLAYER, Common_Movement_FaceUp
-	goto SootopolisCity_Gym_B1F_EventScript_InterviewExclaim
+	goto SootopolisCity_Gym_B1F_EventScript_InterviewExclaimDown
 
 SootopolisCity_Gym_B1F_EventScript_InterviewBelow::
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceUp
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_FaceUp
+	goto SootopolisCity_Gym_B1F_EventScript_InterviewExclaimUp
 
-SootopolisCity_Gym_B1F_EventScript_InterviewExclaim::
+SootopolisCity_Gym_B1F_EventScript_InterviewExclaimDown::
 	playse SE_PIN
-	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_ExclamationMark
-	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_ExclamationMark
+	applymovement LOCALID_PLAYER, Common_Movement_ExclamationMark
 	waitmovement 0
 	delay 30
+	applymovement LOCALID_PLAYER, Common_Movement_FaceUp
+	waitmovement 0
 	setvar VAR_0x8004, OPTIONS_TEXT_SPEED_MID
 	special SetOptionsTextSpeed
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
 	msgbox SootopolisCity_Gym_B1F_Text_GabbyWowTy, MSGBOX_DEFAULT
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
 	msgbox SootopolisCity_Gym_B1F_Text_TySureDidGabby, MSGBOX_DEFAULT
 	msgbox SootopolisCity_Gym_B1F_Text_GabbyItGetsWorse, MSGBOX_DEFAULT
 	msgbox SootopolisCity_Gym_B1F_Text_TyHopeNobodyNoticed, MSGBOX_DEFAULT
 	msgbox SootopolisCity_Gym_B1F_Text_GabbyGoodThingWaiting, MSGBOX_DEFAULT
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
 	msgbox SootopolisCity_Gym_B1F_Text_TyGetComment, MSGBOX_DEFAULT
+	setvar VAR_0x8005, 1
+	goto SootopolisCity_Gym_B1F_EventScript_InterviewLoop
+
+SootopolisCity_Gym_B1F_EventScript_InterviewExclaimUp::
+	playse SE_PIN
+	applymovement LOCALID_PLAYER, Common_Movement_ExclamationMark
+	waitmovement 0
+	delay 30
+	applymovement LOCALID_PLAYER, Common_Movement_FaceDown
+	waitmovement 0
+	setvar VAR_0x8004, OPTIONS_TEXT_SPEED_MID
+	special SetOptionsTextSpeed
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyWowTy, MSGBOX_DEFAULT
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_TySureDidGabby, MSGBOX_DEFAULT
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyItGetsWorse, MSGBOX_DEFAULT
+	msgbox SootopolisCity_Gym_B1F_Text_TyHopeNobodyNoticed, MSGBOX_DEFAULT
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyGoodThingWaiting, MSGBOX_DEFAULT
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_TyGetComment, MSGBOX_DEFAULT
+	setvar VAR_0x8005, 0
 
 SootopolisCity_Gym_B1F_EventScript_InterviewLoop::
 	msgbox SootopolisCity_Gym_B1F_Text_GabbyCareToComment, MSGBOX_DEFAULT
@@ -56,6 +124,26 @@ SootopolisCity_Gym_B1F_EventScript_InterviewLoop::
 	call Common_ShowEasyChatScreen
 	lockall
 	goto_if_eq VAR_RESULT, 0, SootopolisCity_Gym_B1F_EventScript_InterviewLoop
+	goto_if_eq VAR_0x8005, 0, SootopolisCity_Gym_B1F_EventScript_InterviewLoop_GabbyJumpUp
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	goto SootopolisCity_Gym_B1F_EventScript_InterviewLoop_AfterGabbyJump
+SootopolisCity_Gym_B1F_EventScript_InterviewLoop_GabbyJumpUp:
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+SootopolisCity_Gym_B1F_EventScript_InterviewLoop_AfterGabbyJump:
 	msgbox SootopolisCity_Gym_B1F_Text_GabbySummarizes, MSGBOX_DEFAULT
 	msgbox SootopolisCity_Gym_B1F_Text_TyWellSaid, MSGBOX_DEFAULT
 	msgbox SootopolisCity_Gym_B1F_Text_GabbyDontGiveUp, MSGBOX_DEFAULT
@@ -254,61 +342,66 @@ SootopolisCity_Gym_B1F_Text_BriannaPostBattle:
 
 
 SootopolisCity_Gym_B1F_Text_GabbyWowTy:
-	.string "GABBY: Wow TY, did you\n"
-	.string "see that!?$"
+	.string "GABBY: Wow TY, did you see that!?$"
 
 SootopolisCity_Gym_B1F_Text_TySureDidGabby:
-	.string "TY: Sure did, GABBY!\n"
-	.string "Looks like {PLAYER} just\n"
-	.string "botched the gym puzzle!$"
+	.string "TY: Sure did, GABBY! Looks like {PLAYER}\n"
+	.string "just royally botched the gym puzzle!$"
 
 SootopolisCity_Gym_B1F_Text_GabbyItGetsWorse:
-	.string "GABBY: That's right TY,\n"
-	.string "but it gets worse!\l"
-	.string "This is a race, where\n"
-	.string "every second counts.\p"
-	.string "And now, they'll have to\n"
-	.string "do that whole puzzle\n"
-	.string "again!$"
+	.string "GABBY: That's right TY, but it gets even\n"
+	.string "worse! This is a race where every\l"
+	.string "second counts.\p"
+	.string "They can't afford to waste any time.\n"
+	.string "And now, they'll have to do that\l"
+	.string "whole puzzle again!$"
 
 SootopolisCity_Gym_B1F_Text_TyHopeNobodyNoticed:
-	.string "TY: Oh man, I bet they\n"
-	.string "sure do hope nobody\n"
-	.string "noticed!$"
+	.string "TY: Oh man, their poor reputation! I bet\n"
+	.string "they sure do wish nobody noticed!$"
 
 SootopolisCity_Gym_B1F_Text_GabbyGoodThingWaiting:
-	.string "GABBY: Good thing we\n"
-	.string "were here waiting!\l"
-	.string "This blunder will be\n"
-	.string "primetime news!$"
+	.string "GABBY: Good thing we're here\n"
+	.string "around the clock waiting!\p"
+	.string "This mistake will be primetime news!$"
 
 SootopolisCity_Gym_B1F_Text_TyGetComment:
-	.string "TY: Good point, GABBY!\n"
-	.string "Let's get a comment!$"
+	.string "TY: Great point, GABBY!\n"
+	.string "Let's get an interview!$"
 
 SootopolisCity_Gym_B1F_Text_GabbyCareToComment:
-	.string "GABBY: {PLAYER}! Care to\n"
-	.string "comment on how\n"
-	.string "embarrassing this is for\n"
-	.string "you?$"
+	.string "GABBY: {PLAYER}! Care to comment on how\n"
+	.string "embarrassing this is for you?$"
 
 SootopolisCity_Gym_B1F_Text_GabbySummarizes:
-	.string "GABBY: Extremely\n"
-	.string "embarrassing! I'd say\n"
-	.string "that just about sums it\n"
-	.string "up!$"
+	.string "GABBY: Extremely embarrassed!\p"
+	.string "I'd say that just about sums it up!$"
 
 SootopolisCity_Gym_B1F_Text_TyWellSaid:
 	.string "TY: So well said!$"
 
 SootopolisCity_Gym_B1F_Text_GabbyDontGiveUp:
-	.string "GABBY: Well, we've got\n"
-	.string "our story!\l"
+	.string "GABBY: Well, we've got our story!\n"
 	.string "{PLAYER}, don't give up!\p"
-	.string "Give it another shot!\n"
-	.string "After all, it can't go\n"
-	.string "any worse than that!$"
+	.string "Give it another shot! After all,\n"
+	.string "it can't go any worse than it just did!$"
 
 SootopolisCity_Gym_B1F_Movement_PopOut:
 	jump_in_place_right
+	step_end
+
+SootopolisCity_Gym_B1F_Movement_GabbyJumpUp:
+	jump_in_place_up
+	step_end
+
+SootopolisCity_Gym_B1F_Movement_TyJumpUp:
+	jump_in_place_up
+	step_end
+
+SootopolisCity_Gym_B1F_Movement_GabbyJumpDown:
+	jump_in_place_down
+	step_end
+
+SootopolisCity_Gym_B1F_Movement_TyJumpDown:
+	jump_in_place_down
 	step_end

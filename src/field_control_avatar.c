@@ -48,6 +48,8 @@ static EWRAM_DATA u16 sPrevMetatileBehavior = 0;
 
 COMMON_DATA u8 gSelectedObjectEvent = 0;
 
+static bool8 IsPlayerOnLockedGymEntrance(struct MapPosition *position);
+
 static void GetPlayerPosition(struct MapPosition *);
 static void GetInFrontOfPlayerPosition(struct MapPosition *);
 static u16 GetPlayerCurMetatileBehavior(int);
@@ -178,6 +180,20 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     if (TryRunOnFrameMapScript() == TRUE)
         return TRUE;
 
+    if (input->dpadDirection == DIR_SOUTH && input->tookStep == FALSE && !ScriptContext_IsEnabled())
+    {
+        struct MapPosition prevPosition;
+        struct ObjectEvent *playerObj = &gObjectEvents[gPlayerAvatar.objectEventId];
+        prevPosition.x = playerObj->previousCoords.x;
+        prevPosition.y = playerObj->previousCoords.y;
+        prevPosition.elevation = PlayerGetElevation();
+        if (IsPlayerOnLockedGymEntrance(&prevPosition))
+        {
+            ScriptContext_SetupScript(EventScript_GymExitBlocked);
+            return TRUE;
+        }
+    }
+
     if (input->pressedBButton && TrySetupDiveEmergeScript() == TRUE)
         return TRUE;
     if (input->tookStep)
@@ -260,6 +276,35 @@ static void GetPlayerPosition(struct MapPosition *position)
 {
     PlayerGetDestCoords(&position->x, &position->y);
     position->elevation = PlayerGetElevation();
+}
+
+static bool8 IsPlayerOnLockedGymEntrance(struct MapPosition *position)
+{
+    s32 i;
+    const struct CoordEvent *coordEvents;
+    u8 coordEventCount;
+    u16 x, y;
+
+    if (VarGet(VAR_GYM_LOCKED) != 1)
+        return FALSE;
+
+    coordEvents = gMapHeader.events->coordEvents;
+    coordEventCount = gMapHeader.events->coordEventCount;
+    x = position->x - MAP_OFFSET;
+    y = position->y - MAP_OFFSET;
+
+    for (i = 0; i < coordEventCount; i++)
+    {
+        if ((u16)coordEvents[i].x == x && (u16)coordEvents[i].y == y)
+        {
+            if (coordEvents[i].elevation == position->elevation || coordEvents[i].elevation == 0)
+            {
+                if (coordEvents[i].script == EventScript_NoBackingOut)
+                    return TRUE;
+            }
+        }
+    }
+    return FALSE;
 }
 
 static void GetInFrontOfPlayerPosition(struct MapPosition *position)

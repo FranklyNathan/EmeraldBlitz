@@ -33,12 +33,12 @@ enum {
 // Tile offsets are in OAM tile units (32 bytes); each 64x64 8bpp sprite consumes 128 units.
 #define VERSION_BANNER_MIDDLE_TILEOFFSET 128
 #define VERSION_BANNER_RIGHT_TILEOFFSET 256
-#define VERSION_BANNER_LEFT_X 101
-#define VERSION_BANNER_MIDDLE_X 165
-#define VERSION_BANNER_RIGHT_X 229
+#define VERSION_BANNER_LEFT_X 102
+#define VERSION_BANNER_MIDDLE_X 166
+#define VERSION_BANNER_RIGHT_X 230
 #define VERSION_BANNER_Y 35
 #define VERSION_BANNER_Y_GOAL 92
-#define START_BANNER_X 153
+#define START_BANNER_X 154
 
 #define CLEAR_SAVE_BUTTON_COMBO (B_BUTTON | SELECT_BUTTON | DPAD_UP)
 #define RESET_RTC_BUTTON_COMBO (B_BUTTON | SELECT_BUTTON | DPAD_LEFT)
@@ -866,7 +866,7 @@ static void Task_TitleScreenPhase2(u8 taskId)
                                     | DISPCNT_BG2_ON
                                     | DISPCNT_OBJ_ON);
         CreatePressStartBanner(START_BANNER_X, 128);
-        CreateCopyrightBanner(145, 154);
+        CreateCopyrightBanner(146, 154);
         CreateFlygonSprites();
         gTasks[taskId].tBg1Y = 0;
         gTasks[taskId].func = Task_TitleScreenPhase3;
@@ -874,7 +874,7 @@ static void Task_TitleScreenPhase2(u8 taskId)
 
     if (!(gTasks[taskId].tCounter & 3) && gTasks[taskId].tPointless != 0)
         gTasks[taskId].tPointless++;
-    if (!(gTasks[taskId].tCounter & 1) && gTasks[taskId].tBg2Y != -54)
+    if (!(gTasks[taskId].tCounter & 1) && gTasks[taskId].tBg2Y != -55)
         gTasks[taskId].tBg2Y--;
 
     // Slide Pokémon logo right
@@ -914,7 +914,7 @@ static void Task_TitleScreenPhase3(u8 taskId)
     }
     else
     {
-        SetGpuReg(REG_OFFSET_BG2X_L, -54 * 256);
+        SetGpuReg(REG_OFFSET_BG2X_L, -55 * 256);
         SetGpuReg(REG_OFFSET_BG2X_H, -1);
         SetGpuReg(REG_OFFSET_BG2Y_L, -15 * 256);
         SetGpuReg(REG_OFFSET_BG2Y_H, -1);

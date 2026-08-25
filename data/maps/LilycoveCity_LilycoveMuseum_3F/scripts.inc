@@ -1,0 +1,2 @@
+LilycoveCity_LilycoveMuseum_3F_MapScripts::
+	.byte 0

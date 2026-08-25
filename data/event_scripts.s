@@ -1135,11 +1135,17 @@ EventScript_VsSeekerChargingDone::
 	end
 
 EventScript_NoBackingOut::
+	end
+
+EventScript_GymExitBlocked::
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceDown
+	waitmovement 0
+	delay 2
 	msgbox gText_SorryTradeCenterInspections, MSGBOX_DEFAULT
 	closemessage
-	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkUp
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceUp
 	waitmovement 0
-	delay 10
+	delay 2
 	end
 
 EventScript_WarpHomeRustboro::
@@ -1389,3 +1395,5 @@ Common_EventScript_SetScottEncounterCancelled::
 	.include "data/maps/EverGrandeCity_BrandonsRoom/scripts.inc"
 
 	.include "data/maps/RustboroCity_Gym_Viola_Edition/scripts.inc"
+
+	.include "data/maps/LilycoveCity_LilycoveMuseum_3F/scripts.inc"

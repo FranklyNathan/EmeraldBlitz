@@ -120,10 +120,10 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_SPECIES(KRICKETUNE)",
-      "x": 14,
-      "y": 8,
+      "x": 12,
+      "y": 9,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_LEFT",
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_UP",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
@@ -189,7 +189,7 @@
       "x": 16,
       "y": 1,
       "elevation": 0,
-      "dest_map": "MAP_LILYCOVE_CITY_LILYCOVE_MUSEUM_2F",
+      "dest_map": "MAP_LILYCOVE_CITY_LILYCOVE_MUSEUM_3F",
       "dest_warp_id": "0"
     }
   ],
