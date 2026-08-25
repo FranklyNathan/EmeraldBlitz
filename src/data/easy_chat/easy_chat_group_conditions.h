@@ -68,6 +68,7 @@ const u8 gEasyChatWord_Simple[] = _("SIMPLE");
 const u8 gEasyChatWord_Seems[] = _("SEEMS");
 const u8 gEasyChatWord_Badly[] = _("BADLY");
 const u8 gEasyChatWord_Extremely[] = _("EXTREMELY");
+const u8 gEasyChatWord_Unspeakably[] = _("UNSPEAKABLY");
 
 const struct EasyChatWordInfo gEasyChatGroup_Conditions[] = {
     [EC_INDEX(EC_WORD_HOT)] =
@@ -488,6 +489,12 @@ const struct EasyChatWordInfo gEasyChatGroup_Conditions[] = {
     {
         .text = gEasyChatWord_Extremely,
         .alphabeticalOrder = EC_INDEX(EC_WORD_WELL),
+        .enabled = TRUE,
+    },
+    [EC_INDEX(EC_WORD_UNSPEAKABLY)] =
+    {
+        .text = gEasyChatWord_Unspeakably,
+        .alphabeticalOrder = EC_INDEX(EC_WORD_UNSPEAKABLY),
         .enabled = TRUE,
     },
 };

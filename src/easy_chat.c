@@ -38,6 +38,7 @@ static EWRAM_DATA struct EasyChatScreen *sEasyChatScreen = NULL;
 static EWRAM_DATA struct EasyChatScreenControl *sScreenControl = NULL;
 static EWRAM_DATA struct EasyChatScreenWordData *sWordData = NULL;
 static bool8 sSootopolisFallRestriction = FALSE;
+static bool8 sSootopolisFallRestriction2 = FALSE;
 
 static void Task_InitEasyChatScreen(u8);
 static void CB2_EasyChatScreen(void);
@@ -682,6 +683,18 @@ static const struct EasyChatScreenTemplate sEasyChatScreenTemplates[] = {
     },
     {
         .type = EASY_CHAT_TYPE_SOOTOPOLIS_FALL,
+        .numColumns = 1,
+        .numRows = 1,
+        .frameId = FRAMEID_INTERVIEW_SHOW_PERSON,
+        .fourFooterOptions = FALSE,
+        .titleText = gText_Interview,
+        .instructionsText1 = gText_FindWordsThatDescribeYour,
+        .instructionsText2 = gText_FeelingsRightNow,
+        .confirmText1 = gText_TheAnswer,
+        .confirmText2 = gText_IsAsShownOkay,
+    },
+    {
+        .type = EASY_CHAT_TYPE_SOOTOPOLIS_FALL_2,
         .numColumns = 1,
         .numRows = 1,
         .frameId = FRAMEID_INTERVIEW_SHOW_PERSON,
@@ -1465,6 +1478,7 @@ static void ExitEasyChatScreen(MainCallback callback)
     FreeEasyChatScreenWordData();
     FreeAllWindowBuffers();
     sSootopolisFallRestriction = FALSE;
+    sSootopolisFallRestriction2 = FALSE;
     SetMainCallback2(callback);
 }
 
@@ -1559,6 +1573,12 @@ void ShowEasyChatScreen(void)
         InitializeEasyChatWordArray(words, 1);
         displayedPersonType = EASY_CHAT_PERSON_REPORTER_FEMALE;
         sSootopolisFallRestriction = TRUE;
+        break;
+    case EASY_CHAT_TYPE_SOOTOPOLIS_FALL_2:
+        words = (u16 *)gStringVar3;
+        InitializeEasyChatWordArray(words, 1);
+        displayedPersonType = EASY_CHAT_PERSON_REPORTER_FEMALE;
+        sSootopolisFallRestriction2 = TRUE;
         break;
     default:
         return;
@@ -5641,6 +5661,11 @@ static void SetUnlockedEasyChatGroups(void)
         sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_CONDITIONS;
         return;
     }
+    if (sSootopolisFallRestriction2)
+    {
+        sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_CONDITIONS;
+        return;
+    }
 
     if (GetNationalPokedexCount(FLAG_GET_SEEN))
         sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_POKEMON;
@@ -5834,6 +5859,8 @@ static bool8 IsEasyChatIndexAndGroupUnlocked(u16 wordIndex, u8 groupId)
 {
     if (sSootopolisFallRestriction)
         return groupId == EC_GROUP_CONDITIONS && wordIndex == EC_INDEX(EC_WORD_EXTREMELY);
+    if (sSootopolisFallRestriction2)
+        return groupId == EC_GROUP_CONDITIONS && wordIndex == EC_INDEX(EC_WORD_UNSPEAKABLY);
 
     switch (groupId)
     {

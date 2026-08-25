@@ -129,11 +129,24 @@ LilycoveCity_LilycoveMuseum_1F_EventScript_Zigzagoon::
 LilycoveCity_LilycoveMuseum_1F_EventScript_Pangoro::
     lock
     faceplayer
-    playmoncry SPECIES_PANGORO, CRY_MODE_NORMAL
-    msgbox LilycoveCity_LilycoveMuseum_1F_Text_Pangoro, MSGBOX_DEFAULT
-    waitmoncry
+    goto_if_set FLAG_TEMP_5, LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroSatisfied
+    msgbox LilycoveCity_LilycoveMuseum_1F_Text_PangoroSatisfied, MSGBOX_DEFAULT
+    closemessage
+    applymovement VAR_LAST_TALKED, LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepRight
+    waitmovement 0
+    setflag FLAG_TEMP_5
     release
     end
+
+LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroSatisfied::
+    msgbox LilycoveCity_LilycoveMuseum_1F_Text_PangoroNap, MSGBOX_DEFAULT
+    release
+    end
+
+LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepRight:
+    walk_right
+    face_down
+    step_end
 
 LilycoveCity_LilycoveMuseum_1F_EventScript_Victini::
     lock
@@ -240,10 +253,12 @@ LilycoveCity_LilycoveMuseum_1F_Text_Zigzagoon:
     .string "always knew you were destined for\l"
     .string "greatness.$"
 
-LilycoveCity_LilycoveMuseum_1F_Text_Pangoro:
-    .string "PANGORO appears to be blocking the\n"
-    .string "stairs to an area the developer was\l"
-    .string "too lazy to customize.$"
+LilycoveCity_LilycoveMuseum_1F_Text_PangoroSatisfied:
+    .string "PANGORO sizes you up. He seems\n"
+    .string "satisfied.$"
+
+LilycoveCity_LilycoveMuseum_1F_Text_PangoroNap:
+    .string "PANGORO looks ready for a nap.$"
 
 LilycoveCity_LilycoveMuseum_1F_Text_Victini:
     .string "Victini is basking in your victory!$"

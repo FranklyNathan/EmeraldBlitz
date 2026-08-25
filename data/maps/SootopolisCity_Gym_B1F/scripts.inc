@@ -20,6 +20,7 @@ SootopolisCity_Gym_B1F_EventScript_InterviewScene::
 	special SootopolisGymB1F_SetupGabbyTy
 	special SootopolisGymB1F_StartAshPuffGabbyTy
 	delay 14
+	goto_if_set FLAG_SOOTOPOLIS_GYM_INTERVIEWED, SootopolisCity_Gym_B1F_EventScript_RepeatInterviewScene
 	special SootopolisGymB1F_ShowGabbyTy
 	playse SE_M_DIG
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_PopOut
@@ -147,6 +148,153 @@ SootopolisCity_Gym_B1F_EventScript_InterviewLoop_AfterGabbyJump:
 	msgbox SootopolisCity_Gym_B1F_Text_GabbySummarizes, MSGBOX_DEFAULT
 	msgbox SootopolisCity_Gym_B1F_Text_TyWellSaid, MSGBOX_DEFAULT
 	msgbox SootopolisCity_Gym_B1F_Text_GabbyDontGiveUp, MSGBOX_DEFAULT
+	closemessage
+	setvar VAR_0x8004, OPTIONS_TEXT_SPEED_FAST
+	special SetOptionsTextSpeed
+	setflag FLAG_SOOTOPOLIS_GYM_INTERVIEWED
+	fadescreen FADE_TO_BLACK
+	delay 30
+	removeobject LOCALID_SOOTOPOLIS_GYM_B1F_GABBY
+	removeobject LOCALID_SOOTOPOLIS_GYM_B1F_TY
+	setflag FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY
+	delay 10
+	fadescreen FADE_FROM_BLACK
+	releaseall
+	end
+
+SootopolisCity_Gym_B1F_EventScript_RepeatInterviewScene::
+	special SootopolisGymB1F_ShowGabby
+	playse SE_M_DIG
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_PopOut
+	waitmovement 0
+	goto_if_eq VAR_RESULT, 0, SootopolisCity_Gym_B1F_EventScript_RepeatBelow
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceDown
+	goto SootopolisCity_Gym_B1F_EventScript_RepeatExclaimDown
+
+SootopolisCity_Gym_B1F_EventScript_RepeatBelow::
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceUp
+	goto SootopolisCity_Gym_B1F_EventScript_RepeatExclaimUp
+
+SootopolisCity_Gym_B1F_EventScript_RepeatExclaimDown::
+	playse SE_PIN
+	applymovement LOCALID_PLAYER, Common_Movement_ExclamationMark
+	waitmovement 0
+	delay 30
+	applymovement LOCALID_PLAYER, Common_Movement_FaceUp
+	waitmovement 0
+	setvar VAR_0x8004, OPTIONS_TEXT_SPEED_MID
+	special SetOptionsTextSpeed
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyGetUpHere, MSGBOX_DEFAULT
+	special SootopolisGymB1F_ShowGabbyTy
+	playse SE_M_DIG
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_PopOut
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_FaceDown
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_TyBackToBack, MSGBOX_DEFAULT
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceLeft
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_FaceRight
+	waitmovement 0
+	delay 20
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceDown
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_FaceDown
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_ItsPlayerAgain, MSGBOX_DEFAULT
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyFallenAgain, MSGBOX_DEFAULT
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_TyHardlyBelieve, MSGBOX_DEFAULT
+	setvar VAR_0x8005, 1
+	goto SootopolisCity_Gym_B1F_EventScript_RepeatInterviewLoop
+
+SootopolisCity_Gym_B1F_EventScript_RepeatExclaimUp::
+	playse SE_PIN
+	applymovement LOCALID_PLAYER, Common_Movement_ExclamationMark
+	waitmovement 0
+	delay 30
+	applymovement LOCALID_PLAYER, Common_Movement_FaceDown
+	waitmovement 0
+	setvar VAR_0x8004, OPTIONS_TEXT_SPEED_MID
+	special SetOptionsTextSpeed
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyGetUpHere, MSGBOX_DEFAULT
+	special SootopolisGymB1F_ShowGabbyTy
+	playse SE_M_DIG
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_PopOut
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_FaceUp
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_TyBackToBack, MSGBOX_DEFAULT
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceLeft
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_FaceRight
+	waitmovement 0
+	delay 20
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceUp
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_FaceUp
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_ItsPlayerAgain, MSGBOX_DEFAULT
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyFallenAgain, MSGBOX_DEFAULT
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_TyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	msgbox SootopolisCity_Gym_B1F_Text_TyHardlyBelieve, MSGBOX_DEFAULT
+	setvar VAR_0x8005, 0
+
+SootopolisCity_Gym_B1F_EventScript_RepeatInterviewLoop::
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyCareToComment, MSGBOX_DEFAULT
+	setvar VAR_0x8004, EASY_CHAT_TYPE_SOOTOPOLIS_FALL_2
+	call Common_ShowEasyChatScreen
+	lockall
+	goto_if_eq VAR_RESULT, 0, SootopolisCity_Gym_B1F_EventScript_RepeatInterviewLoop
+	goto_if_eq VAR_0x8005, 0, SootopolisCity_Gym_B1F_EventScript_RepeatLoop_GabbyJumpUp
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpDown
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	goto SootopolisCity_Gym_B1F_EventScript_RepeatLoop_AfterGabbyJump
+SootopolisCity_Gym_B1F_EventScript_RepeatLoop_GabbyJumpUp:
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_GabbyJumpUp
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+SootopolisCity_Gym_B1F_EventScript_RepeatLoop_AfterGabbyJump:
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyUnspeakably, MSGBOX_DEFAULT
+	msgbox SootopolisCity_Gym_B1F_Text_WaywithWords, MSGBOX_DEFAULT
+	msgbox SootopolisCity_Gym_B1F_Text_GabbyDontGiveUpAgain, MSGBOX_DEFAULT
 	closemessage
 	setvar VAR_0x8004, OPTIONS_TEXT_SPEED_FAST
 	special SetOptionsTextSpeed
@@ -385,6 +533,41 @@ SootopolisCity_Gym_B1F_Text_GabbyDontGiveUp:
 	.string "{PLAYER}, don't give up!\p"
 	.string "Give it another shot! After all,\n"
 	.string "it can't go any worse than it just did!$"
+
+SootopolisCity_Gym_B1F_Text_GabbyDontGiveUpAgain:
+	.string "GABBY: Well, we've got our story!\n"
+	.string "{PLAYER}, don't give up!\p"
+	.string "Give it another shot! After all,\n"
+	.string "you clearly need the practice!$"
+
+SootopolisCity_Gym_B1F_Text_GabbyGetUpHere:
+	.string "GABBY: TY, get up here!\n"
+	.string "Another trainer fell!$"
+
+SootopolisCity_Gym_B1F_Text_TyBackToBack:
+	.string "TY: Wow, back to back!\n"
+	.string "Who is it this time?$"
+
+SootopolisCity_Gym_B1F_Text_ItsPlayerAgain:
+	.string "GABBY and TY: It's {PLAYER} AGAIN!$"
+
+SootopolisCity_Gym_B1F_Text_GabbyFallenAgain:
+	.string "GABBY: {PLAYER}, you've fallen AGAIN!\p"
+	.string "This is going to be front page news!\n"
+	.string "This is going to be the story of\l"
+	.string "the century!$"
+
+SootopolisCity_Gym_B1F_Text_TyHardlyBelieve:
+	.string "TY: I can hardly believe what I'm\n"
+	.string "seeing! Gabby, let's get an interview!\l"
+	.string "I'm rolling!$"
+
+SootopolisCity_Gym_B1F_Text_GabbyUnspeakably:
+	.string "GABBY: Unspeakably embarrassed!\p"
+	.string "I'd say that just about sums it up!$"
+
+SootopolisCity_Gym_B1F_Text_WaywithWords:
+	.string "TY: They have such a way with words!$"
 
 SootopolisCity_Gym_B1F_Movement_PopOut:
 	jump_in_place_right

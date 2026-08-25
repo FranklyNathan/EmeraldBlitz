@@ -5036,6 +5036,11 @@ void SootopolisGymB1F_ShowGabbyTy(void)
     ShowGabbyTyObject(LOCALID_SOOTOPOLIS_GYM_B1F_TY);
 }
 
+void SootopolisGymB1F_ShowGabby(void)
+{
+    ShowGabbyTyObject(LOCALID_SOOTOPOLIS_GYM_B1F_GABBY);
+}
+
 static void StartAshPuffAtGabbyTy(u32 localId)
 {
     u8 objectId = GetObjectEventIdByLocalIdAndMap(localId,

@@ -88,6 +88,7 @@
 #define FLAG_UNUSED_0x043    0x43 // Unused Flag
 #define FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY FLAG_UNUSED_0x043
 #define FLAG_UNUSED_0x044    0x44 // Unused Flag
+#define FLAG_SOOTOPOLIS_GYM_INTERVIEWED FLAG_UNUSED_0x044
 #define FLAG_UNUSED_0x045    0x45 // Unused Flag
 #define FLAG_UNUSED_0x046    0x46 // Unused Flag
 #define FLAG_UNUSED_0x047    0x47 // Unused Flag

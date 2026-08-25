@@ -589,3 +589,4 @@ gSpecials::
 	def_special SetOptionsTextSpeed
 	def_special SootopolisGymB1F_StartAshPuffGabbyTy
 	def_special SootopolisGymB1F_ShowGabbyTy
+	def_special SootopolisGymB1F_ShowGabby
