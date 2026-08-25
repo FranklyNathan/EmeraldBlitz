@@ -27,16 +27,17 @@ enum {
     TAG_VERSION = 1000,
     TAG_PRESS_START_COPYRIGHT,
     TAG_LOGO_SHINE,
+    TAG_FLYGON,
 };
 
 // Tile offsets are in OAM tile units (32 bytes); each 64x64 8bpp sprite consumes 128 units.
 #define VERSION_BANNER_MIDDLE_TILEOFFSET 128
 #define VERSION_BANNER_RIGHT_TILEOFFSET 256
-#define VERSION_BANNER_LEFT_X 24
-#define VERSION_BANNER_MIDDLE_X 88
-#define VERSION_BANNER_RIGHT_X 152
+#define VERSION_BANNER_LEFT_X 44
+#define VERSION_BANNER_MIDDLE_X 108
+#define VERSION_BANNER_RIGHT_X 172
 #define VERSION_BANNER_Y 2
-#define VERSION_BANNER_Y_GOAL 66
+#define VERSION_BANNER_Y_GOAL 71
 #define START_BANNER_X 128
 
 #define CLEAR_SAVE_BUTTON_COMBO (B_BUTTON | SELECT_BUTTON | DPAD_UP)
@@ -65,6 +66,9 @@ static const u16 sUnusedUnknownPal[] = INCBIN_U16("graphics/title_screen/unused.
 
 static const u32 sTitleScreenRayquazaGfx[] = INCBIN_U32("graphics/title_screen/rayquaza.4bpp.smol");
 static const u32 sTitleScreenRayquazaTilemap[] = INCBIN_U32("graphics/title_screen/rayquaza.bin.smolTM");
+static const u32 sTitleScreenFlygonGfx[] = INCBIN_U32("graphics/title_screen/titleflygon.4bpp.smol");
+static const u32 sTitleScreenFlygonTilemap[] = INCBIN_U32("graphics/title_screen/titleflygon.bin.smolTM");
+static const u32 sTitleScreenFlygonObjGfx[] = INCBIN_U32("graphics/title_screen/titleflygon_obj.4bpp.smol");
 static const u32 sTitleScreenLogoShineGfx[] = INCBIN_U32("graphics/title_screen/logo_shine.4bpp.smol");
 static const u32 sTitleScreenCloudsGfx[] = INCBIN_U32("graphics/title_screen/clouds.4bpp.smol");
 
@@ -402,6 +406,55 @@ static const struct CompressedSpriteSheet sPokemonLogoShineSpriteSheet[] =
     {},
 };
 
+// Flygon sprite data
+// Tile offsets within the sheet come from ANIMCMD_FRAME below; OamData.tileNum is ignored for tagged sheets.
+static const struct OamData sFlygonOamData_0 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x64), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x64), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
+static const struct OamData sFlygonOamData_1 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x64), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x64), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
+static const struct OamData sFlygonOamData_2 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x64), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x64), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
+static const struct OamData sFlygonOamData_3 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x64), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x64), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
+static const struct OamData sFlygonOamData_4 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x32), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x32), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
+static const struct OamData sFlygonOamData_5 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x32), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x32), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
+
+#define FLYGON_ANIM(offset) { ANIMCMD_FRAME(offset, 30), ANIMCMD_END }
+static const union AnimCmd sFlygonAnimCmds_0[] = FLYGON_ANIM(0);
+static const union AnimCmd sFlygonAnimCmds_1[] = FLYGON_ANIM(64);
+static const union AnimCmd sFlygonAnimCmds_2[] = FLYGON_ANIM(128);
+static const union AnimCmd sFlygonAnimCmds_3[] = FLYGON_ANIM(192);
+static const union AnimCmd sFlygonAnimCmds_4[] = FLYGON_ANIM(256);
+static const union AnimCmd sFlygonAnimCmds_5[] = FLYGON_ANIM(288);
+
+static const union AnimCmd *const sFlygonAnimTable[] =
+{
+    sFlygonAnimCmds_0,
+    sFlygonAnimCmds_1,
+    sFlygonAnimCmds_2,
+    sFlygonAnimCmds_3,
+    sFlygonAnimCmds_4,
+    sFlygonAnimCmds_5,
+};
+
+static const struct SpriteTemplate sFlygonSpriteTemplate[] =
+{
+    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_0, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
+    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_1, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
+    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_2, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
+    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_3, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
+    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_4, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
+    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_5, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
+};
+
+static const struct CompressedSpriteSheet sSpriteSheet_Flygon[] =
+{
+    { .data = sTitleScreenFlygonObjGfx, .size = 0x2800, .tag = TAG_FLYGON },
+    {},
+};
+
+static const struct SpritePalette sSpritePalette_Flygon[] =
+{
+    { .data = gTitleScreenFlygonPal, .tag = TAG_FLYGON },
+    {},
+};
+
 // Task data for the main title screen tasks (Task_TitleScreenPhase#)
 #define tCounter    data[0]
 #define tSkipToNext data[1]
@@ -641,7 +694,7 @@ void CB2_InitTitleScreen(void)
         DecompressDataWithHeaderVram(gTitleScreenPokemonLogoGfx, (void *)(BG_CHAR_ADDR(0)));
         DecompressDataWithHeaderVram(gTitleScreenPokemonLogoTilemap, (void *)(BG_SCREEN_ADDR(9)));
         LoadPalette(gTitleScreenBgPalettes, BG_PLTT_ID(0), 15 * PLTT_SIZE_4BPP);
-        // bg3
+        // bg0
         DecompressDataWithHeaderVram(sTitleScreenRayquazaGfx, (void *)(BG_CHAR_ADDR(2)));
         DecompressDataWithHeaderVram(sTitleScreenRayquazaTilemap, (void *)(BG_SCREEN_ADDR(26)));
         // bg1
@@ -657,6 +710,21 @@ void CB2_InitTitleScreen(void)
         LoadCompressedSpriteSheet(&sPokemonLogoShineSpriteSheet[0]);
         LoadPalette(gTitleScreenEmeraldVersionPal, OBJ_PLTT_ID(0), PLTT_SIZE_4BPP);
         LoadSpritePalette(&sSpritePalette_PressStart[0]);
+        // Flygon sprites
+        LoadCompressedSpriteSheet(&sSpriteSheet_Flygon[0]);
+        LoadSpritePalette(&sSpritePalette_Flygon[0]);
+        {
+            u8 i;
+            u8 flygonPalIdx = IndexOfSpritePaletteTag(TAG_FLYGON);
+            s16 flygon_x[] = { 32, 96, 32, 96, 32, 96 };
+            s16 flygon_y[] = { 32, 32, 96, 96, 144, 144 };
+            for (i = 0; i < 6; i++)
+            {
+                u8 spriteId = CreateSprite(&sFlygonSpriteTemplate[i], flygon_x[i], flygon_y[i], 0);
+                gSprites[spriteId].oam.paletteNum = flygonPalIdx;
+                StartSpriteAnim(&gSprites[spriteId], i);
+            }
+        }
         gMain.state = 2;
         break;
     case 2:

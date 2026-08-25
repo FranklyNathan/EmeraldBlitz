@@ -2150,6 +2150,7 @@ extern const u32 gTitleScreenCloudsTilemap[];
 extern const u16 gTitleScreenBgPalettes[];
 extern const u16 gTitleScreenPressStartPal[];
 extern const u16 gTitleScreenEmeraldVersionPal[];
+extern const u16 gTitleScreenFlygonPal[];
 
 // Battle Dome
 extern const u32 gDomeTourneyInfoCard_Gfx[];
