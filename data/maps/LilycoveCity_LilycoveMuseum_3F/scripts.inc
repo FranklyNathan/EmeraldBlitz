@@ -31,6 +31,10 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_PostWarpBattle:
 	applymovement LOCALID_PLAYER, LilycoveCity_LilycoveMuseum_3F_Movement_PlayerApproach2
 	waitmovement 0
 	delay 20
+	special SpawnCameraObject
+	applymovement LOCALID_CAMERA, LilycoveCity_LilycoveMuseum_3F_Movement_camerapanleft
+	waitmovement 0
+	special RemoveCameraObject
 	goto LilycoveCity_LilycoveMuseum_3F_EventScript_BattleDispatch
 
 Museum3F_ApproachTrainerAtNPC1:
@@ -40,6 +44,10 @@ Museum3F_ApproachTrainerAtNPC1:
 	applymovement LOCALID_PLAYER, LilycoveCity_LilycoveMuseum_3F_Movement_PlayerApproach2
 	waitmovement 0
 	delay 20
+	special SpawnCameraObject
+	applymovement LOCALID_CAMERA, LilycoveCity_LilycoveMuseum_3F_Movement_camerapanleft
+	waitmovement 0
+	special RemoveCameraObject
 	goto LilycoveCity_LilycoveMuseum_3F_EventScript_BattleDispatch
 
 @ ============================================================
@@ -81,11 +89,40 @@ Museum3F_BattleSetup_TrainerAtLeft:
 
 Museum3F_SetupSprites:
 	goto_if_eq VAR_0x8005, 0, Museum3F_TrainerAtLeft
-	setvar VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_BRENDAN_NORMAL
-	goto Museum3F_SetFillerSprite
+	goto Museum3F_SetTrainerGfx
 
 Museum3F_TrainerAtLeft:
-	setvar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_BRENDAN_NORMAL
+	goto Museum3F_SetTrainerGfx
+
+Museum3F_SetTrainerGfx:
+	switch VAR_0x8004
+	case 0, Museum3F_GfxDefault
+	case 1, Museum3F_GfxSilver
+	case 2, Museum3F_GfxBlue
+	case 3, Museum3F_GfxDefault
+	case 4, Museum3F_GfxPink
+	end
+
+Museum3F_GfxDefault:
+	setvar VAR_0x8007, OBJ_EVENT_GFX_BRENDAN_NORMAL
+	goto Museum3F_ApplyTrainerGfx
+Museum3F_GfxSilver:
+	setvar VAR_0x8007, OBJ_EVENT_GFX_BRENDAN_SILVER
+	goto Museum3F_ApplyTrainerGfx
+Museum3F_GfxBlue:
+	setvar VAR_0x8007, OBJ_EVENT_GFX_BRENDAN_BLUE
+	goto Museum3F_ApplyTrainerGfx
+Museum3F_GfxPink:
+	setvar VAR_0x8007, OBJ_EVENT_GFX_BRENDAN_PINK
+	goto Museum3F_ApplyTrainerGfx
+
+Museum3F_ApplyTrainerGfx:
+	goto_if_eq VAR_0x8005, 0, Museum3F_ApplyTrainerGfxToID0
+	copyvar VAR_OBJ_GFX_ID_1, VAR_0x8007
+	goto Museum3F_SetFillerSprite
+
+Museum3F_ApplyTrainerGfxToID0:
+	copyvar VAR_OBJ_GFX_ID_0, VAR_0x8007
 
 Museum3F_SetFillerSprite:
 	switch VAR_0x8006
@@ -315,6 +352,12 @@ LilycoveCity_LilycoveMuseum_3F_Movement_PlayerApproach1:
 	step_end
 
 LilycoveCity_LilycoveMuseum_3F_Movement_PlayerApproach2:
+	walk_left
+	step_end
+
+LilycoveCity_LilycoveMuseum_3F_Movement_camerapanleft:
+	walk_left
+	walk_left
 	walk_left
 	step_end
 

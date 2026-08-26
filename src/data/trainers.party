@@ -18704,7 +18704,7 @@ Ability: Poison Heal
 === TRAINER_MUSEUM_KCH42 ===
 Name: KCH42
 Class: Living Legend
-Pic: Brendan
+Pic: Brendan Silver
 Gender: Male
 Music: Male
 Double Battle: No
@@ -18760,7 +18760,7 @@ Ability: Wind Rider
 - X Scissor
 - Explosion
 
-Venusaur (M) @ Venusaurite
+Venusaur (F) @ Venusaurite
 Level: 58
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
@@ -18773,7 +18773,7 @@ Ability: Overgrow
 === TRAINER_MUSEUM_JEANS ===
 Name: JEANS
 Class: Living Legend
-Pic: Brendan
+Pic: Brendan Blue
 Gender: Male
 Music: Male
 Double Battle: No
@@ -18911,7 +18911,7 @@ Ability: Forecast
 === TRAINER_MUSEUM_FREEZ ===
 Name: FREEZ
 Class: Living Legend
-Pic: Brendan
+Pic: Brendan Pink
 Gender: Male
 Music: Male
 Double Battle: No

@@ -106,6 +106,8 @@ LilycoveCity_LilycoveMuseum_1F_EventScript_Kricketune::
     playmoncry SPECIES_KRICKETUNE, CRY_MODE_NORMAL
     msgbox LilycoveCity_LilycoveMuseum_1F_Text_Kricketune, MSGBOX_DEFAULT
     waitmoncry
+    applymovement VAR_LAST_TALKED, Common_Movement_FaceUp
+    waitmovement 0
     release
     end
 

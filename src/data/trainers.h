@@ -47632,7 +47632,7 @@ F_TRAINER_FEMALE |
 #line 18706
         .trainerClass = TRAINER_CLASS_LIVING_LEGEND,
 #line 18707
-        .trainerPic = TRAINER_PIC_BRENDAN,
+        .trainerPic = TRAINER_PIC_BRENDAN_SILVER,
         .encounterMusic_gender =
 #line 18709
             TRAINER_ENCOUNTER_MUSIC_MALE,
@@ -47641,7 +47641,7 @@ F_TRAINER_FEMALE |
 #line 18711
         .aiFlags = AI_FLAG_BASIC_TRAINER | AI_FLAG_SMART_MON_CHOICES | AI_FLAG_SMART_SWITCHING,
 #line 0
-        .trainerBackPic = TRAINER_PIC_BRENDAN,
+        .trainerBackPic = TRAINER_PIC_BRENDAN_SILVER,
         .partySize = 6,
         .party = (const struct TrainerMon[])
         {
@@ -47769,7 +47769,7 @@ F_TRAINER_FEMALE |
 #line 18763
             .species = SPECIES_VENUSAUR,
 #line 18763
-            .gender = TRAINER_MON_MALE,
+            .gender = TRAINER_MON_FEMALE,
 #line 18763
             .heldItem = ITEM_VENUSAURITE,
 #line 18765
@@ -47799,7 +47799,7 @@ F_TRAINER_FEMALE |
 #line 18775
         .trainerClass = TRAINER_CLASS_LIVING_LEGEND,
 #line 18776
-        .trainerPic = TRAINER_PIC_BRENDAN,
+        .trainerPic = TRAINER_PIC_BRENDAN_BLUE,
         .encounterMusic_gender =
 #line 18778
             TRAINER_ENCOUNTER_MUSIC_MALE,
@@ -47808,7 +47808,7 @@ F_TRAINER_FEMALE |
 #line 18780
         .aiFlags = AI_FLAG_BASIC_TRAINER | AI_FLAG_SMART_MON_CHOICES | AI_FLAG_SMART_SWITCHING,
 #line 0
-        .trainerBackPic = TRAINER_PIC_BRENDAN,
+        .trainerBackPic = TRAINER_PIC_BRENDAN_BLUE,
         .partySize = 6,
         .party = (const struct TrainerMon[])
         {
@@ -48133,7 +48133,7 @@ F_TRAINER_FEMALE |
 #line 18913
         .trainerClass = TRAINER_CLASS_LIVING_LEGEND,
 #line 18914
-        .trainerPic = TRAINER_PIC_BRENDAN,
+        .trainerPic = TRAINER_PIC_BRENDAN_PINK,
         .encounterMusic_gender =
 #line 18916
             TRAINER_ENCOUNTER_MUSIC_MALE,
@@ -48142,7 +48142,7 @@ F_TRAINER_FEMALE |
 #line 18918
         .aiFlags = AI_FLAG_BASIC_TRAINER | AI_FLAG_SMART_MON_CHOICES | AI_FLAG_SMART_SWITCHING,
 #line 0
-        .trainerBackPic = TRAINER_PIC_BRENDAN,
+        .trainerBackPic = TRAINER_PIC_BRENDAN_PINK,
         .partySize = 6,
         .party = (const struct TrainerMon[])
         {
