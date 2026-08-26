@@ -132,7 +132,17 @@ LilycoveCity_LilycoveMuseum_1F_EventScript_Pangoro::
     goto_if_set FLAG_TEMP_5, LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroSatisfied
     msgbox LilycoveCity_LilycoveMuseum_1F_Text_PangoroSatisfied, MSGBOX_DEFAULT
     closemessage
+    getplayerxy VAR_TEMP_0, VAR_TEMP_1
+    compare VAR_TEMP_0, 16
+    goto_if_gt LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroStepLeft
     applymovement VAR_LAST_TALKED, LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepRight
+    waitmovement 0
+    setflag FLAG_TEMP_5
+    release
+    end
+
+LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroStepLeft::
+    applymovement VAR_LAST_TALKED, LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepLeft
     waitmovement 0
     setflag FLAG_TEMP_5
     release
@@ -145,6 +155,11 @@ LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroSatisfied::
 
 LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepRight:
     walk_right
+    face_down
+    step_end
+
+LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepLeft:
+    walk_left
     face_down
     step_end
 

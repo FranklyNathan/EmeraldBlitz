@@ -26,6 +26,7 @@ SootopolisCity_Gym_B1F_EventScript_InterviewScene::
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_PopOut
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_PopOut
 	waitmovement 0
+	playbgm MUS_ENCOUNTER_INTERVIEWER, FALSE
 	goto_if_eq VAR_RESULT, 0, SootopolisCity_Gym_B1F_EventScript_InterviewBelow
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceDown
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, Common_Movement_FaceDown
@@ -159,6 +160,7 @@ SootopolisCity_Gym_B1F_EventScript_InterviewLoop_AfterGabbyJump:
 	setflag FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY
 	delay 10
 	fadescreen FADE_FROM_BLACK
+	playbgm MUS_GYM, FALSE
 	releaseall
 	end
 
@@ -167,6 +169,7 @@ SootopolisCity_Gym_B1F_EventScript_RepeatInterviewScene::
 	playse SE_M_DIG
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_PopOut
 	waitmovement 0
+	playbgm MUS_ENCOUNTER_INTERVIEWER, FALSE
 	goto_if_eq VAR_RESULT, 0, SootopolisCity_Gym_B1F_EventScript_RepeatBelow
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, Common_Movement_FaceDown
 	goto SootopolisCity_Gym_B1F_EventScript_RepeatExclaimDown
@@ -305,6 +308,7 @@ SootopolisCity_Gym_B1F_EventScript_RepeatLoop_AfterGabbyJump:
 	setflag FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY
 	delay 10
 	fadescreen FADE_FROM_BLACK
+	playbgm MUS_GYM, FALSE
 	releaseall
 	end
 

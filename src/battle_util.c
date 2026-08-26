@@ -3871,6 +3871,14 @@ bool32 TryFieldEffects(enum FieldEffectCases caseId)
                         B_ANIM_SWAMP,
                         &gSideTimers[B_SIDE_OPPONENT].swampTimer);
             break;
+        case STARTING_STATUS_POISON_OPPONENT:
+            {
+                u8 battler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+                u32 status = STATUS1_POISON;
+                gBattleMons[battler].status1 = STATUS1_POISON;
+                SetMonData(GetBattlerMon(battler), MON_DATA_STATUS, &status);
+            }
+            break;
         }
         if (effect)
         {

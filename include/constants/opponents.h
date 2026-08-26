@@ -866,13 +866,18 @@
 #define TRAINER_VIOLA_6                     860
 #define TRAINER_VIOLA_7                     861
 #define TRAINER_VIOLA_8                     862
+#define TRAINER_MUSEUM_JASON                863
+#define TRAINER_MUSEUM_KCH42                864
+#define TRAINER_MUSEUM_JEANS                865
+#define TRAINER_MUSEUM_BEASTLY              866
+#define TRAINER_MUSEUM_FREEZ                867
 
 // NOTE: Because each Trainer uses a flag to determine when they are defeated, there is only space for 9 additional trainers before trainer flag space overflows
 //       More space can be made by shifting flags around in constants/flags.h or changing how trainer flags are handled
 //       MAX_TRAINERS_COUNT can be increased but will take up additional saveblock space
 
-#define TRAINERS_COUNT                      863
-#define MAX_TRAINERS_COUNT                  864
+#define TRAINERS_COUNT                      868
+#define MAX_TRAINERS_COUNT                  869
 #define TRAINER_PARTNER(partner)           (MAX_TRAINERS_COUNT + partner)
 
 #endif  // GUARD_CONSTANTS_OPPONENTS_H

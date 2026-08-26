@@ -18630,3 +18630,349 @@ Ability: Steadfast
 - Leaf Blade
 - Psycho Cut
 - Swords Dance
+
+=== TRAINER_MUSEUM_JASON ===
+Name: JASON
+Class: Living Legend
+Pic: Brendan
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
+Starting Status: Poison Opponent
+
+Arcanine (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Intimidate
+- Raging Fury
+- Overheat
+- Play Rough
+- Thunder Fang
+
+Slurpuff (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Unburden
+- Psychic
+- Draining Kiss
+- Dazzling Gleam
+- Flamethrower
+
+Mismagius (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Levitate
+- Shadow Ball
+- Mystical Fire
+- Power Gem
+- Will O Wisp
+
+Electivire (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Static
+- Light Screen
+- Reflect
+- Thunderbolt
+- Supercell Slam
+
+Jellicent (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Cursed Body
+- Surf
+- Shadow Ball
+- Brine
+- Ice Beam
+
+Gliscor (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Poison Heal
+- Knock Off
+- Acrobatics
+- Earthquake
+- X Scissor
+
+=== TRAINER_MUSEUM_KCH42 ===
+Name: KCH42
+Class: Living Legend
+Pic: Brendan
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
+
+Masquerain (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Intimidate
+- Sticky Web
+- Air Slash
+- Bug Buzz
+- Surf
+
+Porygon-Z (M) @ Silk Scarf
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Download
+- Tri Attack
+- Ice Beam
+- Thunderbolt
+- Psychic
+
+Tinkaton (M) @ Metal Coat
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Mold Breaker
+- Gigaton Hammer
+- Play Rough
+- Ice Hammer
+- Fake Out
+
+Emolga (M) @ King's Rock
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Motor Drive
+- Volt Switch
+- Air Slash
+- Encore
+- Protect
+
+Shiftry (M) @ Salac Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Wind Rider
+- Foul Play
+- Giga Drain
+- X Scissor
+- Explosion
+
+Venusaur (M) @ Venusaurite
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Overgrow
+- Giga Drain
+- Sludge Bomb
+- Earthquake
+- Growth
+
+=== TRAINER_MUSEUM_JEANS ===
+Name: JEANS
+Class: Living Legend
+Pic: Brendan
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
+
+Araquanid (M) @ Mystic Water
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Water Bubble
+- Sticky Web
+- Liquidation
+- Leech Life
+- Crunch
+
+Flygon (M) @ Soft Sand
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Levitate
+- Earthquake
+- Dragon Rush
+- Iron Tail
+- Thunder Punch
+
+Chandelure (M) @ Chandelurite
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Flame Body
+- Shadow Ball
+- Flamethrower
+- Energy Ball
+- Calm Mind
+
+Luxray (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Intimidate
+- Volt Switch
+- Play Rough
+- Ice Fang
+- Iron Tail
+
+Tyranitar (M) @ Lum Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Sand Stream
+- Stone Edge
+- Crunch
+- Rock Tomb
+- Earthquake
+
+Decidueye-Hisui (M) @ Miracle Seed
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Overgrow
+- Leaf Blade
+- Triple Arrows
+- Brave Bird
+- Leaf Storm
+
+=== TRAINER_MUSEUM_BEASTLY ===
+Name: BEASTLY
+Class: Living Legend
+Pic: Brendan
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
+
+Ninjask (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Speed Boost
+- Substitute
+- Baton Pass
+- X Scissor
+- Hone Claws
+
+Lucario (M) @ Lucarionite
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Inner Focus
+- Close Combat
+- Meteor Mash
+- Work Up
+- Aura Sphere
+
+Rotom-Mow (M) @ White Herb
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Levitate
+- Leaf Storm
+- Thunderbolt
+- Substitute
+- Thunder
+
+Revavroom (M) @ Lum Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Filter
+- Iron Head
+- Poison Jab
+- Shift Gear
+- Taunt
+
+Espeon (M) @ Twisted Spoon
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Magic Bounce
+- Psychic
+- Calm Mind
+- Shadow Ball
+- Dazzling Gleam
+
+Castform (M) @ Mystic Water
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Forecast
+- Hydro Pump
+- Hurricane
+- Thunder
+- Weather Ball
+
+=== TRAINER_MUSEUM_FREEZ ===
+Name: FREEZ
+Class: Living Legend
+Pic: Brendan
+Gender: Male
+Music: Male
+Double Battle: No
+AI: Basic Trainer / Smart Mon Choices / Smart Switching
+
+Salazzle (F) @ Mental Herb
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Corrosion
+- Toxic Spikes
+- Sludge Bomb
+- Flamethrower
+- Encore
+
+Slither Wing (M) @ Silver Powder
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Protosynthesis
+- First Impression
+- U Turn
+- Close Combat
+- Wild Charge
+
+Primarina (F) @ Quick Claw
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Torrent
+- Sparkling Aria
+- Moonblast
+- Ice Beam
+- Energy Ball
+
+Shaymin (M) @ Sitrus Berry
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Natural Cure
+- Seed Flare
+- Earth Power
+- Air Slash
+- Dazzling Gleam
+
+Braviary (M) @ Silk Scarf
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Defiant
+- Brave Bird
+- Return
+- Superpower
+- Retaliate
+
+Excadrill (M) @ Excadrite
+Level: 58
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Mold Breaker
+- Earthquake
+- Iron Head
+- Rock Slide
+- Swords Dance

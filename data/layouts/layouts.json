@@ -4564,7 +4564,7 @@
     {
       "id": "LAYOUT_LILYCOVE_CITY_LILYCOVE_MUSEUM_3F",
       "name": "LilycoveCity_LilycoveMuseum_3F_Layout",
-      "width": 19,
+      "width": 35,
       "height": 18,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_BattlePalace",
