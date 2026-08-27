@@ -38,8 +38,8 @@ enum {
 #define VERSION_BANNER_MIDDLE_X 145
 #define VERSION_BANNER_RIGHT_X 209
 #define VERSION_BANNER_Y 18
-#define VERSION_BANNER_Y_GOAL 75
-#define START_BANNER_X 154
+#define VERSION_BANNER_Y_GOAL 77
+#define START_BANNER_X 133
 #define SILHOUETTE_CHILD_X_OFFSET 48
 
 #define CLEAR_SAVE_BUTTON_COMBO (B_BUTTON | SELECT_BUTTON | DPAD_UP)
@@ -885,7 +885,11 @@ static void SpriteCB_SilhouetteTinyFly(struct Sprite *sprite)
 
     sprite->invisible = FALSE;
 
-    sprite->x -= 5;
+    // Move every other frame to halve the speed
+    if (++sprite->data[4] & 1)
+        return;
+
+    sprite->x -= 4;
     sprite->y -= 1;
 
     if (sprite->x < -32)
@@ -1164,7 +1168,7 @@ void CB2_InitTitleScreen(void)
         gTasks[taskId].tCounter = 256;
         gTasks[taskId].tSkipToNext = FALSE;
         gTasks[taskId].tPointless = -16;
-        gTasks[taskId].tBg2Y = -15;
+        gTasks[taskId].tBg2Y = -31;
         gMain.state = 3;
         break;
     }
@@ -1177,7 +1181,7 @@ void CB2_InitTitleScreen(void)
         PanFadeAndZoomScreen(DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2, 0x100, 0);
         SetGpuReg(REG_OFFSET_BG2X_L, -37 * 256);
         SetGpuReg(REG_OFFSET_BG2X_H, -1);
-        SetGpuReg(REG_OFFSET_BG2Y_L, -15 * 256);
+        SetGpuReg(REG_OFFSET_BG2Y_L, -31 * 256);
         SetGpuReg(REG_OFFSET_BG2Y_H, -1);
         SetGpuReg(REG_OFFSET_WIN0H, 0);
         SetGpuReg(REG_OFFSET_WIN0V, 0);
@@ -1300,8 +1304,8 @@ static void Task_TitleScreenPhase2(u8 taskId)
                                     | DISPCNT_BG1_ON
                                     | DISPCNT_BG2_ON
                                     | DISPCNT_OBJ_ON);
-        CreatePressStartBanner(START_BANNER_X, 128);
-        CreateCopyrightBanner(146, 154);
+        CreatePressStartBanner(START_BANNER_X, 127);
+        CreateCopyrightBanner(125, 154);
         CreateSilhouetteSprites();
         gTasks[taskId].tBg1Y = 0;
         gTasks[taskId].func = Task_TitleScreenPhase3;
