@@ -67,14 +67,11 @@ SootopolisCity_Gym_1F_OnResume:
 SootopolisCity_Gym_1F_OnLoad:
 	call SootopolisCity_Gym_1F_EventScript_CheckSetStairMetatiles
 	special SetSootopolisGymCrackedIceMetatiles
-	goto_if_set FLAG_BOSS_FLIP, SootopolisCity_Gym_1F_EventScript_ArchieStay
-	setflag FLAG_HIDE_WALLACE_FOR_ARCHIE
-	clearflag FLAG_BOSS_FLIP
-	call_if_eq VAR_BADGE_COUNT, 7, SootopolisCity_Gym_EventScript_RollforArchie
-	end
-
-SootopolisCity_Gym_1F_EventScript_ArchieStay:
+	goto_if_eq VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_WALLACE, SootopolisCity_Gym_1F_EventScript_End
+	goto_if_eq VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_ARCHIE, SootopolisCity_Gym_1F_EventScript_End
 	clearflag FLAG_HIDE_WALLACE_FOR_ARCHIE
+    setvar VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_WALLACE
+	call_if_eq VAR_BADGE_COUNT, 7, SootopolisCity_Gym_EventScript_RollforArchie
 	end
 
 SootopolisCity_Gym_EventScript_RollforArchie:
@@ -83,8 +80,9 @@ SootopolisCity_Gym_EventScript_RollforArchie:
 	end
 
 SootopolisCity_Gym_ArchieAppears:
-	setflag FLAG_BOSS_FLIP
-	clearflag FLAG_HIDE_WALLACE_FOR_ARCHIE
+    setvar VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_ARCHIE
+	setflag FLAG_HIDE_WALLACE_FOR_ARCHIE
+    setflag FLAG_BOSS_FLIP
     end
 
 SootopolisCity_Gym_1F_EventScript_End:
