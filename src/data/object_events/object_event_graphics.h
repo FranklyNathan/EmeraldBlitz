@@ -6,6 +6,7 @@ const u16 gObjectEventPal_BrendanOrange[] = INCBIN_U16("graphics/object_events/p
 const u16 gObjectEventPal_BrendanCyan[] = INCBIN_U16("graphics/object_events/palettes/cyan_brendan.gbapal");
 const u16 gObjectEventPal_BrendanSilver[] = INCBIN_U16("graphics/object_events/palettes/silver_brendan.gbapal");
 const u16 gObjectEventPal_BrendanPink[] = INCBIN_U16("graphics/object_events/palettes/pink_brendan.gbapal");
+const u16 gObjectEventPal_BrendanPurple[] = INCBIN_U16("graphics/object_events/palettes/purple_brendan.gbapal");
 const u16 gObjectEventPal_BrendanGold[] = INCBIN_U16("graphics/object_events/palettes/gold_brendan.gbapal");
 const u32 gObjectEventPic_RubySapphireBrendanNormal[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/walking.4bpp");
 const u32 gObjectEventPic_RubySapphireBrendanRunning[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/running.4bpp");

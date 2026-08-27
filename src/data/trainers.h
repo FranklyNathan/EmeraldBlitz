@@ -47463,7 +47463,7 @@ F_TRAINER_FEMALE |
 #line 18636
         .trainerClass = TRAINER_CLASS_LIVING_LEGEND,
 #line 18637
-        .trainerPic = TRAINER_PIC_BRENDAN,
+        .trainerPic = TRAINER_PIC_BRENDAN_ORANGE,
         .encounterMusic_gender =
 #line 18639
             TRAINER_ENCOUNTER_MUSIC_MALE,
@@ -47474,7 +47474,7 @@ F_TRAINER_FEMALE |
 #line 18642
         .startingStatus = STARTING_STATUS_POISON_OPPONENT,
 #line 0
-        .trainerBackPic = TRAINER_PIC_BRENDAN,
+        .trainerBackPic = TRAINER_PIC_BRENDAN_ORANGE,
         .partySize = 6,
         .party = (const struct TrainerMon[])
         {
@@ -47966,7 +47966,7 @@ F_TRAINER_FEMALE |
 #line 18844
         .trainerClass = TRAINER_CLASS_LIVING_LEGEND,
 #line 18845
-        .trainerPic = TRAINER_PIC_BRENDAN,
+        .trainerPic = TRAINER_PIC_BRENDAN_PURPLE,
         .encounterMusic_gender =
 #line 18847
             TRAINER_ENCOUNTER_MUSIC_MALE,
@@ -47975,7 +47975,7 @@ F_TRAINER_FEMALE |
 #line 18849
         .aiFlags = AI_FLAG_BASIC_TRAINER | AI_FLAG_SMART_MON_CHOICES | AI_FLAG_SMART_SWITCHING,
 #line 0
-        .trainerBackPic = TRAINER_PIC_BRENDAN,
+        .trainerBackPic = TRAINER_PIC_BRENDAN_PURPLE,
         .partySize = 6,
         .party = (const struct TrainerMon[])
         {

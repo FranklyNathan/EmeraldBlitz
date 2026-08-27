@@ -9,7 +9,7 @@ LilycoveCity_LilycoveMuseum_1F_OnTransition:
 	end
 
 LilycoveCity_LilycoveMuseum_1F_OnTransition_PangoroMoved:
-	setobjectxyperm LOCALID_MUSEUM_1F_PANGORO, 17, 2
+	setobjectxyperm 12, 17, 2
 	end
 
 LilycoveCity_LilycoveMuseum_1F_EventScript_Trapped::

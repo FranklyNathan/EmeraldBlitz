@@ -251,11 +251,13 @@
 #define OBJ_EVENT_GFX_BRENDAN_BLUE               244
 #define OBJ_EVENT_GFX_BRENDAN_SILVER             245
 #define OBJ_EVENT_GFX_BRENDAN_PINK               246
+#define OBJ_EVENT_GFX_BRENDAN_ORANGE             247
+#define OBJ_EVENT_GFX_BRENDAN_PURPLE             248
 
 // NOTE: The maximum amount of object events has been expanded from 255 to 65535.
 // Since dynamic graphics ids still require at least 16 free values, the actual limit
 // is 65519, but even considering follower Pokémon, this should be more than enough :)
-#define NUM_OBJ_EVENT_GFX                        247
+#define NUM_OBJ_EVENT_GFX                        249
 
 
 // These are dynamic object gfx ids.
@@ -425,6 +427,7 @@
 #define OBJ_EVENT_PAL_TAG_DYNAMIC_GREY_START      0x11D0
 #define OBJ_EVENT_PAL_TAG_FLYGON_BIKE_FOREST      0x114A
 #define OBJ_EVENT_PAL_TAG_FLYGON_BIKE_MAY_FOREST  0x114B
+#define OBJ_EVENT_PAL_TAG_BRENDAN_PURPLE          0x116B
 #define OBJ_EVENT_PAL_TAG_BRENDAN_SKYBLUE         0x114C
 #define OBJ_EVENT_PAL_TAG_MAY_SKYBLUE             0x114D
 #define OBJ_EVENT_PAL_TAG_FLYGON_BIKE_SKYBLUE     0x114E

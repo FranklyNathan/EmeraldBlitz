@@ -245,6 +245,8 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Viola;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MuseumBrendanBlue;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MuseumBrendanSilver;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MuseumBrendanPink;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MuseumBrendanOrange;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MuseumBrendanPurple;
 
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Bard;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Hipster;
@@ -503,6 +505,8 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_BRENDAN_BLUE] =             &gObjectEventGraphicsInfo_MuseumBrendanBlue,
     [OBJ_EVENT_GFX_BRENDAN_SILVER] =           &gObjectEventGraphicsInfo_MuseumBrendanSilver,
     [OBJ_EVENT_GFX_BRENDAN_PINK] =             &gObjectEventGraphicsInfo_MuseumBrendanPink,
+    [OBJ_EVENT_GFX_BRENDAN_ORANGE] =           &gObjectEventGraphicsInfo_MuseumBrendanOrange,
+    [OBJ_EVENT_GFX_BRENDAN_PURPLE] =           &gObjectEventGraphicsInfo_MuseumBrendanPurple,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {

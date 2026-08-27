@@ -112,7 +112,9 @@
 #define TRAINER_PIC_BRENDAN_BLUE          94
 #define TRAINER_PIC_BRENDAN_SILVER        95
 #define TRAINER_PIC_BRENDAN_PINK          96
-#define TRAINER_PIC_COUNT                 97
+#define TRAINER_PIC_BRENDAN_ORANGE        97
+#define TRAINER_PIC_BRENDAN_PURPLE        98
+#define TRAINER_PIC_COUNT                 99
 
 // The player back pics are assumed to alternate according to the gender values (MALE/FEMALE)
 #define TRAINER_BACK_PIC_BRENDAN                0

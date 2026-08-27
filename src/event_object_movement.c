@@ -522,6 +522,7 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_BrendanSilver,         OBJ_EVENT_PAL_TAG_BRENDAN_SILVER},
     {gObjectEventPal_MaySilver,             OBJ_EVENT_PAL_TAG_MAY_SILVER},
     {gObjectEventPal_BrendanPink,           OBJ_EVENT_PAL_TAG_BRENDAN_PINK},
+    {gObjectEventPal_BrendanPurple,         OBJ_EVENT_PAL_TAG_BRENDAN_PURPLE},
     {gObjectEventPal_MayPink,               OBJ_EVENT_PAL_TAG_MAY_PINK},
     {gObjectEventPal_BrendanGold,           OBJ_EVENT_PAL_TAG_BRENDAN_GOLD},
     {gObjectEventPal_MayGold,               OBJ_EVENT_PAL_TAG_MAY_GOLD},
