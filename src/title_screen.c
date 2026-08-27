@@ -20,6 +20,7 @@
 #include "gpu_regs.h"
 #include "trig.h"
 #include "graphics.h"
+#include "random.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
@@ -27,18 +28,19 @@ enum {
     TAG_VERSION = 1000,
     TAG_PRESS_START_COPYRIGHT,
     TAG_LOGO_SHINE,
-    TAG_FLYGON,
+    TAG_SILHOUETTE,
 };
 
 // Tile offsets are in OAM tile units (32 bytes); each 64x64 8bpp sprite consumes 128 units.
 #define VERSION_BANNER_MIDDLE_TILEOFFSET 128
 #define VERSION_BANNER_RIGHT_TILEOFFSET 256
-#define VERSION_BANNER_LEFT_X 102
-#define VERSION_BANNER_MIDDLE_X 166
-#define VERSION_BANNER_RIGHT_X 230
-#define VERSION_BANNER_Y 35
-#define VERSION_BANNER_Y_GOAL 92
+#define VERSION_BANNER_LEFT_X 81
+#define VERSION_BANNER_MIDDLE_X 145
+#define VERSION_BANNER_RIGHT_X 209
+#define VERSION_BANNER_Y 18
+#define VERSION_BANNER_Y_GOAL 75
 #define START_BANNER_X 154
+#define SILHOUETTE_CHILD_X_OFFSET 48
 
 #define CLEAR_SAVE_BUTTON_COMBO (B_BUTTON | SELECT_BUTTON | DPAD_UP)
 #define RESET_RTC_BUTTON_COMBO (B_BUTTON | SELECT_BUTTON | DPAD_LEFT)
@@ -66,9 +68,7 @@ static const u16 sUnusedUnknownPal[] = INCBIN_U16("graphics/title_screen/unused.
 
 static const u32 sTitleScreenRayquazaGfx[] = INCBIN_U32("graphics/title_screen/rayquaza.4bpp.smol");
 static const u32 sTitleScreenRayquazaTilemap[] = INCBIN_U32("graphics/title_screen/rayquaza.bin.smolTM");
-static const u32 sTitleScreenFlygonGfx[] = INCBIN_U32("graphics/title_screen/titleflygon.4bpp.smol");
-static const u32 sTitleScreenFlygonTilemap[] = INCBIN_U32("graphics/title_screen/titleflygon.bin.smolTM");
-static const u32 sTitleScreenFlygonObjGfx[] = INCBIN_U32("graphics/title_screen/titleflygon_obj.4bpp.smol");
+static const u32 sTitleScreenSilhouetteGfx[] = INCBIN_U32("graphics/title_screen/Silhouettes.4bpp.smol");
 static const u32 sTitleScreenLogoShineGfx[] = INCBIN_U32("graphics/title_screen/logo_shine.4bpp.smol");
 static const u32 sTitleScreenCloudsGfx[] = INCBIN_U32("graphics/title_screen/clouds.4bpp.smol");
 
@@ -406,55 +406,6 @@ static const struct CompressedSpriteSheet sPokemonLogoShineSpriteSheet[] =
     {},
 };
 
-// Flygon sprite data
-// Tile offsets within the sheet come from ANIMCMD_FRAME below; OamData.tileNum is ignored for tagged sheets.
-static const struct OamData sFlygonOamData_0 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x64), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x64), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
-static const struct OamData sFlygonOamData_1 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x64), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x64), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
-static const struct OamData sFlygonOamData_2 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x64), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x64), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
-static const struct OamData sFlygonOamData_3 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x64), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x64), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
-static const struct OamData sFlygonOamData_4 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x32), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x32), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
-static const struct OamData sFlygonOamData_5 = { .y = 0, .affineMode = ST_OAM_AFFINE_OFF, .objMode = ST_OAM_OBJ_NORMAL, .mosaic = FALSE, .bpp = ST_OAM_4BPP, .shape = SPRITE_SHAPE(64x32), .x = 0, .matrixNum = 0, .size = SPRITE_SIZE(64x32), .tileNum = 0, .priority = 2, .paletteNum = 0, .affineParam = 0 };
-
-#define FLYGON_ANIM(offset) { ANIMCMD_FRAME(offset, 30), ANIMCMD_END }
-static const union AnimCmd sFlygonAnimCmds_0[] = FLYGON_ANIM(0);
-static const union AnimCmd sFlygonAnimCmds_1[] = FLYGON_ANIM(64);
-static const union AnimCmd sFlygonAnimCmds_2[] = FLYGON_ANIM(128);
-static const union AnimCmd sFlygonAnimCmds_3[] = FLYGON_ANIM(192);
-static const union AnimCmd sFlygonAnimCmds_4[] = FLYGON_ANIM(256);
-static const union AnimCmd sFlygonAnimCmds_5[] = FLYGON_ANIM(288);
-
-static const union AnimCmd *const sFlygonAnimTable[] =
-{
-    sFlygonAnimCmds_0,
-    sFlygonAnimCmds_1,
-    sFlygonAnimCmds_2,
-    sFlygonAnimCmds_3,
-    sFlygonAnimCmds_4,
-    sFlygonAnimCmds_5,
-};
-
-static const struct SpriteTemplate sFlygonSpriteTemplate[] =
-{
-    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_0, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
-    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_1, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
-    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_2, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
-    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_3, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
-    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_4, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
-    { .tileTag = TAG_FLYGON, .paletteTag = TAG_FLYGON, .oam = &sFlygonOamData_5, .anims = sFlygonAnimTable, .images = NULL, .affineAnims = gDummySpriteAffineAnimTable, .callback = SpriteCallbackDummy },
-};
-
-static const struct CompressedSpriteSheet sSpriteSheet_Flygon[] =
-{
-    { .data = sTitleScreenFlygonObjGfx, .size = 0x2800, .tag = TAG_FLYGON },
-    {},
-};
-
-static const struct SpritePalette sSpritePalette_Flygon[] =
-{
-    { .data = gTitleScreenFlygonPal, .tag = TAG_FLYGON },
-    {},
-};
-
 // Task data for the main title screen tasks (Task_TitleScreenPhase#)
 #define tCounter    data[0]
 #define tSkipToNext data[1]
@@ -544,24 +495,508 @@ static void CreateCopyrightBanner(s16 x, s16 y)
     }
 }
 
-static void CreateFlygonSprites(void)
+// Silhouette sprite data
+static const struct OamData sSilhouetteLeftOamData =
 {
-    u8 i;
-    u8 flygonPalIdx;
-    s16 flygon_x[] = { 32, 96, 32, 96, 32, 96 };
-    s16 flygon_y[] = { 32, 32, 96, 96, 144, 144 };
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(64x64),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(64x64),
+    .tileNum = 0,
+    .priority = 3,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
 
-    LoadCompressedSpriteSheet(&sSpriteSheet_Flygon[0]);
-    LoadSpritePalette(&sSpritePalette_Flygon[0]);
-    flygonPalIdx = IndexOfSpritePaletteTag(TAG_FLYGON);
-    for (i = 0; i < 6; i++)
+static const struct OamData sSilhouetteRightOamData =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x64),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x64),
+    .tileNum = 0,
+    .priority = 3,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const union AnimCmd sSilhouetteLeftAnimCmd[] =
+{
+    ANIMCMD_FRAME(0, 30),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sSilhouetteRightAnimCmd[] =
+{
+    ANIMCMD_FRAME(64, 30),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sSilhouetteLeftAnimTable[] =
+{
+    sSilhouetteLeftAnimCmd,
+};
+
+static const union AnimCmd *const sSilhouetteRightAnimTable[] =
+{
+    sSilhouetteRightAnimCmd,
+};
+
+static const union AnimCmd sSilhouetteMedLeftAnimCmd[] =
+{
+    ANIMCMD_FRAME(96, 30),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sSilhouetteMedRightAnimCmd[] =
+{
+    ANIMCMD_FRAME(160, 30),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sSilhouetteMedLeftAnimTable[] =
+{
+    sSilhouetteMedLeftAnimCmd,
+};
+
+static const union AnimCmd *const sSilhouetteMedRightAnimTable[] =
+{
+    sSilhouetteMedRightAnimCmd,
+};
+
+static const union AnimCmd sSilhouetteSalamenceAnimCmd[] =
+{
+    ANIMCMD_FRAME(224, 30),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sSilhouetteSalamenceAnimTable[] =
+{
+    sSilhouetteSalamenceAnimCmd,
+};
+
+static const union AnimCmd sSilhouetteTinyAnimCmd[] =
+{
+    ANIMCMD_FRAME(288, 30),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sSilhouetteTinyAnimTable[] =
+{
+    sSilhouetteTinyAnimCmd,
+};
+
+#define sChildSpriteId data[0]
+#define sPauseTimer   data[2]
+
+// Random pause between 180-360 frames (3-6 seconds at 60fps)
+#define SILHOUETTE_MIN_PAUSE 180
+#define SILHOUETTE_PAUSE_RANGE 181
+#define SILHOUETTE_START_VARIANCE 20
+
+static u16 GetSilhouettePause(void)
+{
+    return SILHOUETTE_MIN_PAUSE + (Random() % SILHOUETTE_PAUSE_RANGE);
+}
+
+static s16 SilhouetteRandOffset(void)
+{
+    return (Random() % (SILHOUETTE_START_VARIANCE * 2 + 1)) - SILHOUETTE_START_VARIANCE;
+}
+
+// Large silhouette: flies bottom-left to top-right
+static void SpriteCB_SilhouetteFly(struct Sprite *sprite)
+{
+    struct Sprite *child = &gSprites[sprite->sChildSpriteId];
+
+    if (sprite->sPauseTimer != 0)
     {
-        u8 spriteId = CreateSprite(&sFlygonSpriteTemplate[i], flygon_x[i], flygon_y[i], 0);
-        gSprites[spriteId].oam.paletteNum = flygonPalIdx;
-        StartSpriteAnim(&gSprites[spriteId], i);
+        sprite->sPauseTimer--;
+        return;
+    }
+
+    sprite->invisible = FALSE;
+    child->invisible = FALSE;
+
+    sprite->x += 3;
+    sprite->y -= 1;
+
+    child->x = sprite->x + SILHOUETTE_CHILD_X_OFFSET;
+    child->y = sprite->y;
+
+    if (sprite->x > DISPLAY_WIDTH + 96 || sprite->y < -64)
+    {
+        s16 ox = SilhouetteRandOffset();
+        s16 oy = SilhouetteRandOffset();
+        sprite->sPauseTimer = GetSilhouettePause();
+        sprite->x = -26 + ox;
+        sprite->y = DISPLAY_HEIGHT + 32 + oy;
+        child->x = sprite->x + SILHOUETTE_CHILD_X_OFFSET;
+        child->y = sprite->y;
+        sprite->invisible = TRUE;
+        child->invisible = TRUE;
     }
 }
 
+static const struct SpriteTemplate sSilhouetteLeftSpriteTemplate =
+{
+    .tileTag = TAG_SILHOUETTE,
+    .paletteTag = TAG_SILHOUETTE,
+    .oam = &sSilhouetteLeftOamData,
+    .anims = sSilhouetteLeftAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_SilhouetteFly,
+};
+
+static const struct SpriteTemplate sSilhouetteRightSpriteTemplate =
+{
+    .tileTag = TAG_SILHOUETTE,
+    .paletteTag = TAG_SILHOUETTE,
+    .oam = &sSilhouetteRightOamData,
+    .anims = sSilhouetteRightAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+// Medium silhouette: flies bottom-right to top-left
+static void SpriteCB_SilhouetteMedFly(struct Sprite *sprite)
+{
+    struct Sprite *child = &gSprites[sprite->sChildSpriteId];
+
+    if (sprite->sPauseTimer != 0)
+    {
+        sprite->sPauseTimer--;
+        return;
+    }
+
+    sprite->invisible = FALSE;
+    child->invisible = FALSE;
+
+    sprite->x -= 3;
+    sprite->y -= 1;
+
+    child->x = sprite->x + 48;
+    child->y = sprite->y;
+
+    if (sprite->x < -96 || sprite->y < -64)
+    {
+        s16 ox = SilhouetteRandOffset();
+        s16 oy = SilhouetteRandOffset();
+        sprite->sPauseTimer = GetSilhouettePause();
+        sprite->x = DISPLAY_WIDTH + 46 + ox;
+        sprite->y = DISPLAY_HEIGHT + 32 + oy;
+        child->x = sprite->x + 48;
+        child->y = sprite->y;
+        sprite->invisible = TRUE;
+        child->invisible = TRUE;
+    }
+}
+
+static const struct SpriteTemplate sSilhouetteMedLeftSpriteTemplate =
+{
+    .tileTag = TAG_SILHOUETTE,
+    .paletteTag = TAG_SILHOUETTE,
+    .oam = &sSilhouetteLeftOamData,
+    .anims = sSilhouetteMedLeftAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_SilhouetteMedFly,
+};
+
+static const struct SpriteTemplate sSilhouetteMedRightSpriteTemplate =
+{
+    .tileTag = TAG_SILHOUETTE,
+    .paletteTag = TAG_SILHOUETTE,
+    .oam = &sSilhouetteRightOamData,
+    .anims = sSilhouetteMedRightAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+// Small silhouette: flies left to right, starts high
+static const struct OamData sSilhouetteSmallOamData =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(64x32),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(64x32),
+    .tileNum = 0,
+    .priority = 3,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const union AnimCmd sSilhouetteSmallAnimCmd[] =
+{
+    ANIMCMD_FRAME(192, 30),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sSilhouetteSmallAnimTable[] =
+{
+    sSilhouetteSmallAnimCmd,
+};
+
+static void SpriteCB_SilhouetteSmallFly(struct Sprite *sprite)
+{
+    if (sprite->sPauseTimer != 0)
+    {
+        sprite->sPauseTimer--;
+        return;
+    }
+
+    sprite->invisible = FALSE;
+
+    sprite->x += 4;
+    sprite->y -= 1;
+
+    if (sprite->x > DISPLAY_WIDTH + 64)
+    {
+        sprite->sPauseTimer = GetSilhouettePause();
+        sprite->x = -64;
+        sprite->y = 40 + SilhouetteRandOffset();
+        sprite->invisible = TRUE;
+    }
+}
+
+static const struct SpriteTemplate sSilhouetteSmallSpriteTemplate =
+{
+    .tileTag = TAG_SILHOUETTE,
+    .paletteTag = TAG_SILHOUETTE,
+    .oam = &sSilhouetteSmallOamData,
+    .anims = sSilhouetteSmallAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_SilhouetteSmallFly,
+};
+
+// Salamence silhouette: rare (1/20 chance), flies left to right
+#define sIsActive data[3]
+
+static const struct OamData sSilhouetteSalamenceOamData =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(64x64),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(64x64),
+    .tileNum = 0,
+    .priority = 3,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static void SpriteCB_SilhouetteSalamenceFly(struct Sprite *sprite)
+{
+    if (sprite->sIsActive)
+    {
+        sprite->x -= 4;
+        sprite->y -= 1;
+
+        if (sprite->x < -64)
+        {
+            sprite->sIsActive = FALSE;
+            sprite->sPauseTimer = GetSilhouettePause();
+            sprite->x = DISPLAY_WIDTH + 64;
+            sprite->y = 50 + SilhouetteRandOffset();
+        }
+    }
+    else
+    {
+        if (sprite->sPauseTimer != 0)
+        {
+            sprite->sPauseTimer--;
+        }
+        else
+        {
+            // 1 in 20 chance to appear
+            if ((Random() % 10) == 0)
+            {
+                sprite->sIsActive = TRUE;
+                sprite->x = DISPLAY_WIDTH + 64;
+                sprite->y = 72 + SilhouetteRandOffset();
+            }
+            else
+            {
+                sprite->sPauseTimer = GetSilhouettePause();
+            }
+        }
+    }
+}
+
+static const struct SpriteTemplate sSilhouetteSalamenceSpriteTemplate =
+{
+    .tileTag = TAG_SILHOUETTE,
+    .paletteTag = TAG_SILHOUETTE,
+    .oam = &sSilhouetteSalamenceOamData,
+    .anims = sSilhouetteSalamenceAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_SilhouetteSalamenceFly,
+};
+
+// Tiny silhouette: flies right to left, always starts on a slight delay
+static const struct OamData sSilhouetteTinyOamData =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x32),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x32),
+    .tileNum = 0,
+    .priority = 3,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static void SpriteCB_SilhouetteTinyFly(struct Sprite *sprite)
+{
+    if (sprite->sPauseTimer != 0)
+    {
+        sprite->sPauseTimer--;
+        return;
+    }
+
+    sprite->invisible = FALSE;
+
+    sprite->x -= 5;
+    sprite->y -= 1;
+
+    if (sprite->x < -32)
+    {
+        sprite->sPauseTimer = GetSilhouettePause();
+        sprite->x = DISPLAY_WIDTH + 32;
+        sprite->y = 50 + SilhouetteRandOffset();
+        sprite->invisible = TRUE;
+    }
+}
+
+static const struct SpriteTemplate sSilhouetteTinySpriteTemplate =
+{
+    .tileTag = TAG_SILHOUETTE,
+    .paletteTag = TAG_SILHOUETTE,
+    .oam = &sSilhouetteTinyOamData,
+    .anims = sSilhouetteTinyAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_SilhouetteTinyFly,
+};
+
+static const struct CompressedSpriteSheet sSpriteSheet_Silhouette[] =
+{
+    { .data = sTitleScreenSilhouetteGfx, .size = 0x2600, .tag = TAG_SILHOUETTE },
+    {},
+};
+
+static const struct SpritePalette sSpritePalette_Silhouette[] =
+{
+    { .data = gTitleScreenSilhouettePal, .tag = TAG_SILHOUETTE },
+    {},
+};
+
+// Blue tinted palettes for atmospheric perspective effect.
+// Each is the silhouette palette with color index 1 shifted toward blue.
+// Tint levels: 0=none, 1=slight, 2=moderate, 3=strong, 4=strongest
+#define SILHOUETTE_PAL_BASE 3
+
+static const u16 sSilhouetteTintedPalettes[][16] =
+{
+    // Level 0: No tint (dark green, original)
+    {0x0000, RGB(3, 5, 4), [2 ... 15] = 0x0000},
+    // Level 1: Slight blue shift
+    {0x0000, RGB(2, 4, 7), [2 ... 15] = 0x0000},
+    // Level 2: Moderate blue shift
+    {0x0000, RGB(1, 3, 9), [2 ... 15] = 0x0000},
+    // Level 3: Strong blue shift
+    {0x0000, RGB(1, 2, 11), [2 ... 15] = 0x0000},
+    // Level 4: Strongest blue shift
+    {0x0000, RGB(0, 1, 13), [2 ... 15] = 0x0000},
+};
+
+static void CreateSilhouetteSprites(void)
+{
+    u8 leftId, rightId, smallId;
+    s16 ox, oy;
+    u8 i;
+
+    LoadCompressedSpriteSheet(&sSpriteSheet_Silhouette[0]);
+    LoadSpritePalette(&sSpritePalette_Silhouette[0]);
+
+    // Load tinted palettes into fixed OBJ palette slots
+    for (i = 0; i < ARRAY_COUNT(sSilhouetteTintedPalettes); i++)
+    {
+        LoadPalette(sSilhouetteTintedPalettes[i], OBJ_PLTT_ID(SILHOUETTE_PAL_BASE + i), PLTT_SIZE_4BPP);
+    }
+
+    // Large silhouette: flies bottom-left to top-right (no tint)
+    ox = SilhouetteRandOffset();
+    oy = SilhouetteRandOffset();
+    leftId = CreateSprite(&sSilhouetteLeftSpriteTemplate, -26 + ox, DISPLAY_HEIGHT + 32 + oy, 0);
+    gSprites[leftId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
+
+    rightId = CreateSprite(&sSilhouetteRightSpriteTemplate, -26 + ox + SILHOUETTE_CHILD_X_OFFSET, DISPLAY_HEIGHT + 32 + oy, 0);
+    gSprites[rightId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
+
+    gSprites[leftId].sChildSpriteId = rightId;
+
+    // Medium silhouette: flies bottom-right to top-left (slight tint)
+    ox = SilhouetteRandOffset();
+    oy = SilhouetteRandOffset();
+    leftId = CreateSprite(&sSilhouetteMedLeftSpriteTemplate, DISPLAY_WIDTH + 46 + ox, DISPLAY_HEIGHT + 32 + oy, 0);
+    gSprites[leftId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
+    gSprites[leftId].sPauseTimer = 90;
+
+    rightId = CreateSprite(&sSilhouetteMedRightSpriteTemplate, DISPLAY_WIDTH + 46 + ox + 48, DISPLAY_HEIGHT + 32 + oy, 0);
+    gSprites[rightId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
+
+    gSprites[leftId].sChildSpriteId = rightId;
+
+    // Small silhouette: flies left to right, starts high (strong tint)
+    smallId = CreateSprite(&sSilhouetteSmallSpriteTemplate, -64, 40 + SilhouetteRandOffset(), 0);
+    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 2;
+    gSprites[smallId].sPauseTimer = 150;
+
+    // Salamence silhouette: rare, 1/20 chance (moderate tint)
+    smallId = CreateSprite(&sSilhouetteSalamenceSpriteTemplate, -64, 30, 0);
+    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 2;
+    gSprites[smallId].sPauseTimer = 180;
+
+    // Tiny silhouette: same as salamence start, always on delay (strongest tint)
+    smallId = CreateSprite(&sSilhouetteTinySpriteTemplate, DISPLAY_WIDTH + 32, 50, 0);
+    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 2;
+    gSprites[smallId].sPauseTimer = 240;
+    gSprites[smallId].invisible = TRUE;
+}
+
+#undef sChildSpriteId
+#undef sPauseTimer
+#undef sIsActive
 #undef sAnimate
 #undef sTimer
 
@@ -729,7 +1164,7 @@ void CB2_InitTitleScreen(void)
         gTasks[taskId].tCounter = 256;
         gTasks[taskId].tSkipToNext = FALSE;
         gTasks[taskId].tPointless = -16;
-        gTasks[taskId].tBg2Y = -28;
+        gTasks[taskId].tBg2Y = -15;
         gMain.state = 3;
         break;
     }
@@ -740,7 +1175,7 @@ void CB2_InitTitleScreen(void)
         break;
     case 4:
         PanFadeAndZoomScreen(DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2, 0x100, 0);
-        SetGpuReg(REG_OFFSET_BG2X_L, -28 * 256);
+        SetGpuReg(REG_OFFSET_BG2X_L, -37 * 256);
         SetGpuReg(REG_OFFSET_BG2X_H, -1);
         SetGpuReg(REG_OFFSET_BG2Y_L, -15 * 256);
         SetGpuReg(REG_OFFSET_BG2Y_H, -1);
@@ -867,20 +1302,20 @@ static void Task_TitleScreenPhase2(u8 taskId)
                                     | DISPCNT_OBJ_ON);
         CreatePressStartBanner(START_BANNER_X, 128);
         CreateCopyrightBanner(146, 154);
-        CreateFlygonSprites();
+        CreateSilhouetteSprites();
         gTasks[taskId].tBg1Y = 0;
         gTasks[taskId].func = Task_TitleScreenPhase3;
     }
 
     if (!(gTasks[taskId].tCounter & 3) && gTasks[taskId].tPointless != 0)
         gTasks[taskId].tPointless++;
-    if (!(gTasks[taskId].tCounter & 1) && gTasks[taskId].tBg2Y != -55)
-        gTasks[taskId].tBg2Y--;
+    if (!(gTasks[taskId].tCounter & 1) && gTasks[taskId].tBg2Y != -1)
+        gTasks[taskId].tBg2Y++;
 
-    // Slide Pokémon logo right
+    // Slide Pokémon logo up
     yPos = gTasks[taskId].tBg2Y * 256;
-    SetGpuReg(REG_OFFSET_BG2X_L, yPos);
-    SetGpuReg(REG_OFFSET_BG2X_H, yPos / 0x10000);
+    SetGpuReg(REG_OFFSET_BG2Y_L, yPos);
+    SetGpuReg(REG_OFFSET_BG2Y_H, yPos / 0x10000);
 
     gTasks[taskId].data[5] = 15; // Unused
     gTasks[taskId].data[6] = 6;  // Unused
@@ -914,9 +1349,9 @@ static void Task_TitleScreenPhase3(u8 taskId)
     }
     else
     {
-        SetGpuReg(REG_OFFSET_BG2X_L, -55 * 256);
+        SetGpuReg(REG_OFFSET_BG2X_L, -37 * 256);
         SetGpuReg(REG_OFFSET_BG2X_H, -1);
-        SetGpuReg(REG_OFFSET_BG2Y_L, -15 * 256);
+        SetGpuReg(REG_OFFSET_BG2Y_L, -1 * 256);
         SetGpuReg(REG_OFFSET_BG2Y_H, -1);
         if (++gTasks[taskId].tCounter & 1)
         {

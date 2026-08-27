@@ -2100,7 +2100,8 @@ const u16 gMonIconPalettes[][16] =
 const u16 gTitleScreenBgPalettes[]         = INCBIN_U16("graphics/title_screen/pokemon_logo.gbapal",
                                                         "graphics/title_screen/rayquaza_and_clouds.gbapal");
 const u16 gTitleScreenEmeraldVersionPal[]  = INCBIN_U16("graphics/title_screen/emerald_version.gbapal");
-const u16 gTitleScreenFlygonPal[16]        = INCBIN_U16("graphics/title_screen/titleflygon.gbapal");
+const u16 gTitleScreenSilhouettePal[16]     = INCBIN_U16("graphics/title_screen/Silhouettes.gbapal");
+const u32 gTitleScreenSilhouetteGfx[]     = INCBIN_U32("graphics/title_screen/Silhouettes.4bpp.smol");
 const u32 gTitleScreenCloudsTilemap[]      = INCBIN_U32("graphics/title_screen/clouds.bin.smolTM");
 const u32 gTitleScreenPokemonLogoGfx[]     = INCBIN_U32("graphics/title_screen/pokemon_logo.8bpp.smol");
 const u32 gTitleScreenEmeraldVersionGfx[]  = INCBIN_U32("graphics/title_screen/emerald_version.8bpp.smol");

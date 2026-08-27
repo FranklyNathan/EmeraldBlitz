@@ -281,6 +281,9 @@ $(TITLESCREENGFXDIR)/pokemon_logo.gbapal: %.gbapal: %.pal
 $(TITLESCREENGFXDIR)/emerald_version.8bpp: %.8bpp: %.png
 	$(GFX) $< $@ -mwidth 8 -mheight 8
 
+$(TITLESCREENGFXDIR)/Silhouettes.gbapal $(TITLESCREENGFXDIR)/Silhouettes.4bpp: $(TITLESCREENGFXDIR)/SilhouettesLarge.png $(TITLESCREENGFXDIR)/SilhouettesMedium.png
+	python3 tools/convert_silhouette.py
+
 graphics/pokemon_jump/bg.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 63 -Wnum_tiles
 
