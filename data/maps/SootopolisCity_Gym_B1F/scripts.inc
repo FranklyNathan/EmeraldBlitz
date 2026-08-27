@@ -18,9 +18,9 @@ SootopolisCity_Gym_B1F_EventScript_InterviewScene::
 	addobject LOCALID_SOOTOPOLIS_GYM_B1F_GABBY
 	addobject LOCALID_SOOTOPOLIS_GYM_B1F_TY
 	special SootopolisGymB1F_SetupGabbyTy
+	goto_if_set FLAG_SOOTOPOLIS_GYM_INTERVIEWED, SootopolisCity_Gym_B1F_EventScript_RepeatInterviewScene
 	special SootopolisGymB1F_StartAshPuffGabbyTy
 	delay 14
-	goto_if_set FLAG_SOOTOPOLIS_GYM_INTERVIEWED, SootopolisCity_Gym_B1F_EventScript_RepeatInterviewScene
 	special SootopolisGymB1F_ShowGabbyTy
 	playse SE_M_DIG
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_PopOut
@@ -158,13 +158,15 @@ SootopolisCity_Gym_B1F_EventScript_InterviewLoop_AfterGabbyJump:
 	removeobject LOCALID_SOOTOPOLIS_GYM_B1F_GABBY
 	removeobject LOCALID_SOOTOPOLIS_GYM_B1F_TY
 	setflag FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY
+	playbgm MUS_GYM, FALSE
 	delay 10
 	fadescreen FADE_FROM_BLACK
-	playbgm MUS_GYM, FALSE
 	releaseall
 	end
 
 SootopolisCity_Gym_B1F_EventScript_RepeatInterviewScene::
+	special SootopolisGymB1F_StartAshPuffGabby
+	delay 14
 	special SootopolisGymB1F_ShowGabby
 	playse SE_M_DIG
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_GABBY, SootopolisCity_Gym_B1F_Movement_PopOut
@@ -196,6 +198,8 @@ SootopolisCity_Gym_B1F_EventScript_RepeatExclaimDown::
 	waitse
 	waitmovement 0
 	msgbox SootopolisCity_Gym_B1F_Text_GabbyGetUpHere, MSGBOX_DEFAULT
+	special SootopolisGymB1F_StartAshPuffTy
+	delay 14
 	special SootopolisGymB1F_ShowGabbyTy
 	playse SE_M_DIG
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_PopOut
@@ -242,6 +246,8 @@ SootopolisCity_Gym_B1F_EventScript_RepeatExclaimUp::
 	waitse
 	waitmovement 0
 	msgbox SootopolisCity_Gym_B1F_Text_GabbyGetUpHere, MSGBOX_DEFAULT
+	special SootopolisGymB1F_StartAshPuffTy
+	delay 14
 	special SootopolisGymB1F_ShowGabbyTy
 	playse SE_M_DIG
 	applymovement LOCALID_SOOTOPOLIS_GYM_B1F_TY, SootopolisCity_Gym_B1F_Movement_PopOut
@@ -306,9 +312,9 @@ SootopolisCity_Gym_B1F_EventScript_RepeatLoop_AfterGabbyJump:
 	removeobject LOCALID_SOOTOPOLIS_GYM_B1F_GABBY
 	removeobject LOCALID_SOOTOPOLIS_GYM_B1F_TY
 	setflag FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY
+	playbgm MUS_GYM, FALSE
 	delay 10
 	fadescreen FADE_FROM_BLACK
-	playbgm MUS_GYM, FALSE
 	releaseall
 	end
 

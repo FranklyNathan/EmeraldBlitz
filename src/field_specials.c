@@ -5062,6 +5062,16 @@ void SootopolisGymB1F_StartAshPuffGabbyTy(void)
     StartAshPuffAtGabbyTy(LOCALID_SOOTOPOLIS_GYM_B1F_TY);
 }
 
+void SootopolisGymB1F_StartAshPuffGabby(void)
+{
+    StartAshPuffAtGabbyTy(LOCALID_SOOTOPOLIS_GYM_B1F_GABBY);
+}
+
+void SootopolisGymB1F_StartAshPuffTy(void)
+{
+    StartAshPuffAtGabbyTy(LOCALID_SOOTOPOLIS_GYM_B1F_TY);
+}
+
 void SetOptionsTextSpeed(void)
 {
     gSaveBlock2Ptr->optionsTextSpeed = gSpecialVar_0x8004;

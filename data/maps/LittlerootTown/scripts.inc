@@ -408,7 +408,7 @@ LittlerootTown_EventScript_GoSaveBirchTrigger::
 	end
 
 LittlerootTown_EventScript_TownSign::
-	msgbox LittlerootTown_Text_TownSign, MSGBOX_SIGN
+	warp MAP_LILYCOVE_CITY_LILYCOVE_MUSEUM_1F, 10, 12
 	end
 
 LittlerootTown_EventScript_BirchsLabSign::

@@ -1267,7 +1267,7 @@
 #define FLAG_SCOTT_ENCOUNTER_PENDING                                0x4B1
 #define FLAG_SCOTT_DISAPPOINTED                                     0x4B2
 #define FLAG_HIDE_RUSTBORO_CITY_SCOTT                               0x4B3
-#define FLAG_UNUSED_0x4B4                                           0x4B4 // Unused Flag
+#define FLAG_PANGORO_MOVED                                          0x4B4 // Pangoro stepped aside in Lilycove Museum
 #define FLAG_UNUSED_0x4B5                                           0x4B5 // Unused Flag
 #define FLAG_UNUSED_0x4B6                                           0x4B6 // Unused Flag
 #define FLAG_UNUSED_0x4B7                                           0x4B7 // Unused Flag

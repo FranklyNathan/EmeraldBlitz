@@ -5,6 +5,11 @@ LilycoveCity_LilycoveMuseum_1F_MapScripts::
 LilycoveCity_LilycoveMuseum_1F_OnTransition:
 	setweather WEATHER_SUNNY
 	callnative Script_SetTextSpeedMid
+	goto_if_set FLAG_PANGORO_MOVED, LilycoveCity_LilycoveMuseum_1F_OnTransition_PangoroMoved
+	end
+
+LilycoveCity_LilycoveMuseum_1F_OnTransition_PangoroMoved:
+	setobjectxyperm LOCALID_MUSEUM_1F_PANGORO, 17, 2
 	end
 
 LilycoveCity_LilycoveMuseum_1F_EventScript_Trapped::
@@ -131,7 +136,7 @@ LilycoveCity_LilycoveMuseum_1F_EventScript_Zigzagoon::
 LilycoveCity_LilycoveMuseum_1F_EventScript_Pangoro::
     lock
     faceplayer
-    goto_if_set FLAG_TEMP_5, LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroSatisfied
+    goto_if_set FLAG_PANGORO_MOVED, LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroSatisfied
     msgbox LilycoveCity_LilycoveMuseum_1F_Text_PangoroSatisfied, MSGBOX_DEFAULT
     closemessage
     getplayerxy VAR_TEMP_0, VAR_TEMP_1
@@ -139,14 +144,16 @@ LilycoveCity_LilycoveMuseum_1F_EventScript_Pangoro::
     goto_if_gt LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroStepLeft
     applymovement VAR_LAST_TALKED, LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepRight
     waitmovement 0
-    setflag FLAG_TEMP_5
+    setobjectxyperm VAR_LAST_TALKED, 17, 2
+    setflag FLAG_PANGORO_MOVED
     release
     end
 
 LilycoveCity_LilycoveMuseum_1F_EventScript_PangoroStepLeft::
     applymovement VAR_LAST_TALKED, LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepLeft
     waitmovement 0
-    setflag FLAG_TEMP_5
+    setobjectxyperm VAR_LAST_TALKED, 15, 2
+    setflag FLAG_PANGORO_MOVED
     release
     end
 
