@@ -10,6 +10,7 @@
 LilycoveCity_LilycoveMuseum_3F_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, LilycoveCity_LilycoveMuseum_3F_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, LilycoveCity_LilycoveMuseum_3F_OnFrame
+	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LilycoveCity_LilycoveMuseum_3F_OnWarp
 	.byte 0
 
 @ ============================================================
@@ -28,7 +29,7 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_PostWarpBattle:
 	clearflag FLAG_MUSEUM_3F_BATTLE
 	lockall
 	hidefollower 0
-	applymovement LOCALID_PLAYER, Common_Movement_FaceLeft
+	turnobject LOCALID_PLAYER, DIR_WEST
 	delay 20
 	goto_if_eq VAR_0x8005, 0, Museum3F_ApproachTrainerAtNPC1
 	applymovement LOCALID_PLAYER, LilycoveCity_LilycoveMuseum_3F_Movement_PlayerApproach1
@@ -57,6 +58,17 @@ Museum3F_ApproachTrainerAtNPC1:
 	goto LilycoveCity_LilycoveMuseum_3F_EventScript_BattleDispatch
 
 @ ============================================================
+@ OnWarp
+@ ============================================================
+LilycoveCity_LilycoveMuseum_3F_OnWarp:
+	goto_if_set FLAG_MUSEUM_3F_BATTLE, Museum3F_OnWarp_FaceWest
+	end
+
+Museum3F_OnWarp_FaceWest:
+	turnobject LOCALID_PLAYER, DIR_WEST
+	end
+
+@ ============================================================
 @ OnTransition
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_OnTransition:
@@ -75,7 +87,6 @@ LilycoveCity_LilycoveMuseum_3F_OnTransition:
 	goto Museum3F_SetupSprites
 
 Museum3F_OnTransition_BattleSetup:
-	turnobject LOCALID_PLAYER, DIR_WEST
 	copyvar VAR_0x8004, VAR_MUSEUM_3F_TRAINER
 	copyvar VAR_0x8005, VAR_MUSEUM_3F_LOCATION
 	copyvar VAR_0x8006, VAR_MUSEUM_3F_FILLER
