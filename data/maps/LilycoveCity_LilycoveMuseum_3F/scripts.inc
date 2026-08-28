@@ -956,70 +956,153 @@ MChkTbl6:
 	goto MDialogueGeneric
 
 MDialogueGeneric:
-	switch VAR_0x8008
-	case 0, MTextGenericLopunny
-	case 1, MTextGenericGardevoir
-	case 2, MTextGenericChesnaught
-	case 3, MTextGenericSlowking
-	case 4, MTextGenericAmpharos
-	case 5, MTextGenericMimeJr
-	case 6, MTextGenericDrifloon
-	case 7, MTextGenericOshawott
-	case 8, MTextGenericGreedent
-	case 9, MTextGenericSnubbull
-	case 10, MTextGenericSlurpuff
-	case 11, MTextGenericHitmontop
-	case 12, MTextGenericYamper
-	case 13, MTextGenericAppletun
-	case 14, MTextGenericSkiploom
-	case 15, MTextGenericSwoobat
-	case 16, MTextGenericSeel
-	case 17, MTextGenericFurret
-	case 18, MTextGenericTorchic
-	case 19, MTextGenericSpinda
-	case 20, MTextGenericDarumaka
-	case 21, MTextGenericMaractus
-	case 22, MTextGenericDucklett
-	case 23, MTextGenericHelioptile
-	case 24, MTextGenericBrionne
-	case 25, MTextGenericCorphish
-	case 26, MTextGenericTeddiursa
-	case 27, MTextGenericMagnemite
-	case 28, MTextGenericSliggoo
+	call Museum3F_IndexToSpecies
+	bufferspeciesname STR_VAR_1, VAR_0x800B
+	random 7
+	switch VAR_RESULT
+	case 0, MTextPartyPhraseParty
+	case 1, MTextPartyPhraseThrilledHere
+	case 2, MTextPartyPhraseThrilledJoin
+	case 3, MTextPartyPhraseGladInvited
+	case 4, MTextPartyPhraseEnergy
+	case 5, MTextPartyPhraseDancingJoy
+	case 6, MTextPartyPhraseExcitedSee
 	end
 
 MDialogueOnTable:
+	call Museum3F_IndexToSpecies
+	bufferspeciesname STR_VAR_1, VAR_0x800B
+	compare VAR_0x800B, SPECIES_APPLETUN
+	goto_if_eq MDialogueTableAppletun
+	msgbox MTextPartyTableStr, MSGBOX_DEFAULT
+	return
+MDialogueTableAppletun:
+	msgbox MTextPartyTableAppletunStr, MSGBOX_DEFAULT
+	return
+
+@ ============================================================
+@ Convert species index (VAR_0x8008, 0-28) into SPECIES_* (VAR_0x800B)
+@ ============================================================
+Museum3F_IndexToSpecies:
 	switch VAR_0x8008
-	case 0, MTextTableLopunny
-	case 1, MTextTableGardevoir
-	case 2, MTextTableChesnaught
-	case 3, MTextTableSlowking
-	case 4, MTextTableAmpharos
-	case 5, MTextTableMimeJr
-	case 6, MTextTableDrifloon
-	case 7, MTextTableOshawott
-	case 8, MTextTableGreedent
-	case 9, MTextTableSnubbull
-	case 10, MTextTableSlurpuff
-	case 11, MTextTableHitmontop
-	case 12, MTextTableYamper
-	case 13, MTextTableAppletun
-	case 14, MTextTableSkiploom
-	case 15, MTextTableSwoobat
-	case 16, MTextTableSeel
-	case 17, MTextTableFurret
-	case 18, MTextTableTorchic
-	case 19, MTextTableSpinda
-	case 20, MTextTableDarumaka
-	case 21, MTextTableMaractus
-	case 22, MTextTableDucklett
-	case 23, MTextTableHelioptile
-	case 24, MTextTableBrionne
-	case 25, MTextTableCorphish
-	case 26, MTextTableTeddiursa
-	case 27, MTextTableMagnemite
-	case 28, MTextTableSliggoo
+	case 0, MISLopunny
+	case 1, MISGardevoir
+	case 2, MISChesnaught
+	case 3, MISSlowking
+	case 4, MISAmpharos
+	case 5, MISMimeJr
+	case 6, MISDrifloon
+	case 7, MISOShawott
+	case 8, MISGreedent
+	case 9, MISSnubbull
+	case 10, MISSlurpuff
+	case 11, MISHitmontop
+	case 12, MISYamper
+	case 13, MISAppletun
+	case 14, MISSkiploom
+	case 15, MISSwoobat
+	case 16, MISSeel
+	case 17, MISFurret
+	case 18, MISTorchic
+	case 19, MISSpinda
+	case 20, MISDarumaka
+	case 21, MISMaractus
+	case 22, MISDucklett
+	case 23, MISHelioptile
+	case 24, MISBrionne
+	case 25, MISCorphish
+	case 26, MISTeddiursa
+	case 27, MISMagnemite
+	case 28, MISSliggoo
 	end
+
+MISLopunny:
+	setvar VAR_0x800B, SPECIES_LOPUNNY
+	return
+MISGardevoir:
+	setvar VAR_0x800B, SPECIES_GARDEVOIR
+	return
+MISChesnaught:
+	setvar VAR_0x800B, SPECIES_CHESNAUGHT
+	return
+MISSlowking:
+	setvar VAR_0x800B, SPECIES_SLOWKING
+	return
+MISAmpharos:
+	setvar VAR_0x800B, SPECIES_AMPHAROS
+	return
+MISMimeJr:
+	setvar VAR_0x800B, SPECIES_MIME_JR
+	return
+MISDrifloon:
+	setvar VAR_0x800B, SPECIES_DRIFLOON
+	return
+MISOShawott:
+	setvar VAR_0x800B, SPECIES_OSHAWOTT
+	return
+MISGreedent:
+	setvar VAR_0x800B, SPECIES_GREEDENT
+	return
+MISSnubbull:
+	setvar VAR_0x800B, SPECIES_SNUBBULL
+	return
+MISSlurpuff:
+	setvar VAR_0x800B, SPECIES_SLURPUFF
+	return
+MISHitmontop:
+	setvar VAR_0x800B, SPECIES_HITMONTOP
+	return
+MISYamper:
+	setvar VAR_0x800B, SPECIES_YAMPER
+	return
+MISAppletun:
+	setvar VAR_0x800B, SPECIES_APPLETUN
+	return
+MISSkiploom:
+	setvar VAR_0x800B, SPECIES_SKIPLOOM
+	return
+MISSwoobat:
+	setvar VAR_0x800B, SPECIES_SWOOBAT
+	return
+MISSeel:
+	setvar VAR_0x800B, SPECIES_SEEL
+	return
+MISFurret:
+	setvar VAR_0x800B, SPECIES_FURRET
+	return
+MISTorchic:
+	setvar VAR_0x800B, SPECIES_TORCHIC
+	return
+MISSpinda:
+	setvar VAR_0x800B, SPECIES_SPINDA
+	return
+MISDarumaka:
+	setvar VAR_0x800B, SPECIES_DARUMAKA
+	return
+MISMaractus:
+	setvar VAR_0x800B, SPECIES_MARACTUS
+	return
+MISDucklett:
+	setvar VAR_0x800B, SPECIES_DUCKLETT
+	return
+MISHelioptile:
+	setvar VAR_0x800B, SPECIES_HELIOPTILE
+	return
+MISBrionne:
+	setvar VAR_0x800B, SPECIES_BRIONNE
+	return
+MISCorphish:
+	setvar VAR_0x800B, SPECIES_CORPHISH
+	return
+MISTeddiursa:
+	setvar VAR_0x800B, SPECIES_TEDDIURSA
+	return
+MISMagnemite:
+	setvar VAR_0x800B, SPECIES_MAGNEMITE
+	return
+MISSliggoo:
+	setvar VAR_0x800B, SPECIES_SLIGGOO
+	return
 
 @ ============================================================
 @ Position Index → Coordinates (left room base)
@@ -1146,7 +1229,8 @@ Museum3F_SetMove1:
 	goto_if_ge MSM1Table
 	compare VAR_0x8008, 5
 	goto_if_eq MSM1MimeJr
-	setobjectmovementtype LOCALID_POKE1, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
+	setvar VAR_0x800A, LOCALID_POKE1
+	call Museum3F_SetRandomMove
 	return
 MSM1Appletun:
 	setobjectmovementtype LOCALID_POKE1, MOVEMENT_TYPE_FACE_LEFT
@@ -1171,7 +1255,8 @@ Museum3F_SetMove2:
 	goto_if_ge MSM2Table
 	compare VAR_0x8008, 5
 	goto_if_eq MSM2MimeJr
-	setobjectmovementtype LOCALID_POKE2, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
+	setvar VAR_0x800A, LOCALID_POKE2
+	call Museum3F_SetRandomMove
 	return
 MSM2Appletun:
 	setobjectmovementtype LOCALID_POKE2, MOVEMENT_TYPE_FACE_LEFT
@@ -1196,7 +1281,8 @@ Museum3F_SetMove3:
 	goto_if_ge MSM3Table
 	compare VAR_0x8008, 5
 	goto_if_eq MSM3MimeJr
-	setobjectmovementtype LOCALID_POKE3, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
+	setvar VAR_0x800A, LOCALID_POKE3
+	call Museum3F_SetRandomMove
 	return
 MSM3Appletun:
 	setobjectmovementtype LOCALID_POKE3, MOVEMENT_TYPE_FACE_LEFT
@@ -1221,7 +1307,8 @@ Museum3F_SetMove4:
 	goto_if_ge MSM4Table
 	compare VAR_0x8008, 5
 	goto_if_eq MSM4MimeJr
-	setobjectmovementtype LOCALID_POKE4, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
+	setvar VAR_0x800A, LOCALID_POKE4
+	call Museum3F_SetRandomMove
 	return
 MSM4Appletun:
 	setobjectmovementtype LOCALID_POKE4, MOVEMENT_TYPE_FACE_LEFT
@@ -1246,7 +1333,8 @@ Museum3F_SetMove5:
 	goto_if_ge MSM5Table
 	compare VAR_0x8008, 5
 	goto_if_eq MSM5MimeJr
-	setobjectmovementtype LOCALID_POKE5, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
+	setvar VAR_0x800A, LOCALID_POKE5
+	call Museum3F_SetRandomMove
 	return
 MSM5Appletun:
 	setobjectmovementtype LOCALID_POKE5, MOVEMENT_TYPE_FACE_LEFT
@@ -1271,7 +1359,8 @@ Museum3F_SetMove6:
 	goto_if_ge MSM6Table
 	compare VAR_0x8008, 5
 	goto_if_eq MSM6MimeJr
-	setobjectmovementtype LOCALID_POKE6, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
+	setvar VAR_0x800A, LOCALID_POKE6
+	call Museum3F_SetRandomMove
 	return
 MSM6Appletun:
 	setobjectmovementtype LOCALID_POKE6, MOVEMENT_TYPE_FACE_LEFT
@@ -1287,6 +1376,62 @@ MSM6TableCW:
 	return
 MSM6MimeJr:
 	setobjectmovementtype LOCALID_POKE6, MOVEMENT_TYPE_ROTATE_CLOCKWISE
+	return
+
+@ ============================================================
+@ Random Movement for non-special, non-table Pokémon
+@ VAR_0x800A = localId of the Pokémon to set
+@ ============================================================
+Museum3F_SetRandomMove:
+	random 10
+	switch VAR_RESULT
+	case 0, MRM_WalkInPlaceDown
+	case 1, MRM_WalkInPlaceDown
+	case 2, MRM_BackForth
+	case 3, MRM_BackForth
+	case 4, MRM_Rotate
+	case 5, MRM_InPlaceSide
+	case 6, MRM_InPlaceSide
+	case 7, MRM_InPlaceUp
+	case 8, MRM_SlowInPlaceDown
+	case 9, MRM_Rotate
+	end
+
+MRM_WalkInPlaceDown:
+	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
+	return
+MRM_BackForth:
+	@ Run one tile left, one tile right (mirrored by room)
+	compare VAR_0x8005, 1
+	goto_if_eq MRM_BackForthRight
+	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_LEFT_AND_RIGHT
+	return
+MRM_BackForthRight:
+	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_RIGHT_AND_LEFT
+	return
+MRM_Rotate:
+	random 2
+	compare VAR_RESULT, 0
+	goto_if_eq MRM_RotateCW
+	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_ROTATE_COUNTERCLOCKWISE
+	return
+MRM_RotateCW:
+	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_ROTATE_CLOCKWISE
+	return
+MRM_InPlaceSide:
+	@ Walk in place facing into the room: left room -> left, right room -> right
+	compare VAR_0x8005, 0
+	goto_if_eq MRM_InPlaceLeft
+	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_IN_PLACE_RIGHT
+	return
+MRM_InPlaceLeft:
+	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_IN_PLACE_LEFT
+	return
+MRM_InPlaceUp:
+	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_IN_PLACE_UP
+	return
+MRM_SlowInPlaceDown:
+	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_DOWN
 	return
 
 @ ============================================================
@@ -1376,299 +1521,48 @@ LilycoveCity_LilycoveMuseum_3F_Text_Filler9:
 	.string "This is a cool place.$"
 
 @ ============================================================
-@ Text - Pokémon Generic
+@ Text - Pokémon Generic (shared phrases, species name buffered)
 @ ============================================================
-	MTextGenericLopunny:
-	msgbox MTextGenericLopunnyStr, MSGBOX_DEFAULT
+MTextPartyPhraseParty:
+	msgbox MTextPartyPhrasePartyStr, MSGBOX_DEFAULT
 	return
-MTextGenericLopunnyStr:
-	.string "Lopunny is partying it up!$"
-	MTextGenericGardevoir:
-	msgbox MTextGenericGardevoirStr, MSGBOX_DEFAULT
+MTextPartyPhrasePartyStr:
+	.string "{STR_VAR_1} looks like it's having a great time at the party!$"
+MTextPartyPhraseThrilledHere:
+	msgbox MTextPartyPhraseThrilledHereStr, MSGBOX_DEFAULT
 	return
-MTextGenericGardevoirStr:
-	.string "Gardevoir looks thrilled to be here!$"
-	MTextGenericChesnaught:
-	msgbox MTextGenericChesnaughtStr, MSGBOX_DEFAULT
+MTextPartyPhraseThrilledHereStr:
+	.string "{STR_VAR_1} is thrilled to be here!$"
+MTextPartyPhraseThrilledJoin:
+	msgbox MTextPartyPhraseThrilledJoinStr, MSGBOX_DEFAULT
 	return
-MTextGenericChesnaughtStr:
-	.string "Chesnaught is partying it up!$"
-	MTextGenericSlowking:
-	msgbox MTextGenericSlowkingStr, MSGBOX_DEFAULT
+MTextPartyPhraseThrilledJoinStr:
+	.string "{STR_VAR_1} is thrilled to join the party!$"
+MTextPartyPhraseGladInvited:
+	msgbox MTextPartyPhraseGladInvitedStr, MSGBOX_DEFAULT
 	return
-MTextGenericSlowkingStr:
-	.string "Slowking looks thrilled to be here!$"
-	MTextGenericAmpharos:
-	msgbox MTextGenericAmpharosStr, MSGBOX_DEFAULT
+MTextPartyPhraseGladInvitedStr:
+	.string "{STR_VAR_1} is glad you invited it!$"
+MTextPartyPhraseEnergy:
+	msgbox MTextPartyPhraseEnergyStr, MSGBOX_DEFAULT
 	return
-MTextGenericAmpharosStr:
-	.string "Ampharos is partying it up!$"
-	MTextGenericMimeJr:
-	msgbox MTextGenericMimeJrStr, MSGBOX_DEFAULT
+MTextPartyPhraseEnergyStr:
+	.string "{STR_VAR_1} is full of energy!$"
+MTextPartyPhraseDancingJoy:
+	msgbox MTextPartyPhraseDancingJoyStr, MSGBOX_DEFAULT
 	return
-MTextGenericMimeJrStr:
-	.string "Mime Jr. looks thrilled to be here!$"
-	MTextGenericDrifloon:
-	msgbox MTextGenericDrifloonStr, MSGBOX_DEFAULT
+MTextPartyPhraseDancingJoyStr:
+	.string "{STR_VAR_1} is dancing with joy!$"
+MTextPartyPhraseExcitedSee:
+	msgbox MTextPartyPhraseExcitedSeeStr, MSGBOX_DEFAULT
 	return
-MTextGenericDrifloonStr:
-	.string "Drifloon is partying it up!$"
-	MTextGenericOshawott:
-	msgbox MTextGenericOshawottStr, MSGBOX_DEFAULT
-	return
-MTextGenericOshawottStr:
-	.string "Oshawott looks thrilled to be here!$"
-	MTextGenericGreedent:
-	msgbox MTextGenericGreedentStr, MSGBOX_DEFAULT
-	return
-MTextGenericGreedentStr:
-	.string "Greedent is partying it up!$"
-	MTextGenericSnubbull:
-	msgbox MTextGenericSnubbullStr, MSGBOX_DEFAULT
-	return
-MTextGenericSnubbullStr:
-	.string "Snubbull looks thrilled to be here!$"
-	MTextGenericSlurpuff:
-	msgbox MTextGenericSlurpuffStr, MSGBOX_DEFAULT
-	return
-MTextGenericSlurpuffStr:
-	.string "Slurpuff is partying it up!$"
-	MTextGenericHitmontop:
-	msgbox MTextGenericHitmontopStr, MSGBOX_DEFAULT
-	return
-MTextGenericHitmontopStr:
-	.string "Hitmontop looks thrilled to be here!$"
-	MTextGenericYamper:
-	msgbox MTextGenericYamperStr, MSGBOX_DEFAULT
-	return
-MTextGenericYamperStr:
-	.string "Yamper is partying it up!$"
-	MTextGenericAppletun:
-	msgbox MTextGenericAppletunStr, MSGBOX_DEFAULT
-	return
-MTextGenericAppletunStr:
-	.string "Appletun looks thrilled to be here!$"
-	MTextGenericSkiploom:
-	msgbox MTextGenericSkiploomStr, MSGBOX_DEFAULT
-	return
-MTextGenericSkiploomStr:
-	.string "Skiploom is partying it up!$"
-	MTextGenericSwoobat:
-	msgbox MTextGenericSwoobatStr, MSGBOX_DEFAULT
-	return
-MTextGenericSwoobatStr:
-	.string "Swoobat looks thrilled to be here!$"
-	MTextGenericSeel:
-	msgbox MTextGenericSeelStr, MSGBOX_DEFAULT
-	return
-MTextGenericSeelStr:
-	.string "Seel is partying it up!$"
-	MTextGenericFurret:
-	msgbox MTextGenericFurretStr, MSGBOX_DEFAULT
-	return
-MTextGenericFurretStr:
-	.string "Furret looks thrilled to be here!$"
-	MTextGenericTorchic:
-	msgbox MTextGenericTorchicStr, MSGBOX_DEFAULT
-	return
-MTextGenericTorchicStr:
-	.string "Torchic is partying it up!$"
-	MTextGenericSpinda:
-	msgbox MTextGenericSpindaStr, MSGBOX_DEFAULT
-	return
-MTextGenericSpindaStr:
-	.string "Spinda looks thrilled to be here!$"
-	MTextGenericDarumaka:
-	msgbox MTextGenericDarumakaStr, MSGBOX_DEFAULT
-	return
-MTextGenericDarumakaStr:
-	.string "Darumaka is partying it up!$"
-	MTextGenericMaractus:
-	msgbox MTextGenericMaractusStr, MSGBOX_DEFAULT
-	return
-MTextGenericMaractusStr:
-	.string "Maractus looks thrilled to be here!$"
-	MTextGenericDucklett:
-	msgbox MTextGenericDucklettStr, MSGBOX_DEFAULT
-	return
-MTextGenericDucklettStr:
-	.string "Ducklett is partying it up!$"
-	MTextGenericHelioptile:
-	msgbox MTextGenericHelioptileStr, MSGBOX_DEFAULT
-	return
-MTextGenericHelioptileStr:
-	.string "Helioptile looks thrilled to be here!$"
-	MTextGenericBrionne:
-	msgbox MTextGenericBrionneStr, MSGBOX_DEFAULT
-	return
-MTextGenericBrionneStr:
-	.string "Brionne is partying it up!$"
-	MTextGenericCorphish:
-	msgbox MTextGenericCorphishStr, MSGBOX_DEFAULT
-	return
-MTextGenericCorphishStr:
-	.string "Corphish looks thrilled to be here!$"
-	MTextGenericTeddiursa:
-	msgbox MTextGenericTeddiursaStr, MSGBOX_DEFAULT
-	return
-MTextGenericTeddiursaStr:
-	.string "Teddiursa is partying it up!$"
-	MTextGenericMagnemite:
-	msgbox MTextGenericMagnemiteStr, MSGBOX_DEFAULT
-	return
-MTextGenericMagnemiteStr:
-	.string "Magnemite looks thrilled to be here!$"
-	MTextGenericSliggoo:
-	msgbox MTextGenericSliggooStr, MSGBOX_DEFAULT
-	return
-MTextGenericSliggooStr:
-	.string "Sliggoo is partying it up!$"
+MTextPartyPhraseExcitedSeeStr:
+	.string "{STR_VAR_1} is excited to see you!$"
 
 @ ============================================================
 @ Text - Pokémon On Table
 @ ============================================================
-	MTextTableLopunny:
-	msgbox MTextTableLopunnyStr, MSGBOX_DEFAULT
-	return
-MTextTableLopunnyStr:
-	.string "Lopunny is dancing on the table!$"
-	MTextTableGardevoir:
-	msgbox MTextTableGardevoirStr, MSGBOX_DEFAULT
-	return
-MTextTableGardevoirStr:
-	.string "Gardevoir is dancing on the table!$"
-	MTextTableChesnaught:
-	msgbox MTextTableChesnaughtStr, MSGBOX_DEFAULT
-	return
-MTextTableChesnaughtStr:
-	.string "Chesnaught is dancing on the table!$"
-	MTextTableSlowking:
-	msgbox MTextTableSlowkingStr, MSGBOX_DEFAULT
-	return
-MTextTableSlowkingStr:
-	.string "Slowking is dancing on the table!$"
-	MTextTableAmpharos:
-	msgbox MTextTableAmpharosStr, MSGBOX_DEFAULT
-	return
-MTextTableAmpharosStr:
-	.string "Ampharos is dancing on the table!$"
-	MTextTableMimeJr:
-	msgbox MTextTableMimeJrStr, MSGBOX_DEFAULT
-	return
-MTextTableMimeJrStr:
-	.string "Mime Jr. is dancing on the table!$"
-	MTextTableDrifloon:
-	msgbox MTextTableDrifloonStr, MSGBOX_DEFAULT
-	return
-MTextTableDrifloonStr:
-	.string "Drifloon is dancing on the table!$"
-	MTextTableOshawott:
-	msgbox MTextTableOshawottStr, MSGBOX_DEFAULT
-	return
-MTextTableOshawottStr:
-	.string "Oshawott is dancing on the table!$"
-	MTextTableGreedent:
-	msgbox MTextTableGreedentStr, MSGBOX_DEFAULT
-	return
-MTextTableGreedentStr:
-	.string "Greedent is dancing on the table!$"
-	MTextTableSnubbull:
-	msgbox MTextTableSnubbullStr, MSGBOX_DEFAULT
-	return
-MTextTableSnubbullStr:
-	.string "Snubbull is dancing on the table!$"
-	MTextTableSlurpuff:
-	msgbox MTextTableSlurpuffStr, MSGBOX_DEFAULT
-	return
-MTextTableSlurpuffStr:
-	.string "Slurpuff is dancing on the table!$"
-	MTextTableHitmontop:
-	msgbox MTextTableHitmontopStr, MSGBOX_DEFAULT
-	return
-MTextTableHitmontopStr:
-	.string "Hitmontop is dancing on the table!$"
-	MTextTableYamper:
-	msgbox MTextTableYamperStr, MSGBOX_DEFAULT
-	return
-MTextTableYamperStr:
-	.string "Yamper is dancing on the table!$"
-	MTextTableAppletun:
-	msgbox MTextTableAppletunStr, MSGBOX_DEFAULT
-	return
-MTextTableAppletunStr:
+MTextPartyTableStr:
+	.string "{STR_VAR_1} is dancing on the table!$"
+MTextPartyTableAppletunStr:
 	.string "Appletun is looking like an excellent feast!$"
-	MTextTableSkiploom:
-	msgbox MTextTableSkiploomStr, MSGBOX_DEFAULT
-	return
-MTextTableSkiploomStr:
-	.string "Skiploom is dancing on the table!$"
-	MTextTableSwoobat:
-	msgbox MTextTableSwoobatStr, MSGBOX_DEFAULT
-	return
-MTextTableSwoobatStr:
-	.string "Swoobat is dancing on the table!$"
-	MTextTableSeel:
-	msgbox MTextTableSeelStr, MSGBOX_DEFAULT
-	return
-MTextTableSeelStr:
-	.string "Seel is dancing on the table!$"
-	MTextTableFurret:
-	msgbox MTextTableFurretStr, MSGBOX_DEFAULT
-	return
-MTextTableFurretStr:
-	.string "Furret is dancing on the table!$"
-	MTextTableTorchic:
-	msgbox MTextTableTorchicStr, MSGBOX_DEFAULT
-	return
-MTextTableTorchicStr:
-	.string "Torchic is dancing on the table!$"
-	MTextTableSpinda:
-	msgbox MTextTableSpindaStr, MSGBOX_DEFAULT
-	return
-MTextTableSpindaStr:
-	.string "Spinda is dancing on the table!$"
-	MTextTableDarumaka:
-	msgbox MTextTableDarumakaStr, MSGBOX_DEFAULT
-	return
-MTextTableDarumakaStr:
-	.string "Darumaka is dancing on the table!$"
-	MTextTableMaractus:
-	msgbox MTextTableMaractusStr, MSGBOX_DEFAULT
-	return
-MTextTableMaractusStr:
-	.string "Maractus is dancing on the table!$"
-	MTextTableDucklett:
-	msgbox MTextTableDucklettStr, MSGBOX_DEFAULT
-	return
-MTextTableDucklettStr:
-	.string "Ducklett is dancing on the table!$"
-	MTextTableHelioptile:
-	msgbox MTextTableHelioptileStr, MSGBOX_DEFAULT
-	return
-MTextTableHelioptileStr:
-	.string "Helioptile is dancing on the table!$"
-	MTextTableBrionne:
-	msgbox MTextTableBrionneStr, MSGBOX_DEFAULT
-	return
-MTextTableBrionneStr:
-	.string "Brionne is dancing on the table!$"
-	MTextTableCorphish:
-	msgbox MTextTableCorphishStr, MSGBOX_DEFAULT
-	return
-MTextTableCorphishStr:
-	.string "Corphish is dancing on the table!$"
-	MTextTableTeddiursa:
-	msgbox MTextTableTeddiursaStr, MSGBOX_DEFAULT
-	return
-MTextTableTeddiursaStr:
-	.string "Teddiursa is dancing on the table!$"
-	MTextTableMagnemite:
-	msgbox MTextTableMagnemiteStr, MSGBOX_DEFAULT
-	return
-MTextTableMagnemiteStr:
-	.string "Magnemite is dancing on the table!$"
-	MTextTableSliggoo:
-	msgbox MTextTableSliggooStr, MSGBOX_DEFAULT
-	return
-MTextTableSliggooStr:
-	.string "Sliggoo is dancing on the table!$"
