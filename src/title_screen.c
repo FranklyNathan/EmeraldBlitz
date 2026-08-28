@@ -598,15 +598,42 @@ static const union AnimCmd *const sSilhouetteTinyAnimTable[] =
 
 #define sChildSpriteId data[0]
 #define sPauseTimer   data[2]
+#define sIsActive     data[3]
+#define sSpeedFlag    data[4]
+#define sBaseY        data[6]
+#define sFirstFlight  data[7]
 
-// Random pause between 180-360 frames (3-6 seconds at 60fps)
-#define SILHOUETTE_MIN_PAUSE 180
-#define SILHOUETTE_PAUSE_RANGE 181
-#define SILHOUETTE_START_VARIANCE 20
+// Random pause between 120-300 frames
+#define SILHOUETTE_MIN_PAUSE 120
+#define SILHOUETTE_PAUSE_RANGE 300
+#define SILHOUETTE_START_VARIANCE 22
 
 static u16 GetSilhouettePause(void)
 {
     return SILHOUETTE_MIN_PAUSE + (Random() % SILHOUETTE_PAUSE_RANGE);
+}
+
+// 80% chance of half speed, 20% full speed. Set once per flight.
+// First flight is always half speed if sFirstFlight is set.
+static void MaybeSetHalfSpeed(struct Sprite *sprite)
+{
+    if (sprite->sFirstFlight)
+    {
+        sprite->sSpeedFlag = 1;
+        sprite->sFirstFlight = FALSE;
+    }
+    else if ((Random() % 5) != 0) // 4/5 = 80%
+        sprite->sSpeedFlag = 1;
+    else
+        sprite->sSpeedFlag = 0;
+}
+
+// Returns TRUE if sprite should skip this frame (half speed mode)
+static u8 IsHalfSpeedSkipped(struct Sprite *sprite)
+{
+    if (sprite->sSpeedFlag)
+        return (++sprite->data[5] & 1);
+    return FALSE;
 }
 
 static s16 SilhouetteRandOffset(void)
@@ -625,8 +652,15 @@ static void SpriteCB_SilhouetteFly(struct Sprite *sprite)
         return;
     }
 
-    sprite->invisible = FALSE;
-    child->invisible = FALSE;
+    if (sprite->invisible)
+    {
+        sprite->invisible = FALSE;
+        child->invisible = FALSE;
+        MaybeSetHalfSpeed(sprite);
+    }
+
+    if (IsHalfSpeedSkipped(sprite))
+        return;
 
     sprite->x += 3;
     sprite->y -= 1;
@@ -647,6 +681,8 @@ static void SpriteCB_SilhouetteFly(struct Sprite *sprite)
         child->invisible = TRUE;
     }
 }
+
+static void SpriteCB_SilhouetteSmallFly(struct Sprite *sprite);
 
 static const struct SpriteTemplate sSilhouetteLeftSpriteTemplate =
 {
@@ -681,8 +717,15 @@ static void SpriteCB_SilhouetteMedFly(struct Sprite *sprite)
         return;
     }
 
-    sprite->invisible = FALSE;
-    child->invisible = FALSE;
+    if (sprite->invisible)
+    {
+        sprite->invisible = FALSE;
+        child->invisible = FALSE;
+        MaybeSetHalfSpeed(sprite);
+    }
+
+    if (IsHalfSpeedSkipped(sprite))
+        return;
 
     sprite->x -= 3;
     sprite->y -= 1;
@@ -755,28 +798,6 @@ static const union AnimCmd *const sSilhouetteSmallAnimTable[] =
     sSilhouetteSmallAnimCmd,
 };
 
-static void SpriteCB_SilhouetteSmallFly(struct Sprite *sprite)
-{
-    if (sprite->sPauseTimer != 0)
-    {
-        sprite->sPauseTimer--;
-        return;
-    }
-
-    sprite->invisible = FALSE;
-
-    sprite->x += 4;
-    sprite->y -= 1;
-
-    if (sprite->x > DISPLAY_WIDTH + 64)
-    {
-        sprite->sPauseTimer = GetSilhouettePause();
-        sprite->x = -64;
-        sprite->y = 40 + SilhouetteRandOffset();
-        sprite->invisible = TRUE;
-    }
-}
-
 static const struct SpriteTemplate sSilhouetteSmallSpriteTemplate =
 {
     .tileTag = TAG_SILHOUETTE,
@@ -788,8 +809,61 @@ static const struct SpriteTemplate sSilhouetteSmallSpriteTemplate =
     .callback = SpriteCB_SilhouetteSmallFly,
 };
 
+// data[7]: companion delay countdown only (0 = no delay active)
+#define sCompanionDelay  data[7]
+
+static void SpriteCB_SilhouetteSmallFly(struct Sprite *sprite)
+{
+    if (sprite->sPauseTimer != 0)
+    {
+        sprite->sPauseTimer--;
+        return;
+    }
+
+    if (sprite->invisible)
+    {
+        sprite->invisible = FALSE;
+        MaybeSetHalfSpeed(sprite);
+
+        // 10% chance to spawn a companion (not if this sprite IS a companion)
+        if (!(sprite->sCompanionDelay & 0x80) && (Random() % 10) == 0)
+            sprite->sCompanionDelay = 127; // start 127-frame countdown (~2s)
+    }
+
+    // Countdown and spawn companion exactly once
+    if (sprite->sCompanionDelay > 0 && sprite->sCompanionDelay < 0x80)
+    {
+        sprite->sCompanionDelay--;
+        if (sprite->sCompanionDelay == 0)
+        {
+            u8 compId = CreateSprite(&sSilhouetteSmallSpriteTemplate, sprite->x, sprite->y + 60, 0);
+            gSprites[compId].oam.paletteNum = sprite->oam.paletteNum;
+            gSprites[compId].sBaseY = sprite->y + 60;
+            gSprites[compId].sSpeedFlag = sprite->sSpeedFlag;
+            gSprites[compId].sFirstFlight = FALSE;
+            gSprites[compId].sCompanionDelay = 0x80; // permanently blocked
+            gSprites[compId].sPauseTimer = 0;
+            gSprites[compId].invisible = TRUE;
+            sprite->sCompanionDelay = 0x80; // parent also permanently blocked
+        }
+    }
+
+    if (IsHalfSpeedSkipped(sprite))
+        return;
+
+    sprite->x += 4;
+    sprite->y -= 1;
+
+    if (sprite->x > DISPLAY_WIDTH + 64)
+    {
+        sprite->sPauseTimer = GetSilhouettePause();
+        sprite->x = -64;
+        sprite->y = sprite->sBaseY + SilhouetteRandOffset();
+        sprite->invisible = TRUE;
+    }
+}
+
 // Salamence silhouette: rare (1/20 chance), flies left to right
-#define sIsActive data[3]
 
 static const struct OamData sSilhouetteSalamenceOamData =
 {
@@ -812,6 +886,9 @@ static void SpriteCB_SilhouetteSalamenceFly(struct Sprite *sprite)
 {
     if (sprite->sIsActive)
     {
+        if (IsHalfSpeedSkipped(sprite))
+            return;
+
         sprite->x -= 4;
         sprite->y -= 1;
 
@@ -820,7 +897,7 @@ static void SpriteCB_SilhouetteSalamenceFly(struct Sprite *sprite)
             sprite->sIsActive = FALSE;
             sprite->sPauseTimer = GetSilhouettePause();
             sprite->x = DISPLAY_WIDTH + 64;
-            sprite->y = 50 + SilhouetteRandOffset();
+            sprite->y = 72 + SilhouetteRandOffset();
         }
     }
     else
@@ -831,12 +908,13 @@ static void SpriteCB_SilhouetteSalamenceFly(struct Sprite *sprite)
         }
         else
         {
-            // 1 in 20 chance to appear
+            // 1 in 10 chance to appear
             if ((Random() % 10) == 0)
             {
                 sprite->sIsActive = TRUE;
                 sprite->x = DISPLAY_WIDTH + 64;
                 sprite->y = 72 + SilhouetteRandOffset();
+                MaybeSetHalfSpeed(sprite);
             }
             else
             {
@@ -883,10 +961,13 @@ static void SpriteCB_SilhouetteTinyFly(struct Sprite *sprite)
         return;
     }
 
-    sprite->invisible = FALSE;
+    if (sprite->invisible)
+    {
+        sprite->invisible = FALSE;
+        MaybeSetHalfSpeed(sprite);
+    }
 
-    // Move every other frame to halve the speed
-    if (++sprite->data[4] & 1)
+    if (IsHalfSpeedSkipped(sprite))
         return;
 
     sprite->x -= 4;
@@ -924,23 +1005,19 @@ static const struct SpritePalette sSpritePalette_Silhouette[] =
     {},
 };
 
-// Blue tinted palettes for atmospheric perspective effect.
-// Each is the silhouette palette with color index 1 shifted toward blue.
-// Tint levels: 0=none, 1=slight, 2=moderate, 3=strong, 4=strongest
+// Tinted palettes simulating atmospheric transparency.
+// Color 1 blended 50% toward sky blue, then tinted progressively bluer for smaller sprites.
+// Large=no tint, Medium=slight, Salamence=moderate, Small=strong, Tiny=strongest
 #define SILHOUETTE_PAL_BASE 3
 
 static const u16 sSilhouetteTintedPalettes[][16] =
 {
-    // Level 0: No tint (dark green, original)
-    {0x0000, RGB(3, 5, 4), [2 ... 15] = 0x0000},
-    // Level 1: Slight blue shift
-    {0x0000, RGB(2, 4, 7), [2 ... 15] = 0x0000},
-    // Level 2: Moderate blue shift
-    {0x0000, RGB(1, 3, 9), [2 ... 15] = 0x0000},
-    // Level 3: Strong blue shift
-    {0x0000, RGB(1, 2, 11), [2 ... 15] = 0x0000},
-    // Level 4: Strongest blue shift
-    {0x0000, RGB(0, 1, 13), [2 ... 15] = 0x0000},
+    // Level 0: Small #2 (bottom start) — darker blue-grey
+    {0x0000, RGB(9, 10, 16), [2 ... 15] = 0x0000},
+    // Level 1: Small #1, Salamence, Tiny — lighter blue-grey
+    {0x0000, RGB(10, 11, 18), [2 ... 15] = 0x0000},
+    // Level 2: Medium — lightest blue-grey
+    {0x0000, RGB(11, 12, 19), [2 ... 15] = 0x0000},
 };
 
 static void CreateSilhouetteSprites(void)
@@ -958,49 +1035,55 @@ static void CreateSilhouetteSprites(void)
         LoadPalette(sSilhouetteTintedPalettes[i], OBJ_PLTT_ID(SILHOUETTE_PAL_BASE + i), PLTT_SIZE_4BPP);
     }
 
-    // Large silhouette: flies bottom-left to top-right (no tint)
-    ox = SilhouetteRandOffset();
+    // Small silhouette #1: flies left to right from high up
+    smallId = CreateSprite(&sSilhouetteSmallSpriteTemplate, -64, 40 + SilhouetteRandOffset(), 0);
+    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
+    gSprites[smallId].sBaseY = 40;
+    gSprites[smallId].sFirstFlight = 1;
+    gSprites[smallId].sPauseTimer = 40;
+    gSprites[smallId].invisible = TRUE;
+
+    // Small silhouette #2: flies left to right from bottom (former large position)
     oy = SilhouetteRandOffset();
-    leftId = CreateSprite(&sSilhouetteLeftSpriteTemplate, -26 + ox, DISPLAY_HEIGHT + 32 + oy, 0);
-    gSprites[leftId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
+    smallId = CreateSprite(&sSilhouetteSmallSpriteTemplate, -64, DISPLAY_HEIGHT + 32 + oy, 0);
+    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 0;
+    gSprites[smallId].sBaseY = DISPLAY_HEIGHT + 32;
+    gSprites[smallId].sFirstFlight = 1;
+    gSprites[smallId].sPauseTimer = 80;
+    gSprites[smallId].invisible = TRUE;
 
-    rightId = CreateSprite(&sSilhouetteRightSpriteTemplate, -26 + ox + SILHOUETTE_CHILD_X_OFFSET, DISPLAY_HEIGHT + 32 + oy, 0);
-    gSprites[rightId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
-
-    gSprites[leftId].sChildSpriteId = rightId;
-
-    // Medium silhouette: flies bottom-right to top-left (slight tint)
+    // Medium silhouette: flies bottom-right to top-left (launches immediately)
     ox = SilhouetteRandOffset();
     oy = SilhouetteRandOffset();
     leftId = CreateSprite(&sSilhouetteMedLeftSpriteTemplate, DISPLAY_WIDTH + 46 + ox, DISPLAY_HEIGHT + 32 + oy, 0);
-    gSprites[leftId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
-    gSprites[leftId].sPauseTimer = 90;
+    gSprites[leftId].oam.paletteNum = SILHOUETTE_PAL_BASE + 2;
+    gSprites[leftId].sPauseTimer = 0;
 
     rightId = CreateSprite(&sSilhouetteMedRightSpriteTemplate, DISPLAY_WIDTH + 46 + ox + 48, DISPLAY_HEIGHT + 32 + oy, 0);
-    gSprites[rightId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
+    gSprites[rightId].oam.paletteNum = SILHOUETTE_PAL_BASE + 2;
 
     gSprites[leftId].sChildSpriteId = rightId;
 
-    // Small silhouette: flies left to right, starts high (strong tint)
-    smallId = CreateSprite(&sSilhouetteSmallSpriteTemplate, -64, 40 + SilhouetteRandOffset(), 0);
-    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 2;
-    gSprites[smallId].sPauseTimer = 150;
-
-    // Salamence silhouette: rare, 1/20 chance (moderate tint)
+    // Salamence silhouette: rare (1/10 chance)
     smallId = CreateSprite(&sSilhouetteSalamenceSpriteTemplate, -64, 30, 0);
-    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 2;
-    gSprites[smallId].sPauseTimer = 180;
+    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
+    gSprites[smallId].sPauseTimer = 20;
 
-    // Tiny silhouette: same as salamence start, always on delay (strongest tint)
+    // Tiny silhouette: launches after small #1
     smallId = CreateSprite(&sSilhouetteTinySpriteTemplate, DISPLAY_WIDTH + 32, 50, 0);
-    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 2;
-    gSprites[smallId].sPauseTimer = 240;
+    gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
+    gSprites[smallId].sFirstFlight = 1;
+    gSprites[smallId].sPauseTimer = 100;
     gSprites[smallId].invisible = TRUE;
 }
 
 #undef sChildSpriteId
 #undef sPauseTimer
 #undef sIsActive
+#undef sSpeedFlag
+#undef sBaseY
+#undef sFirstFlight
+#undef sCompanionDelay
 #undef sAnimate
 #undef sTimer
 
@@ -1076,19 +1159,19 @@ static void StartPokemonLogoShine(u8 mode)
     case SHINE_MODE_SINGLE:
         // Create one regular shine sprite.
         // If mode is SHINE_MODE_SINGLE it will also change the background color.
-        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 40, 0);
+        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 58, 0);
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_WINDOW;
         gSprites[spriteId].sMode = mode;
         break;
     case SHINE_MODE_DOUBLE:
         // Create an invisible sprite with mode set to update the background color
-        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 40, 0);
+        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 58, 0);
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_WINDOW;
         gSprites[spriteId].sMode = mode;
         gSprites[spriteId].invisible = TRUE;
 
         // Create two faster shine sprites
-        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 40, 0);
+        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 58, 0);
         gSprites[spriteId].callback = SpriteCB_PokemonLogoShine_Fast;
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_WINDOW;
 

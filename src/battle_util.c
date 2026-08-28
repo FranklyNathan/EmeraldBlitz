@@ -2233,6 +2233,7 @@ static enum MoveCanceler CancelerFlinch(struct BattleContext *ctx)
     if (gBattleMons[ctx->battlerAtk].volatiles.flinched)
     {
         gProtectStructs[ctx->battlerAtk].unableToUseMove = TRUE;
+        gBattleScripting.battler = ctx->battlerAtk;
         CancelMultiTurnMoves(ctx->battlerAtk, SKY_DROP_ATTACKCANCELER_CHECK);
         gBattlescriptCurrInstr = BattleScript_MoveUsedFlinched;
         gHitMarker |= HITMARKER_UNABLE_TO_USE_MOVE;

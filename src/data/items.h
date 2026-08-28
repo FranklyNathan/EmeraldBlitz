@@ -3143,17 +3143,17 @@ const struct Item gItemsInfo[] =
 
     [ITEM_RELIC_CROWN] =
     {
-        .name = ITEM_NAME("Relic Crown"),
+        .name = ITEM_NAME("Blitz Crown"),
         .price = 0,
         .description = COMPOUND_STRING(
-            "An old crown.\n"
-            "It sells at a\n"
-            "high price."),
+            "A crown fit for\n"
+            "a legend of\n"
+            "Emerald Blitz."),
         .pocket = POCKET_ITEMS,
         .sortType = ITEM_TYPE_RELIC,
         .type = ITEM_USE_BAG_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
-        .flingPower = 30,
+        .flingPower = 100,
         .iconPic = gItemIcon_RelicCrown,
         .iconPalette = gItemIconPalette_Relics,
     },

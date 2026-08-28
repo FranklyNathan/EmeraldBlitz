@@ -471,7 +471,8 @@
 
 #define FLAG_UNUSED_0x1AA                    0x1AA // Unused Flag
 #define FLAG_MUSEUM_3F_BATTLE                0x1AA
-#define FLAG_UNUSED_0x1AB                    0x1AB // Unused Flag
+#define FLAG_MUSEUM_3F_SPAWN_NPC1            0x1AB
+#define FLAG_MUSEUM_3F_SPAWN_NPC2            0x1DA
 
 #define FLAG_DEFEATED_DEOXYS                 0x1AC
 #define FLAG_BATTLED_DEOXYS                  0x1AD

@@ -10,7 +10,19 @@
 LilycoveCity_LilycoveMuseum_3F_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, LilycoveCity_LilycoveMuseum_3F_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, LilycoveCity_LilycoveMuseum_3F_OnFrame
+	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LilycoveCity_LilycoveMuseum_3F_OnWarp
 	.byte 0
+
+@ ============================================================
+@ OnWarp
+@ ============================================================
+LilycoveCity_LilycoveMuseum_3F_OnWarp:
+	map_script_2 FLAG_MUSEUM_3F_BATTLE, TRUE, Museum3F_OnWarp_FaceWest
+	.2byte 0
+
+Museum3F_OnWarp_FaceWest:
+	turnobject LOCALID_PLAYER, DIR_WEST
+	end
 
 @ ============================================================
 @ OnFrame
@@ -28,7 +40,6 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_PostWarpBattle:
 	clearflag FLAG_MUSEUM_3F_BATTLE
 	lockall
 	hidefollower 0
-	applymovement LOCALID_PLAYER, Common_Movement_FaceLeft
 	delay 20
 	goto_if_eq VAR_0x8005, 0, Museum3F_ApproachTrainerAtNPC1
 	applymovement LOCALID_PLAYER, LilycoveCity_LilycoveMuseum_3F_Movement_PlayerApproach1
@@ -72,10 +83,10 @@ LilycoveCity_LilycoveMuseum_3F_OnTransition:
 	copyvar VAR_0x8005, VAR_RESULT
 	random 10
 	copyvar VAR_0x8006, VAR_RESULT
+	call Museum3F_SetSpawnFlags
 	goto Museum3F_SetupSprites
 
 Museum3F_OnTransition_BattleSetup:
-	turnobject LOCALID_PLAYER, DIR_WEST
 	copyvar VAR_0x8004, VAR_MUSEUM_3F_TRAINER
 	copyvar VAR_0x8005, VAR_MUSEUM_3F_LOCATION
 	copyvar VAR_0x8006, VAR_MUSEUM_3F_FILLER
@@ -85,6 +96,7 @@ Museum3F_OnTransition_BattleSetup:
 	settrainerflag TRAINER_MUSEUM_JEANS
 	settrainerflag TRAINER_MUSEUM_BEASTLY
 	settrainerflag TRAINER_MUSEUM_FREEZ
+	call Museum3F_SetSpawnFlags
 	goto_if_eq VAR_0x8005, 0, Museum3F_BattleSetup_TrainerAtLeft
 	setobjectxyperm LOCALID_NPC2, 14, 11
 	goto Museum3F_SetupSprites
@@ -93,6 +105,16 @@ Museum3F_BattleSetup_TrainerAtLeft:
 	setobjectxyperm LOCALID_NPC1, 14, 11
 	setobjectmovementtype LOCALID_NPC1, MOVEMENT_TYPE_FACE_RIGHT
 	goto Museum3F_SetupSprites
+
+Museum3F_SetSpawnFlags:
+	goto_if_eq VAR_0x8005, 0, Museum3F_SpawnFlagsNPC1
+	setflag FLAG_MUSEUM_3F_SPAWN_NPC1
+	clearflag FLAG_MUSEUM_3F_SPAWN_NPC2
+	return
+Museum3F_SpawnFlagsNPC1:
+	clearflag FLAG_MUSEUM_3F_SPAWN_NPC1
+	setflag FLAG_MUSEUM_3F_SPAWN_NPC2
+	return
 
 Museum3F_SetupSprites:
 	goto_if_eq VAR_0x8005, 0, Museum3F_TrainerAtLeft
