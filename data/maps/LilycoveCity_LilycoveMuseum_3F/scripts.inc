@@ -26,9 +26,15 @@ LilycoveCity_LilycoveMuseum_3F_OnFrame:
 	map_script_2 VAR_TEMP_E, 0, LilycoveCity_LilycoveMuseum_3F_EventScript_CheckPendingBattle
 	.2byte 0
 
+LilycoveCity_LilycoveMuseum_3F_EventScript_RegenFaceWest:
+	clearflag FLAG_MUSEUM_3F_REGEN_WARP
+	turnobject LOCALID_PLAYER, DIR_WEST
+	end
+
 LilycoveCity_LilycoveMuseum_3F_EventScript_CheckPendingBattle:
 	setvar VAR_TEMP_E, 1
 	goto_if_set FLAG_MUSEUM_3F_BATTLE, LilycoveCity_LilycoveMuseum_3F_EventScript_PostWarpBattle
+	goto_if_set FLAG_MUSEUM_3F_REGEN_WARP, LilycoveCity_LilycoveMuseum_3F_EventScript_RegenFaceWest
 	end
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_PostWarpBattle:
@@ -212,39 +218,35 @@ Museum3F_CrownTransition:
 
 Museum3F_CrownSetup:
 	call Museum3F_SetSpawnFlags
-	goto_if_set FLAG_MUSEUM_3F_CROWN_TAKEN, Museum3F_CrownTaken
+	goto_if_set FLAG_MUSEUM_3F_CROWN_TAKEN, Museum3F_CrownSlotPokemon
 	setvar VAR_0x8007, OBJ_EVENT_GFX_ITEM_BALL
 	goto Museum3F_ApplyTrainerGfx
 
-Museum3F_CrownTaken:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_SCHOOL_KID_M
-	goto_if_eq VAR_0x8005, 0, Museum3F_CrownRemoveNPC1
-	removeobject LOCALID_NPC2
+Museum3F_CrownSlotPokemon:
+	random 32
+	copyvar VAR_0x8008, VAR_RESULT
+	copyvar VAR_MUSEUM_3F_CROWN_SPECIES, VAR_0x8008
+	call Museum3F_SpeciesToGfx
+	copyvar VAR_0x8007, VAR_TEMP_7
+	goto_if_eq VAR_0x8005, 0, Museum3F_CrownSlotPokemonNPC1
+	setobjectmovementtype LOCALID_NPC2, MOVEMENT_TYPE_WALK_IN_PLACE_RIGHT
 	goto Museum3F_ApplyTrainerGfx
-Museum3F_CrownRemoveNPC1:
-	removeobject LOCALID_NPC1
+
+Museum3F_CrownSlotPokemonNPC1:
+	setobjectmovementtype LOCALID_NPC1, MOVEMENT_TYPE_WALK_IN_PLACE_LEFT
 	goto Museum3F_ApplyTrainerGfx
 
 Museum3F_CrownPickup:
-	goto_if_set FLAG_MUSEUM_3F_CROWN_TAKEN, Museum3F_CrownEmpty
-	giveitem ITEM_RELIC_CROWN
-	goto_if_eq VAR_RESULT, FALSE, Museum3F_CrownBagFull
+	goto_if_set FLAG_MUSEUM_3F_CROWN_TAKEN, Museum3F_CrownSlotTalk
+	removeobject VAR_LAST_TALKED
 	setflag FLAG_MUSEUM_3F_CROWN_TAKEN
-	goto_if_eq VAR_0x8005, 0, Museum3F_CrownPickNPC1
-	removeobject LOCALID_NPC2
-	goto Museum3F_CrownDone
-Museum3F_CrownPickNPC1:
-	removeobject LOCALID_NPC1
-Museum3F_CrownDone:
+	giveitem ITEM_RELIC_CROWN
 	release
 	end
 
-Museum3F_CrownBagFull:
-	release
-	end
-
-Museum3F_CrownEmpty:
-	msgbox MTextMuseumCrownEmpty, MSGBOX_DEFAULT
+Museum3F_CrownSlotTalk:
+	copyvar VAR_0x8008, VAR_MUSEUM_3F_CROWN_SPECIES
+	call MDialogueGeneric
 	release
 	end
 
@@ -376,27 +378,35 @@ Museum3F_LegendSeatRight:
 LilycoveCity_LilycoveMuseum_3F_EventScript_NPC1::
 	lock
 	faceplayer
-	call Museum3F_CheckAllDefeated
-	compare VAR_RESULT, 1
-	goto_if_eq Museum3F_CrownPickup
-	goto_if_eq VAR_0x8005, 0, LilycoveCity_LilycoveMuseum_3F_EventScript_TrainerTalk
+	setvar VAR_0x8005, 0
+	call Museum3F_NPCTalkDispatch
 	release
 	end
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_NPC2::
 	lock
 	faceplayer
-	call Museum3F_CheckAllDefeated
-	compare VAR_RESULT, 1
-	goto_if_eq Museum3F_CrownPickup
-	goto_if_eq VAR_0x8005, 1, LilycoveCity_LilycoveMuseum_3F_EventScript_TrainerTalk
+	setvar VAR_0x8005, 1
+	call Museum3F_NPCTalkDispatch
 	release
 	end
+
+Museum3F_NPCTalkDispatch:
+	call Museum3F_CheckAllDefeated
+	compare VAR_RESULT, 1
+	goto_if_eq Museum3F_AllDefeatedFlow
+	copyvar VAR_0x8004, VAR_MUSEUM_3F_TRAINER
+	goto LilycoveCity_LilycoveMuseum_3F_EventScript_TrainerTalk
+
+Museum3F_AllDefeatedFlow:
+	goto_if_set FLAG_MUSEUM_3F_CROWN_TAKEN, Museum3F_CrownSlotTalk
+	goto Museum3F_CrownPickup
 
 @ ============================================================
 @ Trainer Talk and Battle
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_EventScript_TrainerTalk:
+	copyvar VAR_0x8004, VAR_MUSEUM_3F_TRAINER
 	switch VAR_0x8004
 	case 0, Museum3F_TrainerTalkJason
 	case 1, Museum3F_TrainerTalkKCH42
@@ -518,12 +528,6 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_BattleFreez:
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_EventScript_BattleWon:
 	call Museum3F_MarkDefeated
-	goto_if_eq VAR_0x8005, 0, Museum3F_RemoveTrainerNPC1
-	removeobject LOCALID_NPC2
-	goto Museum3F_AdvancePool
-Museum3F_RemoveTrainerNPC1:
-	removeobject LOCALID_NPC1
-Museum3F_AdvancePool:
 	call Museum3F_CheckAllDefeated
 	compare VAR_RESULT, 1
 	goto_if_eq Museum3F_EnterCrown
@@ -542,7 +546,9 @@ Museum3F_EnterCrown:
 	copyvar VAR_MUSEUM_3F_LOCATION, VAR_RESULT
 Museum3F_BattleCleanup:
 	hidefollower 0
-	setobjectxy LOCALID_PLAYER, 20, 11
+	setflag FLAG_MUSEUM_3F_REGEN_WARP
+	warp MAP_LILYCOVE_CITY_LILYCOVE_MUSEUM_3F, 20, 11
+	waitstate
 	updatefollowingmon
 	release
 	end
@@ -1131,5 +1137,31 @@ MTextCardPhrase9Str:
 	.string "{STR_VAR_1} is studying their cards\n"
 	.string "closely.$"
 
-MTextMuseumCrownEmpty:
-	.string "There's nothing here anymore.$"
+LilycoveCity_LilycoveMuseum_3F_EventScript_Kirlia::
+	lock
+	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Kirlia, MSGBOX_DEFAULT
+	release
+	end
+
+LilycoveCity_LilycoveMuseum_3F_Text_Kirlia:
+	.string "Kirlia is trying to get Ralts to come out\n"
+	.string "from under the table.\p"
+	.string "...It's not having much success.$"
+
+LilycoveCity_LilycoveMuseum_3F_EventScript_UnderTable::
+	msgbox LilycoveCity_LilycoveMuseum_3F_Text_UnderTable, MSGBOX_SIGN
+	end
+
+LilycoveCity_LilycoveMuseum_3F_Text_UnderTable:
+	.string "You peak under the table...\n"
+	.string "Ralts is snickering to itself!$"
+
+LilycoveCity_LilycoveMuseum_3F_EventScript_Meloetta::
+	lock
+	faceplayer
+	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Meloetta, MSGBOX_DEFAULT
+	release
+	end
+
+LilycoveCity_LilycoveMuseum_3F_Text_Meloetta:
+	.string "Meloetta looks to be resting her voice.$"

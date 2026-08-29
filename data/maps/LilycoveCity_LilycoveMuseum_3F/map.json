@@ -195,6 +195,32 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "LilycoveCity_LilycoveMuseum_3F_EventScript_Poke12",
       "flag": "FLAG_MUSEUM_3F_SEAT_RIGHT"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(KIRLIA)",
+      "x": 25,
+      "y": 5,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "LilycoveCity_LilycoveMuseum_3F_EventScript_Kirlia",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_SPECIES(MELOETTA_ARIA)",
+      "x": 13,
+      "y": 5,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WALK_IN_PLACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "LilycoveCity_LilycoveMuseum_3F_EventScript_Meloetta",
+      "flag": "0"
     }
   ],
   "warp_events": [
@@ -207,5 +233,14 @@
     }
   ],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 25,
+      "y": 6,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "LilycoveCity_LilycoveMuseum_3F_EventScript_UnderTable"
+    }
+  ]
 }

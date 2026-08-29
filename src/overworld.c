@@ -1030,7 +1030,7 @@ static u8 GetAdjustedInitialTransitionFlags(struct InitialPlayerAvatarState *pla
 
 static u8 GetAdjustedInitialDirection(struct InitialPlayerAvatarState *playerStruct, u8 transitionFlags, u16 metatileBehavior, enum MapType mapType)
 {
-    if (FlagGet(FLAG_MUSEUM_3F_BATTLE))
+    if (FlagGet(FLAG_MUSEUM_3F_BATTLE) || FlagGet(FLAG_MUSEUM_3F_REGEN_WARP))
         return DIR_WEST;
     if (FlagGet(FLAG_SYS_CRUISE_MODE) && mapType == MAP_TYPE_OCEAN_ROUTE)
         return DIR_EAST;

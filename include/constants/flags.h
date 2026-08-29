@@ -481,6 +481,7 @@
 #define FLAG_MUSEUM_3F_LEGEND_BEASTLY_DEFEATED 0x28E
 #define FLAG_MUSEUM_3F_LEGEND_FREEZ_DEFEATED 0x28F
 #define FLAG_MUSEUM_3F_CROWN_TAKEN           0x290
+#define FLAG_MUSEUM_3F_REGEN_WARP             0x2A0 // Set right before the post-battle regen warp; consumed by OnFrame to face the player west on arrival
 // Museum 3F legend-seat Pokémon spawn locks (claimed from unused block)
 #define FLAG_MUSEUM_3F_SEAT_LEFT             0x291
 #define FLAG_MUSEUM_3F_SEAT_RIGHT            0x292
