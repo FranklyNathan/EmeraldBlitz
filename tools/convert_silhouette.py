@@ -193,6 +193,26 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     gfx_dir = os.path.join(script_dir, '..', 'graphics', 'title_screen')
 
+    # Skip if outputs are already up to date
+    input_files = [
+        os.path.join(gfx_dir, 'SilhouettesLarge.png'),
+        os.path.join(gfx_dir, 'SilhouettesMedium.png'),
+        os.path.join(gfx_dir, 'SilhouettesSmall.png'),
+        os.path.join(gfx_dir, 'SalamenceSilhouette.png'),
+        os.path.join(gfx_dir, 'SilhouettesTiny.png'),
+    ]
+    output_files = [
+        os.path.join(gfx_dir, 'Silhouettes.gbapal'),
+        os.path.join(gfx_dir, 'Silhouettes.4bpp'),
+    ]
+    all_exist = all(os.path.exists(f) for f in input_files + output_files)
+    if all_exist:
+        newest_in = max(os.path.getmtime(f) for f in input_files)
+        oldest_out = min(os.path.getmtime(f) for f in output_files)
+        if oldest_out > newest_in:
+            print("Silhouette tiles up to date, skipping.")
+            return
+
     # Process Large silhouette
     print("Processing SilhouettesLarge.png:")
     large_img, large_left, large_right = process_silhouette(

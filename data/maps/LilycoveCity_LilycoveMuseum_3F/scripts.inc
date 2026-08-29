@@ -19,44 +19,23 @@ LilycoveCity_LilycoveMuseum_3F_MapScripts::
 	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LilycoveCity_LilycoveMuseum_3F_OnWarp
 	.byte 0
 
-@ ============================================================
-@ OnWarp
-@ ============================================================
 LilycoveCity_LilycoveMuseum_3F_OnWarp:
 	.2byte 0
 
-@ ============================================================
-@ OnFrame
-@ ============================================================
 LilycoveCity_LilycoveMuseum_3F_OnFrame:
-	map_script_2 VAR_TEMP_0, 0, LilycoveCity_LilycoveMuseum_3F_EventScript_CheckPendingBattle
+	map_script_2 VAR_TEMP_E, 0, LilycoveCity_LilycoveMuseum_3F_EventScript_CheckPendingBattle
 	.2byte 0
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_CheckPendingBattle:
-	setvar VAR_TEMP_0, 1
+	setvar VAR_TEMP_E, 1
 	goto_if_set FLAG_MUSEUM_3F_BATTLE, LilycoveCity_LilycoveMuseum_3F_EventScript_PostWarpBattle
 	end
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_PostWarpBattle:
-	clearflag FLAG_MUSEUM_3F_BATTLE
 	lockall
 	turnobject LOCALID_PLAYER, DIR_WEST
 	hidefollower 0
 	delay 20
-	goto_if_eq VAR_0x8005, 0, Museum3F_ApproachTrainerAtNPC1
-	applymovement LOCALID_PLAYER, LilycoveCity_LilycoveMuseum_3F_Movement_PlayerApproach1
-	waitmovement 0
-	delay 40
-	applymovement LOCALID_PLAYER, LilycoveCity_LilycoveMuseum_3F_Movement_PlayerApproach2
-	waitmovement 0
-	delay 20
-	special SpawnCameraObject
-	applymovement LOCALID_CAMERA, LilycoveCity_LilycoveMuseum_3F_Movement_camerapanleft
-	waitmovement 0
-	special RemoveCameraObject
-	goto LilycoveCity_LilycoveMuseum_3F_EventScript_BattleDispatch
-
-Museum3F_ApproachTrainerAtNPC1:
 	applymovement LOCALID_PLAYER, LilycoveCity_LilycoveMuseum_3F_Movement_PlayerApproach1
 	waitmovement 0
 	delay 40
@@ -108,7 +87,7 @@ Museum3F_OnTransition_BattleSetup:
 	copyvar VAR_0x8004, VAR_MUSEUM_3F_TRAINER
 	copyvar VAR_0x8005, VAR_MUSEUM_3F_LOCATION
 	copyvar VAR_0x8006, VAR_MUSEUM_3F_FILLER
-	setvar VAR_TEMP_0, 0
+	setvar VAR_TEMP_E, 0
 	settrainerflag TRAINER_MUSEUM_JASON
 	settrainerflag TRAINER_MUSEUM_KCH42
 	settrainerflag TRAINER_MUSEUM_JEANS
@@ -401,7 +380,6 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_NPC1::
 	compare VAR_RESULT, 1
 	goto_if_eq Museum3F_CrownPickup
 	goto_if_eq VAR_0x8005, 0, LilycoveCity_LilycoveMuseum_3F_EventScript_TrainerTalk
-	call LilycoveCity_LilycoveMuseum_3F_EventScript_FillerDialogue
 	release
 	end
 
@@ -412,7 +390,6 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_NPC2::
 	compare VAR_RESULT, 1
 	goto_if_eq Museum3F_CrownPickup
 	goto_if_eq VAR_0x8005, 1, LilycoveCity_LilycoveMuseum_3F_EventScript_TrainerTalk
-	call LilycoveCity_LilycoveMuseum_3F_EventScript_FillerDialogue
 	release
 	end
 
@@ -486,7 +463,7 @@ Museum3F_TrainerTalkContinue:
 	copyvar VAR_MUSEUM_3F_TRAINER, VAR_0x8004
 	copyvar VAR_MUSEUM_3F_LOCATION, VAR_0x8005
 	copyvar VAR_MUSEUM_3F_FILLER, VAR_0x8006
-	setvar VAR_TEMP_0, 0
+	setvar VAR_TEMP_E, 0
 	setflag FLAG_MUSEUM_3F_BATTLE
 	warp MAP_LILYCOVE_CITY_LILYCOVE_MUSEUM_3F, 23, 11
 	waitstate
@@ -496,6 +473,7 @@ Museum3F_TrainerTalkContinue:
 @ Battle Dispatch
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_EventScript_BattleDispatch:
+	clearflag FLAG_MUSEUM_3F_BATTLE
 	switch VAR_0x8004
 	case 0, LilycoveCity_LilycoveMuseum_3F_EventScript_BattleJason
 	case 1, LilycoveCity_LilycoveMuseum_3F_EventScript_BattleKCH42
@@ -569,53 +547,7 @@ Museum3F_BattleCleanup:
 	release
 	end
 
-@ ============================================================
-@ Filler Dialogue
-@ ============================================================
-LilycoveCity_LilycoveMuseum_3F_EventScript_FillerDialogue:
-	switch VAR_0x8006
-	case 0, Museum3F_Filler0
-	case 1, Museum3F_Filler1
-	case 2, Museum3F_Filler2
-	case 3, Museum3F_Filler3
-	case 4, Museum3F_Filler4
-	case 5, Museum3F_Filler5
-	case 6, Museum3F_Filler6
-	case 7, Museum3F_Filler7
-	case 8, Museum3F_Filler8
-	case 9, Museum3F_Filler9
-	return
 
-Museum3F_Filler0:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler0, MSGBOX_DEFAULT
-	return
-Museum3F_Filler1:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler1, MSGBOX_DEFAULT
-	return
-Museum3F_Filler2:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler2, MSGBOX_DEFAULT
-	return
-Museum3F_Filler3:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler3, MSGBOX_DEFAULT
-	return
-Museum3F_Filler4:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler4, MSGBOX_DEFAULT
-	return
-Museum3F_Filler5:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler5, MSGBOX_DEFAULT
-	return
-Museum3F_Filler6:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler6, MSGBOX_DEFAULT
-	return
-Museum3F_Filler7:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler7, MSGBOX_DEFAULT
-	return
-Museum3F_Filler8:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler8, MSGBOX_DEFAULT
-	return
-Museum3F_Filler9:
-	msgbox LilycoveCity_LilycoveMuseum_3F_Text_Filler9, MSGBOX_DEFAULT
-	return
 
 @ ============================================================
 @ Species ... GFX  (input: VAR_0x8008, output: VAR_TEMP_7)
@@ -666,10 +598,10 @@ MSTG_Chesnaught:
 	setvar VAR_TEMP_7, 17036
 	return
 MSTG_Slowking:
-	setvar VAR_TEMP_7, 16583
+	setvar VAR_TEMP_7, 16583, FALSE
 	return
 MSTG_Ampharos:
-	setvar VAR_TEMP_7, 16565
+	setvar VAR_TEMP_7, 16565, FALSE
 	return
 MSTG_MimeJr:
 	setvar VAR_TEMP_7, 16823
@@ -684,13 +616,13 @@ MSTG_Greedent:
 	setvar VAR_TEMP_7, 17204
 	return
 MSTG_Snubbull:
-	setvar VAR_TEMP_7, 16593
+	setvar VAR_TEMP_7, 16593, FALSE
 	return
 MSTG_Slurpuff:
 	setvar VAR_TEMP_7, 17069
 	return
 MSTG_Hitmontop:
-	setvar VAR_TEMP_7, 16621
+	setvar VAR_TEMP_7, 16621, FALSE
 	return
 MSTG_Yamper:
 	setvar VAR_TEMP_7, 17219
@@ -699,19 +631,19 @@ MSTG_Appletun:
 	setvar VAR_TEMP_7, 17226
 	return
 MSTG_Skiploom:
-	setvar VAR_TEMP_7, 16572
+	setvar VAR_TEMP_7, 16572, FALSE
 	return
 MSTG_Swoobat:
 	setvar VAR_TEMP_7, 16912
 	return
 MSTG_Seel:
-	setvar VAR_TEMP_7, 16470
+	setvar VAR_TEMP_7, 16470, FALSE
 	return
 MSTG_Furret:
-	setvar VAR_TEMP_7, 16546
+	setvar VAR_TEMP_7, 16546, FALSE
 	return
 MSTG_Torchic:
-	setvar VAR_TEMP_7, 16639
+	setvar VAR_TEMP_7, 16639, FALSE
 	return
 MSTG_Spinda:
 	setvar VAR_TEMP_7, 16711
@@ -735,22 +667,22 @@ MSTG_Corphish:
 	setvar VAR_TEMP_7, 16725
 	return
 MSTG_Teddiursa:
-	setvar VAR_TEMP_7, 16600
+	setvar VAR_TEMP_7, 16600, FALSE
 	return
 MSTG_Magnemite:
-	setvar VAR_TEMP_7, 16465
+	setvar VAR_TEMP_7, 16465, FALSE
 	return
 MSTG_SliggooHisui:
 	setvar VAR_TEMP_7, 17389
 	return
 MSTG_Persian:
-	setvar VAR_TEMP_7, 16437
+	setvar VAR_TEMP_7, 16437, FALSE
 	return
 MSTG_Rhydon:
-	setvar VAR_TEMP_7, 16496
+	setvar VAR_TEMP_7, 16496, FALSE
 	return
 MSTG_Unfezant:
-	setvar VAR_TEMP_7, 16905
+	setvar VAR_TEMP_7, 16905, FALSE
 	return
 
 @ ============================================================
@@ -1136,32 +1068,9 @@ LilycoveCity_LilycoveMuseum_3F_Text_BeastlyEllipsesSingle:
 LilycoveCity_LilycoveMuseum_3F_Text_FreezEllipsesSingle:
 	.string "FREEZ: ...$"
 
-@ ============================================================
-@ Text - Filler
-@ ============================================================
-LilycoveCity_LilycoveMuseum_3F_Text_Filler0:
-	.string "I'm just here for the refreshments.$"
-LilycoveCity_LilycoveMuseum_3F_Text_Filler1:
-	.string "I don't recognize you.$"
-LilycoveCity_LilycoveMuseum_3F_Text_Filler2:
-	.string "Just relaxing.$"
-LilycoveCity_LilycoveMuseum_3F_Text_Filler3:
-	.string "This place is really something!$"
-LilycoveCity_LilycoveMuseum_3F_Text_Filler4:
-	.string "I love looking at the exhibits.$"
-LilycoveCity_LilycoveMuseum_3F_Text_Filler5:
-	.string "Where am I?$"
-LilycoveCity_LilycoveMuseum_3F_Text_Filler6:
-	.string "I think I'm lost.$"
-LilycoveCity_LilycoveMuseum_3F_Text_Filler7:
-	.string "Nice museum.$"
-LilycoveCity_LilycoveMuseum_3F_Text_Filler8:
-	.string "I'm studying the artifacts.$"
-LilycoveCity_LilycoveMuseum_3F_Text_Filler9:
-	.string "This is a cool place.$"
 
 @ ============================================================
-@ Text - Pokemon Card Game (shared phrases, species name buffered)
+@ Text - Pokemon Card Game
 @ ============================================================
 MTextCardPhrase0:
 	msgbox MTextCardPhrase0Str, MSGBOX_DEFAULT
@@ -1222,8 +1131,5 @@ MTextCardPhrase9Str:
 	.string "{STR_VAR_1} is studying their cards\n"
 	.string "closely.$"
 
-@ ============================================================
-@ Text - Relic Crown
-@ ============================================================
 MTextMuseumCrownEmpty:
 	.string "There's nothing here anymore.$"
