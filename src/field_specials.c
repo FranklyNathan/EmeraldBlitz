@@ -4590,7 +4590,7 @@ static struct Mail sScriptMail;
 static u8 sProLetterIdx;
 static bool8 sProLetterIdxReady;
 
-#define PRO_LETTER_POOL_SIZE 20
+#define PRO_LETTER_POOL_SIZE 21
 
 struct ProLetterEntry
 {
@@ -4761,6 +4761,10 @@ static const u8 sProLetter19_2[] = _("By playing it you are");
 static const u8 sProLetter19_3[] = _("making history.");
 static const u8 sProLetter19_4[] = _("Don't forget that.");
 
+// Letter 20: Glitter - Moo807
+static const u8 sMoo807[] = _("Moo807");
+static const u8 sProLetter20_0[] = _("Beat 9 minutes");
+
 static const struct ProLetterEntry sProLetterPool[PRO_LETTER_POOL_SIZE] =
 {
     {
@@ -4882,6 +4886,12 @@ static const struct ProLetterEntry sProLetterPool[PRO_LETTER_POOL_SIZE] =
         .lines = { sProLetter19_0, sProLetter19_1, sProLetter19_2, sProLetter19_3, sProLetter19_4 },
         .numLines = 5,
         .sender = sMfrazz,
+    },
+    {
+        .itemId = ITEM_GLITTER_MAIL,
+        .lines = { sProLetter20_0 },
+        .numLines = 1,
+        .sender = sMoo807,
     },
 };
 

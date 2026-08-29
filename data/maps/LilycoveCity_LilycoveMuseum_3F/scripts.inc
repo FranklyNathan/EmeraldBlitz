@@ -6,6 +6,12 @@
 .set LOCALID_POKE4, 6
 .set LOCALID_POKE5, 7
 .set LOCALID_POKE6, 8
+.set LOCALID_POKE7, 9
+.set LOCALID_POKE8, 10
+.set LOCALID_POKE9, 11
+.set LOCALID_POKE10, 12
+.set LOCALID_POKE11, 13
+.set LOCALID_POKE12, 14
 
 LilycoveCity_LilycoveMuseum_3F_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, LilycoveCity_LilycoveMuseum_3F_OnTransition
@@ -17,12 +23,7 @@ LilycoveCity_LilycoveMuseum_3F_MapScripts::
 @ OnWarp
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_OnWarp:
-	map_script_2 FLAG_MUSEUM_3F_BATTLE, TRUE, Museum3F_OnWarp_FaceWest
 	.2byte 0
-
-Museum3F_OnWarp_FaceWest:
-	turnobject LOCALID_PLAYER, DIR_WEST
-	end
 
 @ ============================================================
 @ OnFrame
@@ -39,6 +40,7 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_CheckPendingBattle:
 LilycoveCity_LilycoveMuseum_3F_EventScript_PostWarpBattle:
 	clearflag FLAG_MUSEUM_3F_BATTLE
 	lockall
+	turnobject LOCALID_PLAYER, DIR_WEST
 	hidefollower 0
 	delay 20
 	goto_if_eq VAR_0x8005, 0, Museum3F_ApproachTrainerAtNPC1
@@ -72,17 +74,33 @@ Museum3F_ApproachTrainerAtNPC1:
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_OnTransition:
 	goto_if_set FLAG_MUSEUM_3F_BATTLE, Museum3F_OnTransition_BattleSetup
-	cleartrainerflag TRAINER_MUSEUM_JASON
-	cleartrainerflag TRAINER_MUSEUM_KCH42
-	cleartrainerflag TRAINER_MUSEUM_JEANS
-	cleartrainerflag TRAINER_MUSEUM_BEASTLY
-	cleartrainerflag TRAINER_MUSEUM_FREEZ
-	random 5
-	copyvar VAR_0x8004, VAR_RESULT
+	settrainerflag TRAINER_MUSEUM_JASON
+	settrainerflag TRAINER_MUSEUM_KCH42
+	settrainerflag TRAINER_MUSEUM_JEANS
+	settrainerflag TRAINER_MUSEUM_BEASTLY
+	settrainerflag TRAINER_MUSEUM_FREEZ
+	call Museum3F_CheckAllDefeated
+	compare VAR_RESULT, 1
+	goto_if_eq Museum3F_CrownTransition
+	goto_if_set FLAG_MUSEUM_3F_LEGEND_ACTIVE, Museum3F_LoadLockedLegend
+	call Museum3F_PickLegend
+	copyvar VAR_MUSEUM_3F_TRAINER, VAR_0x8004
 	random 2
+	copyvar VAR_MUSEUM_3F_LOCATION, VAR_RESULT
 	copyvar VAR_0x8005, VAR_RESULT
 	random 10
+	copyvar VAR_MUSEUM_3F_FILLER, VAR_RESULT
 	copyvar VAR_0x8006, VAR_RESULT
+	setflag FLAG_MUSEUM_3F_LEGEND_ACTIVE
+	goto Museum3F_SetupLocked
+
+Museum3F_LoadLockedLegend:
+	copyvar VAR_0x8004, VAR_MUSEUM_3F_TRAINER
+	copyvar VAR_0x8005, VAR_MUSEUM_3F_LOCATION
+	copyvar VAR_0x8006, VAR_MUSEUM_3F_FILLER
+
+Museum3F_SetupLocked:
+	call Museum3F_ClearActiveTrainer
 	call Museum3F_SetSpawnFlags
 	goto Museum3F_SetupSprites
 
@@ -105,6 +123,151 @@ Museum3F_BattleSetup_TrainerAtLeft:
 	setobjectxyperm LOCALID_NPC1, 14, 11
 	setobjectmovementtype LOCALID_NPC1, MOVEMENT_TYPE_FACE_RIGHT
 	goto Museum3F_SetupSprites
+
+Museum3F_CheckAllDefeated:
+	setvar VAR_RESULT, 1
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_JASON_DEFEATED, Museum3F_NotAllDefeated
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_KCH42_DEFEATED, Museum3F_NotAllDefeated
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_JEANS_DEFEATED, Museum3F_NotAllDefeated
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_BEASTLY_DEFEATED, Museum3F_NotAllDefeated
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_FREEZ_DEFEATED, Museum3F_NotAllDefeated
+	return
+
+Museum3F_NotAllDefeated:
+	setvar VAR_RESULT, 0
+	return
+
+Museum3F_PickLegend:
+	random 5
+	copyvar VAR_0x8004, VAR_RESULT
+	switch VAR_0x8004
+	case 0, Museum3F_PickJASON
+	case 1, Museum3F_PickKCH42
+	case 2, Museum3F_PickJEANS
+	case 3, Museum3F_PickBEASTLY
+	case 4, Museum3F_PickFREEZ
+	end
+
+Museum3F_PickJASON:
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_JASON_DEFEATED, Museum3F_PickLive
+	setvar VAR_0x8004, 1
+	goto Museum3F_PickKCH42
+Museum3F_PickKCH42:
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_KCH42_DEFEATED, Museum3F_PickLive
+	setvar VAR_0x8004, 2
+	goto Museum3F_PickJEANS
+Museum3F_PickJEANS:
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_JEANS_DEFEATED, Museum3F_PickLive
+	setvar VAR_0x8004, 3
+	goto Museum3F_PickBEASTLY
+Museum3F_PickBEASTLY:
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_BEASTLY_DEFEATED, Museum3F_PickLive
+	setvar VAR_0x8004, 4
+	goto Museum3F_PickFREEZ
+Museum3F_PickFREEZ:
+	goto_if_unset FLAG_MUSEUM_3F_LEGEND_FREEZ_DEFEATED, Museum3F_PickLive
+	setvar VAR_0x8004, 0
+	goto Museum3F_PickJASON
+
+Museum3F_PickLive:
+	return
+
+Museum3F_ClearActiveTrainer:
+	switch VAR_0x8004
+	case 0, Museum3F_ClearJASON
+	case 1, Museum3F_ClearKCH42
+	case 2, Museum3F_ClearJEANS
+	case 3, Museum3F_ClearBEASTLY
+	case 4, Museum3F_ClearFREEZ
+	end
+Museum3F_ClearJASON:
+	cleartrainerflag TRAINER_MUSEUM_JASON
+	return
+Museum3F_ClearKCH42:
+	cleartrainerflag TRAINER_MUSEUM_KCH42
+	return
+Museum3F_ClearJEANS:
+	cleartrainerflag TRAINER_MUSEUM_JEANS
+	return
+Museum3F_ClearBEASTLY:
+	cleartrainerflag TRAINER_MUSEUM_BEASTLY
+	return
+Museum3F_ClearFREEZ:
+	cleartrainerflag TRAINER_MUSEUM_FREEZ
+	return
+
+Museum3F_MarkDefeated:
+	switch VAR_0x8004
+	case 0, Museum3F_MarkJASON
+	case 1, Museum3F_MarkKCH42
+	case 2, Museum3F_MarkJEANS
+	case 3, Museum3F_MarkBEASTLY
+	case 4, Museum3F_MarkFREEZ
+	end
+Museum3F_MarkJASON:
+	setflag FLAG_MUSEUM_3F_LEGEND_JASON_DEFEATED
+	settrainerflag TRAINER_MUSEUM_JASON
+	return
+Museum3F_MarkKCH42:
+	setflag FLAG_MUSEUM_3F_LEGEND_KCH42_DEFEATED
+	settrainerflag TRAINER_MUSEUM_KCH42
+	return
+Museum3F_MarkJEANS:
+	setflag FLAG_MUSEUM_3F_LEGEND_JEANS_DEFEATED
+	settrainerflag TRAINER_MUSEUM_JEANS
+	return
+Museum3F_MarkBEASTLY:
+	setflag FLAG_MUSEUM_3F_LEGEND_BEASTLY_DEFEATED
+	settrainerflag TRAINER_MUSEUM_BEASTLY
+	return
+Museum3F_MarkFREEZ:
+	setflag FLAG_MUSEUM_3F_LEGEND_FREEZ_DEFEATED
+	settrainerflag TRAINER_MUSEUM_FREEZ
+	return
+
+Museum3F_CrownTransition:
+	copyvar VAR_0x8005, VAR_MUSEUM_3F_LOCATION
+	random 10
+	copyvar VAR_0x8006, VAR_RESULT
+	goto Museum3F_CrownSetup
+
+Museum3F_CrownSetup:
+	call Museum3F_SetSpawnFlags
+	goto_if_set FLAG_MUSEUM_3F_CROWN_TAKEN, Museum3F_CrownTaken
+	setvar VAR_0x8007, OBJ_EVENT_GFX_ITEM_BALL
+	goto Museum3F_ApplyTrainerGfx
+
+Museum3F_CrownTaken:
+	setvar VAR_0x8007, OBJ_EVENT_GFX_SCHOOL_KID_M
+	goto_if_eq VAR_0x8005, 0, Museum3F_CrownRemoveNPC1
+	removeobject LOCALID_NPC2
+	goto Museum3F_ApplyTrainerGfx
+Museum3F_CrownRemoveNPC1:
+	removeobject LOCALID_NPC1
+	goto Museum3F_ApplyTrainerGfx
+
+Museum3F_CrownPickup:
+	goto_if_set FLAG_MUSEUM_3F_CROWN_TAKEN, Museum3F_CrownEmpty
+	giveitem ITEM_RELIC_CROWN
+	goto_if_eq VAR_RESULT, FALSE, Museum3F_CrownBagFull
+	setflag FLAG_MUSEUM_3F_CROWN_TAKEN
+	goto_if_eq VAR_0x8005, 0, Museum3F_CrownPickNPC1
+	removeobject LOCALID_NPC2
+	goto Museum3F_CrownDone
+Museum3F_CrownPickNPC1:
+	removeobject LOCALID_NPC1
+Museum3F_CrownDone:
+	release
+	end
+
+Museum3F_CrownBagFull:
+	release
+	end
+
+Museum3F_CrownEmpty:
+	msgbox MTextMuseumCrownEmpty, MSGBOX_DEFAULT
+	release
+	end
 
 Museum3F_SetSpawnFlags:
 	goto_if_eq VAR_0x8005, 0, Museum3F_SpawnFlagsNPC1
@@ -151,65 +314,81 @@ Museum3F_GfxPink:
 Museum3F_ApplyTrainerGfx:
 	goto_if_eq VAR_0x8005, 0, Museum3F_ApplyTrainerGfxToID0
 	copyvar VAR_OBJ_GFX_ID_1, VAR_0x8007
-	goto Museum3F_SetFillerSprite
+	goto Museum3F_SetupPokemon
 
 Museum3F_ApplyTrainerGfxToID0:
 	copyvar VAR_OBJ_GFX_ID_0, VAR_0x8007
 
-Museum3F_SetFillerSprite:
-	switch VAR_0x8006
-	case 0, Museum3F_SpriteVal0
-	case 1, Museum3F_SpriteVal1
-	case 2, Museum3F_SpriteVal2
-	case 3, Museum3F_SpriteVal3
-	case 4, Museum3F_SpriteVal4
-	case 5, Museum3F_SpriteVal5
-	case 6, Museum3F_SpriteVal6
-	case 7, Museum3F_SpriteVal7
-	case 8, Museum3F_SpriteVal8
-	case 9, Museum3F_SpriteVal9
+Museum3F_SetupPokemon:
+	@ Assign a random species (from the pool) + matching gfx to each of the 12 Pokemon seats.
+	random 32
+	copyvar VAR_TEMP_0, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_2, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_1, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_3, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_2, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_4, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_3, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_5, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_4, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_6, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_5, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_7, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_6, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_8, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_8, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_9, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_9, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_A, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_A, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_B, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_B, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_C, VAR_TEMP_7
+	random 32
+	copyvar VAR_TEMP_C, VAR_RESULT
+	copyvar VAR_0x8008, VAR_RESULT
+	call Museum3F_SpeciesToGfx
+	setorcopyvar VAR_OBJ_GFX_ID_D, VAR_TEMP_7
+	@ The living legend takes a seat in one room, so hide that seat's Pokemon.
+	goto_if_eq VAR_0x8005, 0, Museum3F_LegendSeatRight
+	setflag FLAG_MUSEUM_3F_SEAT_LEFT
+	clearflag FLAG_MUSEUM_3F_SEAT_RIGHT
 	end
-
-Museum3F_SpriteVal0:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_YOUNGSTER
-	goto Museum3F_CopyFiller
-Museum3F_SpriteVal1:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_MAN_1
-	goto Museum3F_CopyFiller
-Museum3F_SpriteVal2:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_MAN_2
-	goto Museum3F_CopyFiller
-Museum3F_SpriteVal3:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_EXPERT_M
-	goto Museum3F_CopyFiller
-Museum3F_SpriteVal4:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_BLACK_BELT
-	goto Museum3F_CopyFiller
-Museum3F_SpriteVal5:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_CAMPER
-	goto Museum3F_CopyFiller
-Museum3F_SpriteVal6:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_MAN_3
-	goto Museum3F_CopyFiller
-Museum3F_SpriteVal7:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_MAN_4
-	goto Museum3F_CopyFiller
-Museum3F_SpriteVal8:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_MAN_5
-	goto Museum3F_CopyFiller
-Museum3F_SpriteVal9:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_SCHOOL_KID_M
-	goto Museum3F_CopyFiller
-
-Museum3F_CopyFiller:
-	goto_if_eq VAR_0x8005, 0, Museum3F_CopyFillerToID1
-	copyvar VAR_OBJ_GFX_ID_0, VAR_0x8007
-	call Museum3F_SetupPokemon
-	end
-
-Museum3F_CopyFillerToID1:
-	copyvar VAR_OBJ_GFX_ID_1, VAR_0x8007
-	call Museum3F_SetupPokemon
+Museum3F_LegendSeatRight:
+	setflag FLAG_MUSEUM_3F_SEAT_RIGHT
+	clearflag FLAG_MUSEUM_3F_SEAT_LEFT
 	end
 
 @ ============================================================
@@ -218,6 +397,9 @@ Museum3F_CopyFillerToID1:
 LilycoveCity_LilycoveMuseum_3F_EventScript_NPC1::
 	lock
 	faceplayer
+	call Museum3F_CheckAllDefeated
+	compare VAR_RESULT, 1
+	goto_if_eq Museum3F_CrownPickup
 	goto_if_eq VAR_0x8005, 0, LilycoveCity_LilycoveMuseum_3F_EventScript_TrainerTalk
 	call LilycoveCity_LilycoveMuseum_3F_EventScript_FillerDialogue
 	release
@@ -226,6 +408,9 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_NPC1::
 LilycoveCity_LilycoveMuseum_3F_EventScript_NPC2::
 	lock
 	faceplayer
+	call Museum3F_CheckAllDefeated
+	compare VAR_RESULT, 1
+	goto_if_eq Museum3F_CrownPickup
 	goto_if_eq VAR_0x8005, 1, LilycoveCity_LilycoveMuseum_3F_EventScript_TrainerTalk
 	call LilycoveCity_LilycoveMuseum_3F_EventScript_FillerDialogue
 	release
@@ -301,6 +486,7 @@ Museum3F_TrainerTalkContinue:
 	copyvar VAR_MUSEUM_3F_TRAINER, VAR_0x8004
 	copyvar VAR_MUSEUM_3F_LOCATION, VAR_0x8005
 	copyvar VAR_MUSEUM_3F_FILLER, VAR_0x8006
+	setvar VAR_TEMP_0, 0
 	setflag FLAG_MUSEUM_3F_BATTLE
 	warp MAP_LILYCOVE_CITY_LILYCOVE_MUSEUM_3F, 23, 11
 	waitstate
@@ -353,11 +539,29 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_BattleFreez:
 @ Battle Won
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_EventScript_BattleWon:
+	call Museum3F_MarkDefeated
 	goto_if_eq VAR_0x8005, 0, Museum3F_RemoveTrainerNPC1
 	removeobject LOCALID_NPC2
-	goto Museum3F_BattleCleanup
+	goto Museum3F_AdvancePool
 Museum3F_RemoveTrainerNPC1:
 	removeobject LOCALID_NPC1
+Museum3F_AdvancePool:
+	call Museum3F_CheckAllDefeated
+	compare VAR_RESULT, 1
+	goto_if_eq Museum3F_EnterCrown
+	call Museum3F_PickLegend
+	copyvar VAR_MUSEUM_3F_TRAINER, VAR_0x8004
+	random 2
+	copyvar VAR_MUSEUM_3F_LOCATION, VAR_RESULT
+	random 10
+	copyvar VAR_MUSEUM_3F_FILLER, VAR_RESULT
+	setflag FLAG_MUSEUM_3F_LEGEND_ACTIVE
+	goto Museum3F_BattleCleanup
+Museum3F_EnterCrown:
+	clearflag FLAG_MUSEUM_3F_LEGEND_ACTIVE
+	clearflag FLAG_MUSEUM_3F_CROWN_TAKEN
+	random 2
+	copyvar VAR_MUSEUM_3F_LOCATION, VAR_RESULT
 Museum3F_BattleCleanup:
 	hidefollower 0
 	setobjectxy LOCALID_PLAYER, 20, 11
@@ -414,302 +618,7 @@ Museum3F_Filler9:
 	return
 
 @ ============================================================
-@ Pokémon Setup
-@ ============================================================
-@ VAR_0x8005 = 0: trainer right → Pokémon left room
-@ VAR_0x8005 = 1: trainer left → Pokémon right room
-@ Left room:  (0,11)-(5,16), off-limits (2,14)/(3,14), table (2,13)/(3,13)
-@ Right room: (29,11)-(34,16), off-limits (31,14)/(32,14), table (31,13)/(32,13)
-@
-@ VAR_TEMP_0-5: per-Pokémon storage, encoded as:
-@   value 0-28   = species index, not on table
-@   value 29-57  = species index - 29, ON table (species = value - 29)
-@
-@ VAR_0x8007: Pokémon count (5 or 6)
-@ VAR_0x8008: scratch (species decode / GFX input)
-@ VAR_0x8009: Pokémon interaction index (1-6) during dialogue
-
-Museum3F_SetupPokemon:
-	@ Remove the filler NPC from the Pokémon room
-	goto_if_eq VAR_0x8005, 0, MPokemonRemoveNPC2
-	removeobject LOCALID_NPC1
-	goto MPokemonRandomCount
-MPokemonRemoveNPC2:
-	removeobject LOCALID_NPC2
-MPokemonRandomCount:
-	random 2
-	addvar VAR_RESULT, 5
-	copyvar VAR_0x8007, VAR_RESULT
-
-	@ Select non-adjacent position template (10 pre-verified layouts)
-	random 10
-	switch VAR_RESULT
-	case 0, MTemplate0
-	case 1, MTemplate1
-	case 2, MTemplate2
-	case 3, MTemplate3
-	case 4, MTemplate4
-	case 5, MTemplate5
-	case 6, MTemplate6
-	case 7, MTemplate7
-	case 8, MTemplate8
-	case 9, MTemplate9
-	end
-
-MTemplate0:
-	setvar VAR_TEMP_0, 0
-	setvar VAR_TEMP_1, 3
-	setvar VAR_TEMP_2, 7
-	setvar VAR_TEMP_3, 19
-	setvar VAR_TEMP_4, 24
-	setvar VAR_TEMP_5, 31
-	goto MPhase2
-MTemplate1:
-	setvar VAR_TEMP_0, 1
-	setvar VAR_TEMP_1, 4
-	setvar VAR_TEMP_2, 9
-	setvar VAR_TEMP_3, 20
-	setvar VAR_TEMP_4, 25
-	setvar VAR_TEMP_5, 30
-	goto MPhase2
-MTemplate2:
-	setvar VAR_TEMP_0, 0
-	setvar VAR_TEMP_1, 2
-	setvar VAR_TEMP_2, 4
-	setvar VAR_TEMP_3, 20
-	setvar VAR_TEMP_4, 25
-	setvar VAR_TEMP_5, 30
-	goto MPhase2
-MTemplate3:
-	setvar VAR_TEMP_0, 1
-	setvar VAR_TEMP_1, 3
-	setvar VAR_TEMP_2, 10
-	setvar VAR_TEMP_3, 18
-	setvar VAR_TEMP_4, 24
-	setvar VAR_TEMP_5, 33
-	goto MPhase2
-MTemplate4:
-	setvar VAR_TEMP_0, 1
-	setvar VAR_TEMP_1, 5
-	setvar VAR_TEMP_2, 6
-	setvar VAR_TEMP_3, 20
-	setvar VAR_TEMP_4, 24
-	setvar VAR_TEMP_5, 29
-	goto MPhase2
-MTemplate5:
-	setvar VAR_TEMP_0, 2
-	setvar VAR_TEMP_1, 4
-	setvar VAR_TEMP_2, 11
-	setvar VAR_TEMP_3, 18
-	setvar VAR_TEMP_4, 23
-	setvar VAR_TEMP_5, 31
-	goto MPhase2
-MTemplate6:
-	setvar VAR_TEMP_0, 0
-	setvar VAR_TEMP_1, 3
-	setvar VAR_TEMP_2, 8
-	setvar VAR_TEMP_3, 21
-	setvar VAR_TEMP_4, 26
-	setvar VAR_TEMP_5, 31
-	goto MPhase2
-MTemplate7:
-	setvar VAR_TEMP_0, 1
-	setvar VAR_TEMP_1, 5
-	setvar VAR_TEMP_2, 8
-	setvar VAR_TEMP_3, 18
-	setvar VAR_TEMP_4, 25
-	setvar VAR_TEMP_5, 29
-	goto MPhase2
-MTemplate8:
-	setvar VAR_TEMP_0, 0
-	setvar VAR_TEMP_1, 4
-	setvar VAR_TEMP_2, 8
-	setvar VAR_TEMP_3, 19
-	setvar VAR_TEMP_4, 24
-	setvar VAR_TEMP_5, 31
-	goto MPhase2
-MTemplate9:
-	setvar VAR_TEMP_0, 3
-	setvar VAR_TEMP_1, 5
-	setvar VAR_TEMP_2, 6
-	setvar VAR_TEMP_3, 19
-	setvar VAR_TEMP_4, 24
-	setvar VAR_TEMP_5, 33
-	goto MPhase2
-
-MPhase2:
-	@ Per Pokémon — set position, pick species, encode table, set GFX, set movement
-	@ Pokémon 1
-	call Museum3F_SetPos1
-	random 29
-	@ Check if on table (position index 14 or 15)
-	compare VAR_TEMP_0, 14
-	goto_if_eq MPPoke1OnTable
-	compare VAR_TEMP_0, 15
-	goto_if_eq MPPoke1OnTable
-	@ Not on table — store species as-is
-	copyvar VAR_TEMP_0, VAR_RESULT
-	goto MPPoke1Gfx
-MPPoke1OnTable:
-	addvar VAR_RESULT, 29
-	copyvar VAR_TEMP_0, VAR_RESULT
-MPPoke1Gfx:
-	call Museum3F_DecodeSpecies1
-	call Museum3F_SpeciesToGfx
-	setorcopyvar VAR_OBJ_GFX_ID_2, VAR_TEMP_7
-	call Museum3F_SetMove1
-
-	@ Pokémon 2
-	call Museum3F_SetPos2
-	random 29
-	compare VAR_TEMP_1, 14
-	goto_if_eq MPPoke2OnTable
-	compare VAR_TEMP_1, 15
-	goto_if_eq MPPoke2OnTable
-	copyvar VAR_TEMP_1, VAR_RESULT
-	goto MPPoke2Gfx
-MPPoke2OnTable:
-	addvar VAR_RESULT, 29
-	copyvar VAR_TEMP_1, VAR_RESULT
-MPPoke2Gfx:
-	call Museum3F_DecodeSpecies2
-	call Museum3F_SpeciesToGfx
-	setorcopyvar VAR_OBJ_GFX_ID_3, VAR_TEMP_7
-	call Museum3F_SetMove2
-
-	@ Pokémon 3
-	call Museum3F_SetPos3
-	random 29
-	compare VAR_TEMP_2, 14
-	goto_if_eq MPPoke3OnTable
-	compare VAR_TEMP_2, 15
-	goto_if_eq MPPoke3OnTable
-	copyvar VAR_TEMP_2, VAR_RESULT
-	goto MPPoke3Gfx
-MPPoke3OnTable:
-	addvar VAR_RESULT, 29
-	copyvar VAR_TEMP_2, VAR_RESULT
-MPPoke3Gfx:
-	call Museum3F_DecodeSpecies3
-	call Museum3F_SpeciesToGfx
-	setorcopyvar VAR_OBJ_GFX_ID_4, VAR_TEMP_7
-	call Museum3F_SetMove3
-
-	@ Pokémon 4
-	call Museum3F_SetPos4
-	random 29
-	compare VAR_TEMP_3, 14
-	goto_if_eq MPPoke4OnTable
-	compare VAR_TEMP_3, 15
-	goto_if_eq MPPoke4OnTable
-	copyvar VAR_TEMP_3, VAR_RESULT
-	goto MPPoke4Gfx
-MPPoke4OnTable:
-	addvar VAR_RESULT, 29
-	copyvar VAR_TEMP_3, VAR_RESULT
-MPPoke4Gfx:
-	call Museum3F_DecodeSpecies4
-	call Museum3F_SpeciesToGfx
-	setorcopyvar VAR_OBJ_GFX_ID_5, VAR_TEMP_7
-	call Museum3F_SetMove4
-
-	@ Pokémon 5
-	call Museum3F_SetPos5
-	random 29
-	compare VAR_TEMP_4, 14
-	goto_if_eq MPPoke5OnTable
-	compare VAR_TEMP_4, 15
-	goto_if_eq MPPoke5OnTable
-	copyvar VAR_TEMP_4, VAR_RESULT
-	goto MPPoke5Gfx
-MPPoke5OnTable:
-	addvar VAR_RESULT, 29
-	copyvar VAR_TEMP_4, VAR_RESULT
-MPPoke5Gfx:
-	call Museum3F_DecodeSpecies5
-	call Museum3F_SpeciesToGfx
-	setorcopyvar VAR_OBJ_GFX_ID_6, VAR_TEMP_7
-	call Museum3F_SetMove5
-
-	@ Pokémon 6
-	call Museum3F_SetPos6
-	random 29
-	compare VAR_TEMP_5, 14
-	goto_if_eq MPPoke6OnTable
-	compare VAR_TEMP_5, 15
-	goto_if_eq MPPoke6OnTable
-	copyvar VAR_TEMP_5, VAR_RESULT
-	goto MPPoke6Gfx
-MPPoke6OnTable:
-	addvar VAR_RESULT, 29
-	copyvar VAR_TEMP_5, VAR_RESULT
-MPPoke6Gfx:
-	call Museum3F_DecodeSpecies6
-	call Museum3F_SpeciesToGfx
-	setorcopyvar VAR_OBJ_GFX_ID_7, VAR_TEMP_7
-	call Museum3F_SetMove6
-
-	@ Hide unused slot if only 5
-	compare VAR_0x8007, 5
-	goto_if_ne MPokemonAllSix
-	removeobject LOCALID_POKE6
-MPokemonAllSix:
-	setvar VAR_TEMP_0, 0
-	return
-
-@ ============================================================
-@ Decode Species from VAR_TEMP_X → VAR_0x8008
-@ ============================================================
-Museum3F_DecodeSpecies1:
-	setorcopyvar VAR_0x8008, VAR_TEMP_0
-	compare VAR_0x8008, 29
-	goto_if_lt MDS1done
-	subvar VAR_0x8008, 29
-MDS1done:
-	return
-
-Museum3F_DecodeSpecies2:
-	setorcopyvar VAR_0x8008, VAR_TEMP_1
-	compare VAR_0x8008, 29
-	goto_if_lt MDS2done
-	subvar VAR_0x8008, 29
-MDS2done:
-	return
-
-Museum3F_DecodeSpecies3:
-	setorcopyvar VAR_0x8008, VAR_TEMP_2
-	compare VAR_0x8008, 29
-	goto_if_lt MDS3done
-	subvar VAR_0x8008, 29
-MDS3done:
-	return
-
-Museum3F_DecodeSpecies4:
-	setorcopyvar VAR_0x8008, VAR_TEMP_3
-	compare VAR_0x8008, 29
-	goto_if_lt MDS4done
-	subvar VAR_0x8008, 29
-MDS4done:
-	return
-
-Museum3F_DecodeSpecies5:
-	setorcopyvar VAR_0x8008, VAR_TEMP_4
-	compare VAR_0x8008, 29
-	goto_if_lt MDS5done
-	subvar VAR_0x8008, 29
-MDS5done:
-	return
-
-Museum3F_DecodeSpecies6:
-	setorcopyvar VAR_0x8008, VAR_TEMP_5
-	compare VAR_0x8008, 29
-	goto_if_lt MDS6done
-	subvar VAR_0x8008, 29
-MDS6done:
-	return
-
-@ ============================================================
-@ Species → GFX  (input: VAR_0x8008, output: VAR_TEMP_7)
+@ Species ... GFX  (input: VAR_0x8008, output: VAR_TEMP_7)
 @ ============================================================
 Museum3F_SpeciesToGfx:
 	switch VAR_0x8008
@@ -734,7 +643,7 @@ Museum3F_SpeciesToGfx:
 	case 18, MSTG_Torchic
 	case 19, MSTG_Spinda
 	case 20, MSTG_Darumaka
-	case 21, MSTG_Maractus
+	case 21, MSTG_Gholdengo
 	case 22, MSTG_Ducklett
 	case 23, MSTG_Helioptile
 	case 24, MSTG_Brionne
@@ -742,6 +651,9 @@ Museum3F_SpeciesToGfx:
 	case 26, MSTG_Teddiursa
 	case 27, MSTG_Magnemite
 	case 28, MSTG_SliggooHisui
+	case 29, MSTG_Persian
+	case 30, MSTG_Rhydon
+	case 31, MSTG_Unfezant
 	end
 
 MSTG_Lopunny:
@@ -807,8 +719,8 @@ MSTG_Spinda:
 MSTG_Darumaka:
 	setvar VAR_TEMP_7, 16938
 	return
-MSTG_Maractus:
-	setvar VAR_TEMP_7, 16940
+MSTG_Gholdengo:
+	setvar VAR_TEMP_7, 17777
 	return
 MSTG_Ducklett:
 	setvar VAR_TEMP_7, 16964
@@ -831,13 +743,21 @@ MSTG_Magnemite:
 MSTG_SliggooHisui:
 	setvar VAR_TEMP_7, 17389
 	return
+MSTG_Persian:
+	setvar VAR_TEMP_7, 16437
+	return
+MSTG_Rhydon:
+	setvar VAR_TEMP_7, 16496
+	return
+MSTG_Unfezant:
+	setvar VAR_TEMP_7, 16905
+	return
 
 @ ============================================================
-@ Pokémon Interaction Scripts
+@ Pokemon Interaction Scripts
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_EventScript_Poke1::
 	lock
-	faceplayer
 	setvar VAR_0x8009, 1
 	call Museum3F_PokemonDialogue
 	release
@@ -845,7 +765,6 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_Poke1::
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_Poke2::
 	lock
-	faceplayer
 	setvar VAR_0x8009, 2
 	call Museum3F_PokemonDialogue
 	release
@@ -853,7 +772,6 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_Poke2::
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_Poke3::
 	lock
-	faceplayer
 	setvar VAR_0x8009, 3
 	call Museum3F_PokemonDialogue
 	release
@@ -861,7 +779,6 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_Poke3::
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_Poke4::
 	lock
-	faceplayer
 	setvar VAR_0x8009, 4
 	call Museum3F_PokemonDialogue
 	release
@@ -869,7 +786,6 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_Poke4::
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_Poke5::
 	lock
-	faceplayer
 	setvar VAR_0x8009, 5
 	call Museum3F_PokemonDialogue
 	release
@@ -877,14 +793,55 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_Poke5::
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_Poke6::
 	lock
-	faceplayer
 	setvar VAR_0x8009, 6
 	call Museum3F_PokemonDialogue
 	release
 	end
 
+LilycoveCity_LilycoveMuseum_3F_EventScript_Poke7::
+	lock
+	setvar VAR_0x8009, 7
+	call Museum3F_PokemonDialogue
+	release
+	end
+
+LilycoveCity_LilycoveMuseum_3F_EventScript_Poke8::
+	lock
+	setvar VAR_0x8009, 8
+	call Museum3F_PokemonDialogue
+	release
+	end
+
+LilycoveCity_LilycoveMuseum_3F_EventScript_Poke9::
+	lock
+	setvar VAR_0x8009, 9
+	call Museum3F_PokemonDialogue
+	release
+	end
+
+LilycoveCity_LilycoveMuseum_3F_EventScript_Poke10::
+	lock
+	setvar VAR_0x8009, 10
+	call Museum3F_PokemonDialogue
+	release
+	end
+
+LilycoveCity_LilycoveMuseum_3F_EventScript_Poke11::
+	lock
+	setvar VAR_0x8009, 11
+	call Museum3F_PokemonDialogue
+	release
+	end
+
+LilycoveCity_LilycoveMuseum_3F_EventScript_Poke12::
+	lock
+	setvar VAR_0x8009, 12
+	call Museum3F_PokemonDialogue
+	release
+	end
+
 @ ============================================================
-@ Pokémon Dialogue Dispatch
+@ Pokemon Dialogue Dispatch
 @ ============================================================
 @ Reads VAR_0x8009 (1-6), loads encoded species from VAR_TEMP_X
 @ into VAR_0x8008 (decoded), checks table (encoded >= 29).
@@ -897,91 +854,92 @@ Museum3F_PokemonDialogue:
 	case 4, MDialogueLoad4
 	case 5, MDialogueLoad5
 	case 6, MDialogueLoad6
+	case 7, MDialogueLoad7
+	case 8, MDialogueLoad8
+	case 9, MDialogueLoad9
+	case 10, MDialogueLoad10
+	case 11, MDialogueLoad11
+	case 12, MDialogueLoad12
 	end
 
 MDialogueLoad1:
-	call Museum3F_DecodeSpecies1
-	goto MDialogueCheckTable
+	copyvar VAR_0x8008, VAR_TEMP_0
+	goto MDialogueGeneric
 MDialogueLoad2:
-	call Museum3F_DecodeSpecies2
-	goto MDialogueCheckTable
+	copyvar VAR_0x8008, VAR_TEMP_1
+	goto MDialogueGeneric
 MDialogueLoad3:
-	call Museum3F_DecodeSpecies3
-	goto MDialogueCheckTable
+	copyvar VAR_0x8008, VAR_TEMP_2
+	goto MDialogueGeneric
 MDialogueLoad4:
-	call Museum3F_DecodeSpecies4
-	goto MDialogueCheckTable
+	copyvar VAR_0x8008, VAR_TEMP_3
+	goto MDialogueGeneric
 MDialogueLoad5:
-	call Museum3F_DecodeSpecies5
-	goto MDialogueCheckTable
+	copyvar VAR_0x8008, VAR_TEMP_4
+	goto MDialogueGeneric
 MDialogueLoad6:
-	call Museum3F_DecodeSpecies6
-	goto MDialogueCheckTable
-
-MDialogueCheckTable:
-	@ Table flag is encoded: if original VAR_TEMP_X >= 29, on table
-	@ We need the original encoded value. Re-load it.
-	switch VAR_0x8009
-	case 1, MChkTbl1
-	case 2, MChkTbl2
-	case 3, MChkTbl3
-	case 4, MChkTbl4
-	case 5, MChkTbl5
-	case 6, MChkTbl6
-	end
-
-MChkTbl1:
-	compare VAR_TEMP_0, 29
-	goto_if_ge MDialogueOnTable
+	copyvar VAR_0x8008, VAR_TEMP_5
 	goto MDialogueGeneric
-MChkTbl2:
-	compare VAR_TEMP_1, 29
-	goto_if_ge MDialogueOnTable
+MDialogueLoad7:
+	copyvar VAR_0x8008, VAR_TEMP_6
 	goto MDialogueGeneric
-MChkTbl3:
-	compare VAR_TEMP_2, 29
-	goto_if_ge MDialogueOnTable
+MDialogueLoad8:
+	copyvar VAR_0x8008, VAR_TEMP_8
 	goto MDialogueGeneric
-MChkTbl4:
-	compare VAR_TEMP_3, 29
-	goto_if_ge MDialogueOnTable
+MDialogueLoad9:
+	copyvar VAR_0x8008, VAR_TEMP_9
 	goto MDialogueGeneric
-MChkTbl5:
-	compare VAR_TEMP_4, 29
-	goto_if_ge MDialogueOnTable
+MDialogueLoad10:
+	copyvar VAR_0x8008, VAR_TEMP_A
 	goto MDialogueGeneric
-MChkTbl6:
-	compare VAR_TEMP_5, 29
-	goto_if_ge MDialogueOnTable
+MDialogueLoad11:
+	copyvar VAR_0x8008, VAR_TEMP_B
+	goto MDialogueGeneric
+MDialogueLoad12:
+	copyvar VAR_0x8008, VAR_TEMP_C
 	goto MDialogueGeneric
 
 MDialogueGeneric:
 	call Museum3F_IndexToSpecies
 	bufferspeciesname STR_VAR_1, VAR_0x800B
-	random 7
-	switch VAR_RESULT
-	case 0, MTextPartyPhraseParty
-	case 1, MTextPartyPhraseThrilledHere
-	case 2, MTextPartyPhraseThrilledJoin
-	case 3, MTextPartyPhraseGladInvited
-	case 4, MTextPartyPhraseEnergy
-	case 5, MTextPartyPhraseDancingJoy
-	case 6, MTextPartyPhraseExcitedSee
+	@ Deterministic card-game phrase per species (index mod 10) so repeated talks are always the same
+	switch VAR_0x8008
+	case 0, MTextCardPhrase0
+	case 1, MTextCardPhrase1
+	case 2, MTextCardPhrase2
+	case 3, MTextCardPhrase3
+	case 4, MTextCardPhrase4
+	case 5, MTextCardPhrase5
+	case 6, MTextCardPhrase6
+	case 7, MTextCardPhrase7
+	case 8, MTextCardPhrase8
+	case 9, MTextCardPhrase9
+	case 10, MTextCardPhrase0
+	case 11, MTextCardPhrase1
+	case 12, MTextCardPhrase2
+	case 13, MTextCardPhrase3
+	case 14, MTextCardPhrase4
+	case 15, MTextCardPhrase5
+	case 16, MTextCardPhrase6
+	case 17, MTextCardPhrase7
+	case 18, MTextCardPhrase8
+	case 19, MTextCardPhrase9
+	case 20, MTextCardPhrase0
+	case 21, MTextCardPhrase1
+	case 22, MTextCardPhrase2
+	case 23, MTextCardPhrase3
+	case 24, MTextCardPhrase4
+	case 25, MTextCardPhrase5
+	case 26, MTextCardPhrase6
+	case 27, MTextCardPhrase7
+	case 28, MTextCardPhrase8
+	case 29, MTextCardPhrase9
+	case 30, MTextCardPhrase0
+	case 31, MTextCardPhrase1
 	end
 
-MDialogueOnTable:
-	call Museum3F_IndexToSpecies
-	bufferspeciesname STR_VAR_1, VAR_0x800B
-	compare VAR_0x800B, SPECIES_APPLETUN
-	goto_if_eq MDialogueTableAppletun
-	msgbox MTextPartyTableStr, MSGBOX_DEFAULT
-	return
-MDialogueTableAppletun:
-	msgbox MTextPartyTableAppletunStr, MSGBOX_DEFAULT
-	return
-
 @ ============================================================
-@ Convert species index (VAR_0x8008, 0-28) into SPECIES_* (VAR_0x800B)
+@ Convert species index (VAR_0x8008, 0-31) into SPECIES_* (VAR_0x800B)
 @ ============================================================
 Museum3F_IndexToSpecies:
 	switch VAR_0x8008
@@ -1006,7 +964,7 @@ Museum3F_IndexToSpecies:
 	case 18, MISTorchic
 	case 19, MISSpinda
 	case 20, MISDarumaka
-	case 21, MISMaractus
+	case 21, MISGholdengo
 	case 22, MISDucklett
 	case 23, MISHelioptile
 	case 24, MISBrionne
@@ -1014,6 +972,9 @@ Museum3F_IndexToSpecies:
 	case 26, MISTeddiursa
 	case 27, MISMagnemite
 	case 28, MISSliggoo
+	case 29, MISPersian
+	case 30, MISRhydon
+	case 31, MISUnfezant
 	end
 
 MISLopunny:
@@ -1079,8 +1040,8 @@ MISSpinda:
 MISDarumaka:
 	setvar VAR_0x800B, SPECIES_DARUMAKA
 	return
-MISMaractus:
-	setvar VAR_0x800B, SPECIES_MARACTUS
+MISGholdengo:
+	setvar VAR_0x800B, SPECIES_GHOLDENGO
 	return
 MISDucklett:
 	setvar VAR_0x800B, SPECIES_DUCKLETT
@@ -1103,335 +1064,14 @@ MISMagnemite:
 MISSliggoo:
 	setvar VAR_0x800B, SPECIES_SLIGGOO
 	return
-
-@ ============================================================
-@ Position Index → Coordinates (left room base)
-@ Input: VAR_TEMP_7 = index 0-33
-@ Output: VAR_TEMP_6 = x, VAR_TEMP_7 = y
-@ ============================================================
-Museum3F_IndexToCoords:
-	copyvar VAR_TEMP_6, VAR_TEMP_7
-	compare VAR_TEMP_6, 6
-	goto_if_lt MICRow11
-	compare VAR_TEMP_6, 12
-	goto_if_lt MICRow12
-	compare VAR_TEMP_6, 18
-	goto_if_lt MICRow13
-	compare VAR_TEMP_6, 22
-	goto_if_lt MICRow14
-	compare VAR_TEMP_6, 28
-	goto_if_lt MICRow15
-	goto MICRow16
-MICRow11:
-	setvar VAR_TEMP_7, 11
+MISPersian:
+	setvar VAR_0x800B, SPECIES_PERSIAN
 	return
-MICRow12:
-	setvar VAR_TEMP_7, 12
-	addvar VAR_TEMP_6, -6
+MISRhydon:
+	setvar VAR_0x800B, SPECIES_RHYDON
 	return
-MICRow13:
-	setvar VAR_TEMP_7, 13
-	addvar VAR_TEMP_6, -12
-	return
-MICRow14:
-	setvar VAR_TEMP_7, 14
-	addvar VAR_TEMP_6, -18
-	compare VAR_TEMP_6, 2
-	goto_if_lt MICRow14Done
-	addvar VAR_TEMP_6, 2
-MICRow14Done:
-	return
-MICRow15:
-	setvar VAR_TEMP_7, 15
-	addvar VAR_TEMP_6, -22
-	return
-MICRow16:
-	setvar VAR_TEMP_7, 16
-	addvar VAR_TEMP_6, -28
-	return
-
-@ ============================================================
-@ Set Pokémon Position
-@ ============================================================
-Museum3F_SetPos1:
-	copyvar VAR_TEMP_7, VAR_TEMP_0
-	call Museum3F_IndexToCoords
-	compare VAR_0x8005, 1
-	goto_if_ne MSP1Left
-	addvar VAR_TEMP_6, 29
-MSP1Left:
-	setobjectxyperm LOCALID_POKE1, VAR_TEMP_6, VAR_TEMP_7
-	return
-
-Museum3F_SetPos2:
-	copyvar VAR_TEMP_7, VAR_TEMP_1
-	call Museum3F_IndexToCoords
-	compare VAR_0x8005, 1
-	goto_if_ne MSP2Left
-	addvar VAR_TEMP_6, 29
-MSP2Left:
-	setobjectxyperm LOCALID_POKE2, VAR_TEMP_6, VAR_TEMP_7
-	return
-
-Museum3F_SetPos3:
-	copyvar VAR_TEMP_7, VAR_TEMP_2
-	call Museum3F_IndexToCoords
-	compare VAR_0x8005, 1
-	goto_if_ne MSP3Left
-	addvar VAR_TEMP_6, 29
-MSP3Left:
-	setobjectxyperm LOCALID_POKE3, VAR_TEMP_6, VAR_TEMP_7
-	return
-
-Museum3F_SetPos4:
-	copyvar VAR_TEMP_7, VAR_TEMP_3
-	call Museum3F_IndexToCoords
-	compare VAR_0x8005, 1
-	goto_if_ne MSP4Left
-	addvar VAR_TEMP_6, 29
-MSP4Left:
-	setobjectxyperm LOCALID_POKE4, VAR_TEMP_6, VAR_TEMP_7
-	return
-
-Museum3F_SetPos5:
-	copyvar VAR_TEMP_7, VAR_TEMP_4
-	call Museum3F_IndexToCoords
-	compare VAR_0x8005, 1
-	goto_if_ne MSP5Left
-	addvar VAR_TEMP_6, 29
-MSP5Left:
-	setobjectxyperm LOCALID_POKE5, VAR_TEMP_6, VAR_TEMP_7
-	return
-
-Museum3F_SetPos6:
-	copyvar VAR_TEMP_7, VAR_TEMP_5
-	call Museum3F_IndexToCoords
-	compare VAR_0x8005, 1
-	goto_if_ne MSP6Left
-	addvar VAR_TEMP_6, 29
-MSP6Left:
-	setobjectxyperm LOCALID_POKE6, VAR_TEMP_6, VAR_TEMP_7
-	return
-
-@ ============================================================
-@ Set Movement Type
-@ VAR_0x8008 = decoded species, VAR_TEMP_X = encoded value
-@ ============================================================
-@ Appletun (13) → FACE_LEFT always
-@ On table (encoded >= 29, not Appletun) → random rotate CW/CCW
-@ Mime Jr. (5) → ROTATE_CLOCKWISE always
-@ Default → FACE_DOWN
-
-Museum3F_SetMove1:
-	compare VAR_0x8008, 13
-	goto_if_eq MSM1Appletun
-	compare VAR_TEMP_0, 29
-	goto_if_ge MSM1Table
-	compare VAR_0x8008, 5
-	goto_if_eq MSM1MimeJr
-	setvar VAR_0x800A, LOCALID_POKE1
-	call Museum3F_SetRandomMove
-	return
-MSM1Appletun:
-	setobjectmovementtype LOCALID_POKE1, MOVEMENT_TYPE_FACE_LEFT
-	return
-MSM1Table:
-	random 2
-	compare VAR_RESULT, 0
-	goto_if_eq MSM1TableCW
-	setobjectmovementtype LOCALID_POKE1, MOVEMENT_TYPE_ROTATE_COUNTERCLOCKWISE
-	return
-MSM1TableCW:
-	setobjectmovementtype LOCALID_POKE1, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-MSM1MimeJr:
-	setobjectmovementtype LOCALID_POKE1, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-
-Museum3F_SetMove2:
-	compare VAR_0x8008, 13
-	goto_if_eq MSM2Appletun
-	compare VAR_TEMP_1, 29
-	goto_if_ge MSM2Table
-	compare VAR_0x8008, 5
-	goto_if_eq MSM2MimeJr
-	setvar VAR_0x800A, LOCALID_POKE2
-	call Museum3F_SetRandomMove
-	return
-MSM2Appletun:
-	setobjectmovementtype LOCALID_POKE2, MOVEMENT_TYPE_FACE_LEFT
-	return
-MSM2Table:
-	random 2
-	compare VAR_RESULT, 0
-	goto_if_eq MSM2TableCW
-	setobjectmovementtype LOCALID_POKE2, MOVEMENT_TYPE_ROTATE_COUNTERCLOCKWISE
-	return
-MSM2TableCW:
-	setobjectmovementtype LOCALID_POKE2, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-MSM2MimeJr:
-	setobjectmovementtype LOCALID_POKE2, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-
-Museum3F_SetMove3:
-	compare VAR_0x8008, 13
-	goto_if_eq MSM3Appletun
-	compare VAR_TEMP_2, 29
-	goto_if_ge MSM3Table
-	compare VAR_0x8008, 5
-	goto_if_eq MSM3MimeJr
-	setvar VAR_0x800A, LOCALID_POKE3
-	call Museum3F_SetRandomMove
-	return
-MSM3Appletun:
-	setobjectmovementtype LOCALID_POKE3, MOVEMENT_TYPE_FACE_LEFT
-	return
-MSM3Table:
-	random 2
-	compare VAR_RESULT, 0
-	goto_if_eq MSM3TableCW
-	setobjectmovementtype LOCALID_POKE3, MOVEMENT_TYPE_ROTATE_COUNTERCLOCKWISE
-	return
-MSM3TableCW:
-	setobjectmovementtype LOCALID_POKE3, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-MSM3MimeJr:
-	setobjectmovementtype LOCALID_POKE3, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-
-Museum3F_SetMove4:
-	compare VAR_0x8008, 13
-	goto_if_eq MSM4Appletun
-	compare VAR_TEMP_3, 29
-	goto_if_ge MSM4Table
-	compare VAR_0x8008, 5
-	goto_if_eq MSM4MimeJr
-	setvar VAR_0x800A, LOCALID_POKE4
-	call Museum3F_SetRandomMove
-	return
-MSM4Appletun:
-	setobjectmovementtype LOCALID_POKE4, MOVEMENT_TYPE_FACE_LEFT
-	return
-MSM4Table:
-	random 2
-	compare VAR_RESULT, 0
-	goto_if_eq MSM4TableCW
-	setobjectmovementtype LOCALID_POKE4, MOVEMENT_TYPE_ROTATE_COUNTERCLOCKWISE
-	return
-MSM4TableCW:
-	setobjectmovementtype LOCALID_POKE4, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-MSM4MimeJr:
-	setobjectmovementtype LOCALID_POKE4, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-
-Museum3F_SetMove5:
-	compare VAR_0x8008, 13
-	goto_if_eq MSM5Appletun
-	compare VAR_TEMP_4, 29
-	goto_if_ge MSM5Table
-	compare VAR_0x8008, 5
-	goto_if_eq MSM5MimeJr
-	setvar VAR_0x800A, LOCALID_POKE5
-	call Museum3F_SetRandomMove
-	return
-MSM5Appletun:
-	setobjectmovementtype LOCALID_POKE5, MOVEMENT_TYPE_FACE_LEFT
-	return
-MSM5Table:
-	random 2
-	compare VAR_RESULT, 0
-	goto_if_eq MSM5TableCW
-	setobjectmovementtype LOCALID_POKE5, MOVEMENT_TYPE_ROTATE_COUNTERCLOCKWISE
-	return
-MSM5TableCW:
-	setobjectmovementtype LOCALID_POKE5, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-MSM5MimeJr:
-	setobjectmovementtype LOCALID_POKE5, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-
-Museum3F_SetMove6:
-	compare VAR_0x8008, 13
-	goto_if_eq MSM6Appletun
-	compare VAR_TEMP_5, 29
-	goto_if_ge MSM6Table
-	compare VAR_0x8008, 5
-	goto_if_eq MSM6MimeJr
-	setvar VAR_0x800A, LOCALID_POKE6
-	call Museum3F_SetRandomMove
-	return
-MSM6Appletun:
-	setobjectmovementtype LOCALID_POKE6, MOVEMENT_TYPE_FACE_LEFT
-	return
-MSM6Table:
-	random 2
-	compare VAR_RESULT, 0
-	goto_if_eq MSM6TableCW
-	setobjectmovementtype LOCALID_POKE6, MOVEMENT_TYPE_ROTATE_COUNTERCLOCKWISE
-	return
-MSM6TableCW:
-	setobjectmovementtype LOCALID_POKE6, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-MSM6MimeJr:
-	setobjectmovementtype LOCALID_POKE6, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-
-@ ============================================================
-@ Random Movement for non-special, non-table Pokémon
-@ VAR_0x800A = localId of the Pokémon to set
-@ ============================================================
-Museum3F_SetRandomMove:
-	random 10
-	switch VAR_RESULT
-	case 0, MRM_WalkInPlaceDown
-	case 1, MRM_WalkInPlaceDown
-	case 2, MRM_BackForth
-	case 3, MRM_BackForth
-	case 4, MRM_Rotate
-	case 5, MRM_InPlaceSide
-	case 6, MRM_InPlaceSide
-	case 7, MRM_InPlaceUp
-	case 8, MRM_SlowInPlaceDown
-	case 9, MRM_Rotate
-	end
-
-MRM_WalkInPlaceDown:
-	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
-	return
-MRM_BackForth:
-	@ Run one tile left, one tile right (mirrored by room)
-	compare VAR_0x8005, 1
-	goto_if_eq MRM_BackForthRight
-	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_LEFT_AND_RIGHT
-	return
-MRM_BackForthRight:
-	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_RIGHT_AND_LEFT
-	return
-MRM_Rotate:
-	random 2
-	compare VAR_RESULT, 0
-	goto_if_eq MRM_RotateCW
-	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_ROTATE_COUNTERCLOCKWISE
-	return
-MRM_RotateCW:
-	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_ROTATE_CLOCKWISE
-	return
-MRM_InPlaceSide:
-	@ Walk in place facing into the room: left room -> left, right room -> right
-	compare VAR_0x8005, 0
-	goto_if_eq MRM_InPlaceLeft
-	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_IN_PLACE_RIGHT
-	return
-MRM_InPlaceLeft:
-	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_IN_PLACE_LEFT
-	return
-MRM_InPlaceUp:
-	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_IN_PLACE_UP
-	return
-MRM_SlowInPlaceDown:
-	setobjectmovementtype VAR_0x800A, MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_DOWN
+MISUnfezant:
+	setvar VAR_0x800B, SPECIES_UNFEZANT
 	return
 
 @ ============================================================
@@ -1464,15 +1104,15 @@ Museum3F_Movement_TurnBackRight:
 @ Text - Trainer
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_Text_JasonEllipses:
-	.string "JASON: … … …$"
+	.string "JASON: ... ... ...$"
 LilycoveCity_LilycoveMuseum_3F_Text_KCH42Ellipses:
-	.string "KCH42: … … …$"
+	.string "KCH42: ... ... ...$"
 LilycoveCity_LilycoveMuseum_3F_Text_JeansEllipses:
-	.string "JEANS: … … …$"
+	.string "JEANS: ... ... ...$"
 LilycoveCity_LilycoveMuseum_3F_Text_BeastlyEllipses:
-	.string "BEASTLY: … … …$"
+	.string "BEASTLY: ... ... ...$"
 LilycoveCity_LilycoveMuseum_3F_Text_FreezEllipses:
-	.string "FREEZ: … … …$"
+	.string "FREEZ: ... ... ...$"
 
 LilycoveCity_LilycoveMuseum_3F_Text_ChallengeJason:
 	.string "Challenge JASON?$"
@@ -1486,15 +1126,15 @@ LilycoveCity_LilycoveMuseum_3F_Text_ChallengeFreez:
 	.string "Challenge FREEZ?$"
 
 LilycoveCity_LilycoveMuseum_3F_Text_JasonEllipsesSingle:
-	.string "JASON: …$"
+	.string "JASON: ...$"
 LilycoveCity_LilycoveMuseum_3F_Text_KCH42EllipsesSingle:
-	.string "KCH42: …$"
+	.string "KCH42: ...$"
 LilycoveCity_LilycoveMuseum_3F_Text_JeansEllipsesSingle:
-	.string "JEANS: …$"
+	.string "JEANS: ...$"
 LilycoveCity_LilycoveMuseum_3F_Text_BeastlyEllipsesSingle:
-	.string "BEASTLY: …$"
+	.string "BEASTLY: ...$"
 LilycoveCity_LilycoveMuseum_3F_Text_FreezEllipsesSingle:
-	.string "FREEZ: …$"
+	.string "FREEZ: ...$"
 
 @ ============================================================
 @ Text - Filler
@@ -1521,48 +1161,69 @@ LilycoveCity_LilycoveMuseum_3F_Text_Filler9:
 	.string "This is a cool place.$"
 
 @ ============================================================
-@ Text - Pokémon Generic (shared phrases, species name buffered)
+@ Text - Pokemon Card Game (shared phrases, species name buffered)
 @ ============================================================
-MTextPartyPhraseParty:
-	msgbox MTextPartyPhrasePartyStr, MSGBOX_DEFAULT
+MTextCardPhrase0:
+	msgbox MTextCardPhrase0Str, MSGBOX_DEFAULT
 	return
-MTextPartyPhrasePartyStr:
-	.string "{STR_VAR_1} looks like it's having a great time at the party!$"
-MTextPartyPhraseThrilledHere:
-	msgbox MTextPartyPhraseThrilledHereStr, MSGBOX_DEFAULT
+MTextCardPhrase0Str:
+	.string "{STR_VAR_1} is extremely focused on\n"
+	.string "their hand of cards.$"
+MTextCardPhrase1:
+	msgbox MTextCardPhrase1Str, MSGBOX_DEFAULT
 	return
-MTextPartyPhraseThrilledHereStr:
-	.string "{STR_VAR_1} is thrilled to be here!$"
-MTextPartyPhraseThrilledJoin:
-	msgbox MTextPartyPhraseThrilledJoinStr, MSGBOX_DEFAULT
+MTextCardPhrase1Str:
+	.string "{STR_VAR_1} is fidgeting nervously.$"
+MTextCardPhrase2:
+	msgbox MTextCardPhrase2Str, MSGBOX_DEFAULT
 	return
-MTextPartyPhraseThrilledJoinStr:
-	.string "{STR_VAR_1} is thrilled to join the party!$"
-MTextPartyPhraseGladInvited:
-	msgbox MTextPartyPhraseGladInvitedStr, MSGBOX_DEFAULT
+MTextCardPhrase2Str:
+	.string "{STR_VAR_1} is holding their cards\n"
+	.string "upside down...$"
+MTextCardPhrase3:
+	msgbox MTextCardPhrase3Str, MSGBOX_DEFAULT
 	return
-MTextPartyPhraseGladInvitedStr:
-	.string "{STR_VAR_1} is glad you invited it!$"
-MTextPartyPhraseEnergy:
-	msgbox MTextPartyPhraseEnergyStr, MSGBOX_DEFAULT
+MTextCardPhrase3Str:
+	.string "{STR_VAR_1} is too focused on the game\n"
+	.string "to pay you any mind.$"
+MTextCardPhrase4:
+	msgbox MTextCardPhrase4Str, MSGBOX_DEFAULT
 	return
-MTextPartyPhraseEnergyStr:
-	.string "{STR_VAR_1} is full of energy!$"
-MTextPartyPhraseDancingJoy:
-	msgbox MTextPartyPhraseDancingJoyStr, MSGBOX_DEFAULT
+MTextCardPhrase4Str:
+	.string "You peer over {STR_VAR_1}'s shoulder...\n"
+	.string "Their hand doesn't seem very good.$"
+MTextCardPhrase5:
+	msgbox MTextCardPhrase5Str, MSGBOX_DEFAULT
 	return
-MTextPartyPhraseDancingJoyStr:
-	.string "{STR_VAR_1} is dancing with joy!$"
-MTextPartyPhraseExcitedSee:
-	msgbox MTextPartyPhraseExcitedSeeStr, MSGBOX_DEFAULT
+MTextCardPhrase5Str:
+	.string "{STR_VAR_1} is dealing cards like\n"
+	.string "a pro!$"
+MTextCardPhrase6:
+	msgbox MTextCardPhrase6Str, MSGBOX_DEFAULT
 	return
-MTextPartyPhraseExcitedSeeStr:
-	.string "{STR_VAR_1} is excited to see you!$"
+MTextCardPhrase6Str:
+	.string "{STR_VAR_1} looks like they're doing\n"
+	.string "well in the game so far$"
+MTextCardPhrase7:
+	msgbox MTextCardPhrase7Str, MSGBOX_DEFAULT
+	return
+MTextCardPhrase7Str:
+	.string "{STR_VAR_1} is thinking about their\n"
+	.string "next move carefully.$"
+MTextCardPhrase8:
+	msgbox MTextCardPhrase8Str, MSGBOX_DEFAULT
+	return
+MTextCardPhrase8Str:
+	.string "{STR_VAR_1} has won big so far!$"
+MTextCardPhrase9:
+	msgbox MTextCardPhrase9Str, MSGBOX_DEFAULT
+	return
+MTextCardPhrase9Str:
+	.string "{STR_VAR_1} is studying their cards\n"
+	.string "closely.$"
 
 @ ============================================================
-@ Text - Pokémon On Table
+@ Text - Relic Crown
 @ ============================================================
-MTextPartyTableStr:
-	.string "{STR_VAR_1} is dancing on the table!$"
-MTextPartyTableAppletunStr:
-	.string "Appletun is looking like an excellent feast!$"
+MTextMuseumCrownEmpty:
+	.string "There's nothing here anymore.$"

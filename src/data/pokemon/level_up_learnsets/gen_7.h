@@ -20339,7 +20339,7 @@ static const struct LevelUpMove sSilicobraLevelUpLearnset[] = {
     LEVEL_UP_MOVE(35, MOVE_SANDSTORM),
     LEVEL_UP_MOVE(40, MOVE_SLAM),
     LEVEL_UP_MOVE(45, MOVE_COIL),
-    LEVEL_UP_MOVE(50, MOVE_SAND_TOMB),
+    //LEVEL_UP_MOVE(50, MOVE_SAND_TOMB),
     LEVEL_UP_END
 };
 
@@ -20356,7 +20356,7 @@ static const struct LevelUpMove sSandacondaLevelUpLearnset[] = {
     LEVEL_UP_MOVE(35, MOVE_SANDSTORM),
     //LEVEL_UP_MOVE(42, MOVE_SLAM),
     LEVEL_UP_MOVE(49, MOVE_COIL),
-    LEVEL_UP_MOVE(51, MOVE_SAND_TOMB),
+    //LEVEL_UP_MOVE(51, MOVE_SAND_TOMB),
     LEVEL_UP_END
 };
 #endif //P_FAMILY_SILICOBRA

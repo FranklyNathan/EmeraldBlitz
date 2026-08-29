@@ -408,6 +408,7 @@ LittlerootTown_EventScript_GoSaveBirchTrigger::
 	end
 
 LittlerootTown_EventScript_TownSign::
+	setflag FLAG_SYS_OPPONENT_LEVEL_1
 	warp MAP_LILYCOVE_CITY_LILYCOVE_MUSEUM_1F, 10, 12
 	end
 

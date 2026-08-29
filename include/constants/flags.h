@@ -473,6 +473,17 @@
 #define FLAG_MUSEUM_3F_BATTLE                0x1AA
 #define FLAG_MUSEUM_3F_SPAWN_NPC1            0x1AB
 #define FLAG_MUSEUM_3F_SPAWN_NPC2            0x1DA
+// Museum 3F living-legend persistent pool (claimed from previously-unused block)
+#define FLAG_MUSEUM_3F_LEGEND_ACTIVE         0x28A
+#define FLAG_MUSEUM_3F_LEGEND_JASON_DEFEATED 0x28B
+#define FLAG_MUSEUM_3F_LEGEND_KCH42_DEFEATED 0x28C
+#define FLAG_MUSEUM_3F_LEGEND_JEANS_DEFEATED 0x28D
+#define FLAG_MUSEUM_3F_LEGEND_BEASTLY_DEFEATED 0x28E
+#define FLAG_MUSEUM_3F_LEGEND_FREEZ_DEFEATED 0x28F
+#define FLAG_MUSEUM_3F_CROWN_TAKEN           0x290
+// Museum 3F legend-seat Pokémon spawn locks (claimed from unused block)
+#define FLAG_MUSEUM_3F_SEAT_LEFT             0x291
+#define FLAG_MUSEUM_3F_SEAT_RIGHT            0x292
 
 #define FLAG_DEFEATED_DEOXYS                 0x1AC
 #define FLAG_BATTLED_DEOXYS                  0x1AD

@@ -3493,11 +3493,7 @@ static const u16 sApplinEggMoveLearnset[] = {
 
 #if P_FAMILY_SILICOBRA
 static const u16 sSilicobraEggMoveLearnset[] = {
-    MOVE_DRAGON_RUSH,
-    MOVE_MUD_SLAP,
-    MOVE_LAST_RESORT,
     MOVE_BELCH,
-    MOVE_POISON_TAIL,
     MOVE_UNAVAILABLE,
 };
 #endif //P_FAMILY_SILICOBRA

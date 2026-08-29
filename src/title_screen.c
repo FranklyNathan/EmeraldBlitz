@@ -825,8 +825,8 @@ static void SpriteCB_SilhouetteSmallFly(struct Sprite *sprite)
         sprite->invisible = FALSE;
         MaybeSetHalfSpeed(sprite);
 
-        // 10% chance to spawn a companion (not if this sprite IS a companion)
-        if (!(sprite->sCompanionDelay & 0x80) && (Random() % 10) == 0)
+        // 10% chance to spawn a companion (only if still in lower half of screen)
+        if (!(sprite->sCompanionDelay & 0x80) && sprite->y > DISPLAY_HEIGHT / 2 && (Random() % 10) == 0)
             sprite->sCompanionDelay = 127; // start 127-frame countdown (~2s)
     }
 
@@ -839,7 +839,7 @@ static void SpriteCB_SilhouetteSmallFly(struct Sprite *sprite)
             u8 compId = CreateSprite(&sSilhouetteSmallSpriteTemplate, sprite->x, sprite->y + 60, 0);
             gSprites[compId].oam.paletteNum = sprite->oam.paletteNum;
             gSprites[compId].sBaseY = sprite->y + 60;
-            gSprites[compId].sSpeedFlag = sprite->sSpeedFlag;
+            gSprites[compId].sSpeedFlag = !sprite->sSpeedFlag; // opposite speed
             gSprites[compId].sFirstFlight = FALSE;
             gSprites[compId].sCompanionDelay = 0x80; // permanently blocked
             gSprites[compId].sPauseTimer = 0;
@@ -863,7 +863,7 @@ static void SpriteCB_SilhouetteSmallFly(struct Sprite *sprite)
     }
 }
 
-// Salamence silhouette: rare (1/20 chance), flies left to right
+// Salamence silhouette: rare, flies left to right
 
 static const struct OamData sSilhouetteSalamenceOamData =
 {
@@ -908,8 +908,8 @@ static void SpriteCB_SilhouetteSalamenceFly(struct Sprite *sprite)
         }
         else
         {
-            // 1 in 10 chance to appear
-            if ((Random() % 10) == 0)
+            // Odds to appear
+            if ((Random() % 12) == 0)
             {
                 sprite->sIsActive = TRUE;
                 sprite->x = DISPLAY_WIDTH + 64;
@@ -1040,7 +1040,7 @@ static void CreateSilhouetteSprites(void)
     gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
     gSprites[smallId].sBaseY = 40;
     gSprites[smallId].sFirstFlight = 1;
-    gSprites[smallId].sPauseTimer = 40;
+    gSprites[smallId].sPauseTimer = 110;
     gSprites[smallId].invisible = TRUE;
 
     // Small silhouette #2: flies left to right from bottom (former large position)
@@ -1049,7 +1049,7 @@ static void CreateSilhouetteSprites(void)
     gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 0;
     gSprites[smallId].sBaseY = DISPLAY_HEIGHT + 32;
     gSprites[smallId].sFirstFlight = 1;
-    gSprites[smallId].sPauseTimer = 80;
+    gSprites[smallId].sPauseTimer = 20;
     gSprites[smallId].invisible = TRUE;
 
     // Medium silhouette: flies bottom-right to top-left (launches immediately)
@@ -1064,16 +1064,16 @@ static void CreateSilhouetteSprites(void)
 
     gSprites[leftId].sChildSpriteId = rightId;
 
-    // Salamence silhouette: rare (1/10 chance)
+    // Salamence silhouette: rare
     smallId = CreateSprite(&sSilhouetteSalamenceSpriteTemplate, -64, 30, 0);
     gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
     gSprites[smallId].sPauseTimer = 20;
 
-    // Tiny silhouette: launches after small #1
+    // Tiny silhouette
     smallId = CreateSprite(&sSilhouetteTinySpriteTemplate, DISPLAY_WIDTH + 32, 50, 0);
     gSprites[smallId].oam.paletteNum = SILHOUETTE_PAL_BASE + 1;
     gSprites[smallId].sFirstFlight = 1;
-    gSprites[smallId].sPauseTimer = 100;
+    gSprites[smallId].sPauseTimer = 50;
     gSprites[smallId].invisible = TRUE;
 }
 
@@ -1159,23 +1159,23 @@ static void StartPokemonLogoShine(u8 mode)
     case SHINE_MODE_SINGLE:
         // Create one regular shine sprite.
         // If mode is SHINE_MODE_SINGLE it will also change the background color.
-        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 58, 0);
+        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 68, 0);
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_WINDOW;
         gSprites[spriteId].sMode = mode;
         break;
     case SHINE_MODE_DOUBLE:
         // Create an invisible sprite with mode set to update the background color
-        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 58, 0);
+        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 68, 0);
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_WINDOW;
         gSprites[spriteId].sMode = mode;
         gSprites[spriteId].invisible = TRUE;
 
         // Create two faster shine sprites
-        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 58, 0);
+        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, 0, 68, 0);
         gSprites[spriteId].callback = SpriteCB_PokemonLogoShine_Fast;
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_WINDOW;
 
-        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, -80, 40, 0);
+        spriteId = CreateSprite(&sPokemonLogoShineSpriteTemplate, -80, 68, 0);
         gSprites[spriteId].callback = SpriteCB_PokemonLogoShine_Fast;
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_WINDOW;
         break;
