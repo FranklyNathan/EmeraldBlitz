@@ -107,6 +107,7 @@ PlayersHouse_2F_EventScript_MomComesUpstairsFemale::
 	return
 
 PlayersHouse_2F_EventScript_MomAskAboutFriend::
+	call LittlerootTown_EventScript_SetRivalHouseShuppetFlags
 	msgbox PlayersHouse_2F_Text_FriendStoppedBy, MSGBOX_DEFAULT
 	multichoice 23, 8, MULTI_WALLY_STEVEN, TRUE
 	copyvar VAR_0x8004, VAR_RESULT
