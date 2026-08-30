@@ -556,7 +556,7 @@ Museum3F_BattleCleanup:
 
 
 @ ============================================================
-@ Species ... GFX  (input: VAR_0x8008, output: VAR_TEMP_7)
+@ Species … GFX  (input: VAR_0x8008, output: VAR_TEMP_7)
 @ ============================================================
 Museum3F_SpeciesToGfx:
 	switch VAR_0x8008
@@ -1042,15 +1042,15 @@ Museum3F_Movement_TurnBackRight:
 @ Text - Trainer
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_Text_JasonEllipses:
-	.string "JASON: ... ... ...$"
+	.string "JASON: … … …$"
 LilycoveCity_LilycoveMuseum_3F_Text_KCH42Ellipses:
-	.string "KCH42: ... ... ...$"
+	.string "KCH42: … … …$"
 LilycoveCity_LilycoveMuseum_3F_Text_JeansEllipses:
-	.string "JEANS: ... ... ...$"
+	.string "JEANS: … … …$"
 LilycoveCity_LilycoveMuseum_3F_Text_BeastlyEllipses:
-	.string "BEASTLY: ... ... ...$"
+	.string "BEASTLY: … … …$"
 LilycoveCity_LilycoveMuseum_3F_Text_FreezEllipses:
-	.string "FREEZ: ... ... ...$"
+	.string "FREEZ: … … …$"
 
 LilycoveCity_LilycoveMuseum_3F_Text_ChallengeJason:
 	.string "Challenge JASON?$"
@@ -1064,15 +1064,15 @@ LilycoveCity_LilycoveMuseum_3F_Text_ChallengeFreez:
 	.string "Challenge FREEZ?$"
 
 LilycoveCity_LilycoveMuseum_3F_Text_JasonEllipsesSingle:
-	.string "JASON: ...$"
+	.string "JASON: …$"
 LilycoveCity_LilycoveMuseum_3F_Text_KCH42EllipsesSingle:
-	.string "KCH42: ...$"
+	.string "KCH42: …$"
 LilycoveCity_LilycoveMuseum_3F_Text_JeansEllipsesSingle:
-	.string "JEANS: ...$"
+	.string "JEANS: …$"
 LilycoveCity_LilycoveMuseum_3F_Text_BeastlyEllipsesSingle:
-	.string "BEASTLY: ...$"
+	.string "BEASTLY: …$"
 LilycoveCity_LilycoveMuseum_3F_Text_FreezEllipsesSingle:
-	.string "FREEZ: ...$"
+	.string "FREEZ: …$"
 
 
 @ ============================================================
@@ -1094,7 +1094,7 @@ MTextCardPhrase2:
 	return
 MTextCardPhrase2Str:
 	.string "{STR_VAR_1} is holding their cards\n"
-	.string "upside down...$"
+	.string "upside down…$"
 MTextCardPhrase3:
 	msgbox MTextCardPhrase3Str, MSGBOX_DEFAULT
 	return
@@ -1105,7 +1105,7 @@ MTextCardPhrase4:
 	msgbox MTextCardPhrase4Str, MSGBOX_DEFAULT
 	return
 MTextCardPhrase4Str:
-	.string "You peer over {STR_VAR_1}'s shoulder...\n"
+	.string "You peer over {STR_VAR_1}'s shoulder…\n"
 	.string "Their hand doesn't seem very good.$"
 MTextCardPhrase5:
 	msgbox MTextCardPhrase5Str, MSGBOX_DEFAULT
@@ -1118,7 +1118,7 @@ MTextCardPhrase6:
 	return
 MTextCardPhrase6Str:
 	.string "{STR_VAR_1} looks like they're doing\n"
-	.string "well in the game so far$"
+	.string "well in the game so far.$"
 MTextCardPhrase7:
 	msgbox MTextCardPhrase7Str, MSGBOX_DEFAULT
 	return
@@ -1146,14 +1146,14 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_Kirlia::
 LilycoveCity_LilycoveMuseum_3F_Text_Kirlia:
 	.string "Kirlia is trying to get Ralts to come out\n"
 	.string "from under the table.\p"
-	.string "...It's not having much success.$"
+	.string "…It's not having much success.$"
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_UnderTable::
 	msgbox LilycoveCity_LilycoveMuseum_3F_Text_UnderTable, MSGBOX_SIGN
 	end
 
 LilycoveCity_LilycoveMuseum_3F_Text_UnderTable:
-	.string "You peak under the table...\n"
+	.string "You peak under the table…\n"
 	.string "Ralts is snickering to itself!$"
 
 LilycoveCity_LilycoveMuseum_3F_EventScript_Meloetta::
