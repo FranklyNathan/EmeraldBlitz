@@ -809,8 +809,9 @@ static const struct SpriteTemplate sSilhouetteSmallSpriteTemplate =
     .callback = SpriteCB_SilhouetteSmallFly,
 };
 
-// data[7]: companion delay countdown only (0 = no delay active)
-#define sCompanionDelay  data[7]
+// data[1]: companion delay countdown only (0 = no delay active), separate from
+// sFirstFlight (data[7]) which MaybeSetHalfSpeed clears on every flight start.
+#define sCompanionDelay  data[1]
 
 static void SpriteCB_SilhouetteSmallFly(struct Sprite *sprite)
 {
@@ -1387,8 +1388,8 @@ static void Task_TitleScreenPhase2(u8 taskId)
                                     | DISPCNT_BG1_ON
                                     | DISPCNT_BG2_ON
                                     | DISPCNT_OBJ_ON);
-        CreatePressStartBanner(START_BANNER_X, 127);
-        CreateCopyrightBanner(125, 154);
+        CreatePressStartBanner(START_BANNER_X, 123);
+        CreateCopyrightBanner(125, 153);
         CreateSilhouetteSprites();
         gTasks[taskId].tBg1Y = 0;
         gTasks[taskId].func = Task_TitleScreenPhase3;
