@@ -526,6 +526,7 @@ OldaleTown_House2_Basement_Mart_HeldItems:
 	.hword ITEM_RAWST_BERRY
 	.hword ITEM_ASPEAR_BERRY
 	.hword ITEM_PERSIM_BERRY
+	.hword ITEM_SALAC_BERRY
 	.hword ITEM_BLACK_GLASSES
 	.hword ITEM_CHARCOAL
 	.hword ITEM_MIRACLE_SEED

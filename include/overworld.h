@@ -66,6 +66,27 @@ extern s16 gTimeUpdateCounter;
 
 extern struct TimeBlendSettings gTimeBlend;
 
+// Live player location, published at the fixed EWRAM address 0x0203F000 for
+// external tools (e.g. a website's embedded emulator) to poll without scanning.
+#define LIVE_WARP_MAGIC 0xEA5A
+struct LiveWarpStatus // 20 bytes, see ld_script_modern.ld ".live_warp"
+{
+    /* +0x00 */ vu16 magic;    // LIVE_WARP_MAGIC while valid
+    /* +0x02 */ s8   mapGroup; // gSaveBlock1Ptr->location.mapGroup
+    /* +0x03 */ s8   mapNum;   // gSaveBlock1Ptr->location.mapNum
+    /* +0x04 */ s8   warpId;   // gSaveBlock1Ptr->location.warpId
+    /* +0x05 */ u8   inBattle; // gMain.inBattle: 1 while a battle is active
+    /* +0x06 */ s16  x;        // gSaveBlock1Ptr->location.x
+    /* +0x08 */ s16  y;        // gSaveBlock1Ptr->location.y
+    /* +0x0C */ vu32 sequence; // increments on every map change
+    /* +0x10 */ u32  money;    // gSaveBlock1Ptr->money
+};
+extern volatile struct LiveWarpStatus gLiveWarpStatus;
+
+// Keeps gLiveWarpStatus.inBattle in sync with gMain.inBattle; called every
+// frame from the main loop so the flag stays fresh between map changes.
+void UpdateLiveBattleStatus(void);
+
 extern const struct UCoords32 gDirectionToVectors[];
 
 void DoWhiteOut(void);

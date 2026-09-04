@@ -223,6 +223,39 @@ EWRAM_DATA static u8 sHoursOverride = 0; // used to override apparent time of da
 EWRAM_DATA struct LinkPlayerObjectEvent gLinkPlayerObjectEvents[4] = {0};
 EWRAM_DATA bool8 gExitStairsMovementDisabled = FALSE;
 
+// Placed at fixed EWRAM address 0x0203F000 by ld_script_modern.ld/ld_script_test.ld
+// (".live_warp" section) so external tools can poll the player location directly.
+volatile struct LiveWarpStatus gLiveWarpStatus __attribute__((section(".live_warp")));
+
+static void UpdateLiveWarpStatus(void)
+{
+    gLiveWarpStatus.magic = LIVE_WARP_MAGIC;
+    gLiveWarpStatus.mapGroup = gSaveBlock1Ptr->location.mapGroup;
+    gLiveWarpStatus.mapNum = gSaveBlock1Ptr->location.mapNum;
+    gLiveWarpStatus.warpId = gSaveBlock1Ptr->location.warpId;
+    gLiveWarpStatus.x = gSaveBlock1Ptr->location.x;
+    gLiveWarpStatus.y = gSaveBlock1Ptr->location.y;
+    gLiveWarpStatus.inBattle = gMain.inBattle;
+    gLiveWarpStatus.sequence++;
+    gLiveWarpStatus.money = GetMoney(&gSaveBlock1Ptr->money);
+}
+
+// Runs every frame from the main loop so the in-battle flag and money stay
+// fresh even when no map change happens (battles start/end in place). Both are
+// plain bytes/u32 at fixed, aligned EWRAM addresses, refreshed on a ~30-frame
+// throttle (~2x/sec) — plenty for the website's sub-second poll while trimming
+// the per-frame EWRAM writes.
+static u8 sLiveStatusFrameCounter = 0;
+void UpdateLiveBattleStatus(void)
+{
+    if (++sLiveStatusFrameCounter >= 30)
+    {
+        sLiveStatusFrameCounter = 0;
+        gLiveWarpStatus.money = GetMoney(&gSaveBlock1Ptr->money);
+        gLiveWarpStatus.inBattle = gMain.inBattle;
+    }
+}
+
 static const struct WarpData sDummyWarpData =
 {
     .mapGroup = MAP_GROUP(MAP_UNDEFINED),
@@ -596,6 +629,7 @@ void ApplyCurrentWarp(void)
     gSaveBlock1Ptr->location = sWarpDestination;
     sFixedDiveWarp = sDummyWarpData;
     sFixedHoleWarp = sDummyWarpData;
+    UpdateLiveWarpStatus();
 }
 
 static void ClearDiveAndHoleWarps(void)
@@ -2000,6 +2034,7 @@ void CB2_ContinueSavedGame(void)
         ResetWinStreaks();
 
     LoadSaveblockMapHeader();
+    UpdateLiveWarpStatus();
     ClearDiveAndHoleWarps();
     trainerHillMapId = GetCurrentTrainerHillMapId();
     if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)

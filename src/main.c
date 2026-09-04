@@ -169,6 +169,7 @@ void AgbMainLoop(void)
 
         PlayTimeCounter_Update();
         MapMusicMain();
+        UpdateLiveBattleStatus();
         WaitForVBlank();
     }
 }

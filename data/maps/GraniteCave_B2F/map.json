@@ -176,7 +176,7 @@
       "x": 28,
       "y": 6,
       "elevation": 3,
-      "item": "ITEM_EVERSTONE",
+      "item": "ITEM_NUGGET",
       "flag": "FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_EVERSTONE_1"
     },
     {
@@ -184,7 +184,7 @@
       "x": 15,
       "y": 11,
       "elevation": 3,
-      "item": "ITEM_EVERSTONE",
+      "item": "ITEM_NUGGET",
       "flag": "FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_EVERSTONE_2"
     }
   ]

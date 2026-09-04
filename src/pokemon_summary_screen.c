@@ -729,6 +729,7 @@ static const u8 sTextColors[][3] =
 static const u8 sButtons_Gfx[][4 * TILE_SIZE_4BPP] = {
     INCBIN_U8("graphics/summary_screen/a_button.4bpp"),
     INCBIN_U8("graphics/summary_screen/b_button.4bpp"),
+    INCBIN_U8("graphics/summary_screen/r_button.4bpp"),
 };
 
 static void (*const sTextPrinterFunctions[])(void) =
