@@ -10,7 +10,7 @@ OldaleTown_House2_Basement_OnTransition:
 	call_if_set FLAG_IN_BASEMENT, OldaleTown_House2_Basement_EventScript_InstantLights
 	special HealPlayerParty
 	setvar VAR_FORCEANIM, 1
-	@ setflag FLAG_HIDE_BASEMENT_E4_WARP_NPC  @ Set to hide E4 warp NPC. Comment out to show.
+	setflag FLAG_HIDE_BASEMENT_E4_WARP_NPC  @ Set to hide E4 warp NPC. Comment out to show.
 	end
 
 OldaleTown_House2_Basement_EventScript_InstantLights::

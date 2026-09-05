@@ -2170,7 +2170,9 @@ void Task_HandleChooseMonInput(u8 taskId)
         }
         else if (JOY_NEW(L_BUTTON) && gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
             && gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC
-            && !sPartyMenuBerriesOnly)
+            && !sPartyMenuBerriesOnly
+            && gPartyMenu.action != PARTY_ACTION_SWITCH
+            && gPartyMenu.action != PARTY_ACTION_SWITCHING)
         {
             // Berries are only accessible from the overworld pause menu,
             // not when the party menu was opened for item use, daycare, etc.
