@@ -2723,6 +2723,9 @@ u32 GetBoxMonData3(struct BoxPokemon *boxMon, s32 field, u8 *data)
         case MON_DATA_HIDDEN_POWER_TYPE:
             retVal = GetSubstruct1(boxMon)->unused_04;
             break;
+        case MON_DATA_NO_EVOLUTION:
+            retVal = GetSubstruct3(boxMon)->unused_0B;
+            break;
         case MON_DATA_KO_COUNT:
             retVal = GetSubstruct3(boxMon)->koCount;
             break;
@@ -3190,6 +3193,9 @@ void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
         }
         case MON_DATA_HIDDEN_POWER_TYPE:
             SET8(GetSubstruct1(boxMon)->unused_04);
+            break;
+        case MON_DATA_NO_EVOLUTION:
+            SET8(GetSubstruct3(boxMon)->unused_0B);
             break;
         case MON_DATA_KO_COUNT:
             SET16(GetSubstruct3(boxMon)->koCount);

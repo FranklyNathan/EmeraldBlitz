@@ -8009,7 +8009,7 @@ void ItemUseCB_RareCandy(u8 taskId, TaskFunc task)
 
             // Check if the Pokémon can evolve
             targetSpecies = GetEvolutionTargetSpecies(mon, EVO_MODE_NORMAL, ITEM_NONE, SPECIES_NONE, &canStopEvo, CHECK_EVO);
-            if (targetSpecies != SPECIES_NONE && !(gMain.heldKeys & L_BUTTON))  // If the Pokémon can evolve and L is not held
+            if (targetSpecies != SPECIES_NONE && !GetMonData(mon, MON_DATA_NO_EVOLUTION))  // If the Pokémon can evolve and "No Evolution" isn't set
             {
                 canEvolve = TRUE;
             }
@@ -8150,7 +8150,7 @@ static void PartyMenuTryEvolution(u8 taskId)
     u32 targetSpecies = GetEvolutionTargetSpecies(mon, EVO_MODE_NORMAL, ITEM_NONE, SPECIES_NONE, &canStopEvo, DO_EVO);
 
 
-    if (targetSpecies != SPECIES_NONE && !(gMain.heldKeys & L_BUTTON))
+    if (targetSpecies != SPECIES_NONE && !GetMonData(mon, MON_DATA_NO_EVOLUTION))
     {
         MainCallback afterEvo = sReturnToPartyMenuAfterEvo ? CB2_ReturnToPartyMenuFromFlyMap : gPartyMenu.exitCallback;
         sReturnToPartyMenuAfterEvo = FALSE;

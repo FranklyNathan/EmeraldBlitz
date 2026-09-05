@@ -18,6 +18,7 @@
 #include "graphics.h"
 #include "international_string_util.h"
 #include "item.h"
+#include "item_icon.h"
 #include "link.h"
 #include "m4a.h"
 #include "malloc.h"
@@ -83,7 +84,9 @@
 #define PSS_LABEL_WINDOW_PORTRAIT_DEX_NUMBER 17
 #define PSS_LABEL_WINDOW_PORTRAIT_NICKNAME 18 // The upper name
 #define PSS_LABEL_WINDOW_PORTRAIT_SPECIES 19 // The lower name
-#define PSS_LABEL_WINDOW_END 20
+#define PSS_LABEL_WINDOW_PROMPT_EVO 20 // R button + "EVO" label to the left of the rename prompt
+#define PSS_LABEL_WINDOW_NO_EVOLUTION 21 // "No Evolution" label next to the Everstone icon
+#define PSS_LABEL_WINDOW_END 22
 
 // Dynamic fields for the Pokémon Info page
 #define PSS_DATA_WINDOW_INFO_ORIGINAL_TRAINER 0
@@ -200,6 +203,13 @@ static EWRAM_DATA u8 sMoveSlotToReplace = 0;
 ALIGNED(4) static EWRAM_DATA u8 sAnimDelayTaskId = 0;
 EWRAM_DATA MainCallback gInitialSummaryScreenCallback = NULL; // stores callback from the first time the screen is opened from the party or PC menu
 
+// Everstone icon sprite shown next to the "No Evolution" label (meta: set to
+// MAX_SPRITES when it has not been created yet).
+static EWRAM_DATA u8 sNoEvoEverstoneSpriteId = 0;
+
+#define TAG_EVO_EVERSTONE 24000
+#define TAG_EVO_EVERSTONE_PAL 24001
+
 // forward declarations
 static bool8 LoadGraphics(void);
 static void CB2_InitSummaryScreen(void);
@@ -212,6 +222,11 @@ static void CloseSummaryScreen(u8);
 static void Task_HandleInput(u8);
 static void ChangeSummaryPokemon(u8, s8);
 static void Task_ChangeSummaryMon(u8);
+static bool32 ShouldShowNoEvolutionToggle(void);
+static void CreateNoEvolutionEverstoneSprite(void);
+static void ShowEvoPrompt(void);
+static void ToggleNoEvolution(void);
+static void UpdateNoEvolutionIndicator(void);
 static s8 AdvanceMonIndex(s8);
 static s8 AdvanceMultiBattleMonIndex(s8);
 static bool8 IsValidToViewInMulti(struct Pokemon *);
@@ -589,6 +604,24 @@ static const struct WindowTemplate sSummaryTemplate[] =
         .height = 4,
         .paletteNum = 6,
         .baseBlock = 439,
+    },
+    [PSS_LABEL_WINDOW_PROMPT_EVO] = {
+        .bg = 0,
+        .tilemapLeft = 15,
+        .tilemapTop = 0,
+        .width = 8,
+        .height = 2,
+        .paletteNum = 7,
+        .baseBlock = 705,
+    },
+    [PSS_LABEL_WINDOW_NO_EVOLUTION] = {
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 18,
+        .width = 9,
+        .height = 2,
+        .paletteNum = 7,
+        .baseBlock = 730,
     },
     [PSS_LABEL_WINDOW_END] = DUMMY_WIN_TEMPLATE
 };
@@ -1309,6 +1342,7 @@ static bool8 LoadGraphics(void)
         break;
     case 7:
         ResetWindows();
+        CreateNoEvolutionEverstoneSprite();
         gMain.state++;
         break;
     case 8:
@@ -1371,6 +1405,8 @@ static bool8 LoadGraphics(void)
         break;
     case 21:
         SetTypeIcons();
+        ShowEvoPrompt();
+        UpdateNoEvolutionIndicator();
         gMain.state++;
         break;
     case 22:
@@ -1793,6 +1829,11 @@ static void Task_HandleInput(u8 taskId)
                 PlaySE(SE_SELECT);
                 ShowRelearnPrompt();
             }
+            else if (sMonSummaryScreen->currPageIndex == PSS_PAGE_INFO && ShouldShowNoEvolutionToggle())
+            {
+                PlaySE(SE_SELECT);
+                ToggleNoEvolution();
+            }
         }
         else if (JOY_NEW(L_BUTTON)) // L means decrease. Level <- Egg <- TM <- Tutor
         {
@@ -2158,6 +2199,8 @@ static void Task_ChangeSummaryMon(u8 taskId)
         break;
     case 10:
         PrintMonInfo();
+        ShowEvoPrompt();
+        UpdateNoEvolutionIndicator();
         break;
     case 11:
         PrintPageSpecificText(sMonSummaryScreen->currPageIndex);
@@ -2340,6 +2383,8 @@ static void PssScrollRightEnd(u8 taskId) // display right
     TryDrawExperienceProgressBar();
     SwitchTaskToFollowupFunc(taskId);
     ShowRelearnPrompt();
+    ShowEvoPrompt();
+    UpdateNoEvolutionIndicator();
 }
 
 static void PssScrollLeft(u8 taskId) // Scroll left
@@ -2393,6 +2438,8 @@ static void PssScrollLeftEnd(u8 taskId) // display left
     TryDrawExperienceProgressBar();
     SwitchTaskToFollowupFunc(taskId);
     ShowRelearnPrompt();
+    ShowEvoPrompt();
+    UpdateNoEvolutionIndicator();
 }
 
 static void TryDrawExperienceProgressBar(void)
@@ -3387,6 +3434,120 @@ static void PrintAOrBButtonIcon(u8 windowId, bool8 bButton, u32 x)
     BlitBitmapToWindow(windowId, button, x, 0, 16, 16);
 }
 
+static void PrintRButtonIcon(u8 windowId, u32 x)
+{
+    BlitBitmapToWindow(windowId, sButtons_Gfx[2], x, 0, 16, 16);
+}
+
+// Returns TRUE when the current Pokémon can evolve (and isn't an egg), so the
+// R + EVO prompt and the "No Evolution" toggle are available.
+static bool32 ShouldShowNoEvolutionToggle(void)
+{
+    u32 i;
+    const struct Evolution *evolutions;
+
+    if (sMonSummaryScreen->summary.isEgg)
+        return FALSE;
+
+    evolutions = GetSpeciesEvolutions(sMonSummaryScreen->summary.species);
+    if (evolutions == NULL)
+        return FALSE;
+
+    for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
+    {
+        if (SanitizeSpeciesId(evolutions[i].targetSpecies) != SPECIES_NONE)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// Creates the Everstone icon sprite that appears next to the "No Evolution"
+// label. Left invisible until UpdateNoEvolutionIndicator() is called.
+static void CreateNoEvolutionEverstoneSprite(void)
+{
+    u8 spriteId = AddItemIconSprite(TAG_EVO_EVERSTONE, TAG_EVO_EVERSTONE_PAL, ITEM_EVERSTONE);
+    sNoEvoEverstoneSpriteId = spriteId;
+
+    if (spriteId == MAX_SPRITES)
+        return;
+
+    struct Sprite *sprite = &gSprites[spriteId];
+    sprite->x = 20;
+    sprite->y = 139;
+    sprite->oam.priority = 0;
+    sprite->invisible = TRUE;
+}
+
+// Shows or hides the R + EVO button prompt at the top of the info page.
+static void ShowEvoPrompt(void)
+{
+    const u8 *text = gText_Evo;
+
+    FillWindowPixelBuffer(PSS_LABEL_WINDOW_PROMPT_EVO, PIXEL_FILL(0));
+
+    if (sMonSummaryScreen->currPageIndex != PSS_PAGE_INFO || !ShouldShowNoEvolutionToggle())
+    {
+        ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_EVO);
+        return;
+    }
+
+    PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_EVO);
+
+    int stringXPos = GetStringRightAlignXOffset(FONT_NORMAL, text, 65);
+    int iconXPos = stringXPos - 16;
+    if (iconXPos < 0)
+        iconXPos = 0;
+
+    PrintRButtonIcon(PSS_LABEL_WINDOW_PROMPT_EVO, iconXPos);
+    PrintTextOnWindow(PSS_LABEL_WINDOW_PROMPT_EVO, text, stringXPos, 1, 0, 0);
+}
+
+// Refreshes the "No Evolution" indicator: the Everstone icon sprite and the
+// "No Evolution" label, shown only on the info page when the flag is set.
+static void UpdateNoEvolutionIndicator(void)
+{
+    bool32 show;
+    u8 spriteId = sNoEvoEverstoneSpriteId;
+
+    if (spriteId >= MAX_SPRITES)
+        return;
+
+    show = (sMonSummaryScreen->currPageIndex == PSS_PAGE_INFO
+            && !sMonSummaryScreen->summary.isEgg
+            && GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_NO_EVOLUTION));
+
+    gSprites[spriteId].invisible = !show;
+
+    if (show)
+    {
+        FillWindowPixelBuffer(PSS_LABEL_WINDOW_NO_EVOLUTION, PIXEL_FILL(0));
+        PrintTextOnWindowToFitPx(PSS_LABEL_WINDOW_NO_EVOLUTION, gText_NoEvolution, 0, 1, 0, 0, WindowWidthPx(PSS_LABEL_WINDOW_NO_EVOLUTION) - 6);
+        PutWindowTilemap(PSS_LABEL_WINDOW_NO_EVOLUTION);
+    }
+    else
+    {
+        ClearWindowTilemap(PSS_LABEL_WINDOW_NO_EVOLUTION);
+    }
+    ScheduleBgCopyTilemapToVram(0);
+}
+
+// Toggles the "Never Evolve" flag on the current Pokémon (and the mon in the
+// party/box it was taken from), then refreshes the on-screen indicator.
+static void ToggleNoEvolution(void)
+{
+    struct Pokemon *mon = &sMonSummaryScreen->currentMon;
+    u8 noEvolution = !GetMonData(mon, MON_DATA_NO_EVOLUTION);
+
+    SetMonData(mon, MON_DATA_NO_EVOLUTION, &noEvolution);
+
+    if (!sMonSummaryScreen->isBoxMon)
+        SetMonData(&sMonSummaryScreen->monList.mons[sMonSummaryScreen->curMonIndex], MON_DATA_NO_EVOLUTION, &noEvolution);
+    else
+        SetBoxMonData(&sMonSummaryScreen->monList.boxMons[sMonSummaryScreen->curMonIndex], MON_DATA_NO_EVOLUTION, &noEvolution);
+
+    UpdateNoEvolutionIndicator();
+}
+
 static void PrintPageNamesAndStats(void)
 {
     int statsXPos;
@@ -3498,6 +3659,8 @@ static void ClearPageWindowTilemaps(u8 page)
     {
     case PSS_PAGE_INFO:
         ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_UTILITY);
+        ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_EVO);
+        ClearWindowTilemap(PSS_LABEL_WINDOW_NO_EVOLUTION);
         if (InBattleFactory() == TRUE || InSlateportBattleTent() == TRUE)
             ClearWindowTilemap(PSS_LABEL_WINDOW_POKEMON_INFO_RENTAL);
         ClearWindowTilemap(PSS_LABEL_WINDOW_POKEMON_INFO_TYPE);

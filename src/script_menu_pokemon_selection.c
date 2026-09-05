@@ -119,6 +119,7 @@ static const struct GiftPokemon sGiftPokemonList[] = {
     {SPECIES_MANKEY, 12},
     {SPECIES_MANTYKE, 10},
     {SPECIES_MAREEP, 8},
+    {SPECIES_MASCHIFF, 12},
     {SPECIES_MAWILE, 12},
     {SPECIES_MEDITITE, 12},
     {SPECIES_MEOWTH_GALAR, 8},

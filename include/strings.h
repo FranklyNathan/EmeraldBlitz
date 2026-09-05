@@ -2444,6 +2444,8 @@ extern const u8 gText_CannotSendMonToBoxPartner[];
 
 // Evolution party screen option
 extern const u8 gText_Evolution[];
+extern const u8 gText_Evo[];
+extern const u8 gText_NoEvolution[];
 extern const u8 gText_Heal[];
 
 #endif // GUARD_STRINGS_H
