@@ -618,8 +618,8 @@ static const struct WindowTemplate sSummaryTemplate[] =
         .bg = 0,
         .tilemapLeft = 1,
         .tilemapTop = 18,
-        .width = 9,
-        .height = 2,
+        .width = 2,
+        .height = 0,
         .paletteNum = 7,
         .baseBlock = 730,
     },
@@ -1829,11 +1829,6 @@ static void Task_HandleInput(u8 taskId)
                 PlaySE(SE_SELECT);
                 ShowRelearnPrompt();
             }
-            else if (sMonSummaryScreen->currPageIndex == PSS_PAGE_INFO && ShouldShowNoEvolutionToggle())
-            {
-                PlaySE(SE_SELECT);
-                ToggleNoEvolution();
-            }
         }
         else if (JOY_NEW(L_BUTTON)) // L means decrease. Level <- Egg <- TM <- Tutor
         {
@@ -1842,6 +1837,11 @@ static void Task_HandleInput(u8 taskId)
                 TryUpdateRelearnType(TRY_DECREMENT);
                 PlaySE(SE_SELECT);
                 ShowRelearnPrompt();
+            }
+            else if (sMonSummaryScreen->currPageIndex == PSS_PAGE_INFO && ShouldShowNoEvolutionToggle())
+            {
+                PlaySE(SE_SELECT);
+                ToggleNoEvolution();
             }
         }
     }
@@ -3525,7 +3525,6 @@ static void UpdateNoEvolutionIndicator(void)
     if (show)
     {
         FillWindowPixelBuffer(PSS_LABEL_WINDOW_NO_EVOLUTION, PIXEL_FILL(0));
-        PrintTextOnWindowToFitPx(PSS_LABEL_WINDOW_NO_EVOLUTION, gText_NoEvolution, 0, 1, 0, 0, WindowWidthPx(PSS_LABEL_WINDOW_NO_EVOLUTION) - 6);
         PutWindowTilemap(PSS_LABEL_WINDOW_NO_EVOLUTION);
     }
     else
