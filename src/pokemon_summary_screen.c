@@ -3449,6 +3449,9 @@ static bool32 ShouldShowNoEvolutionToggle(void)
     if (sMonSummaryScreen->summary.isEgg)
         return FALSE;
 
+    if (!ShouldShowRename())
+        return FALSE;
+
     evolutions = GetSpeciesEvolutions(sMonSummaryScreen->summary.species);
     if (evolutions == NULL)
         return FALSE;
@@ -3514,6 +3517,7 @@ static void UpdateNoEvolutionIndicator(void)
 
     show = (sMonSummaryScreen->currPageIndex == PSS_PAGE_INFO
             && !sMonSummaryScreen->summary.isEgg
+            && ShouldShowRename()
             && GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_NO_EVOLUTION));
 
     gSprites[spriteId].invisible = !show;

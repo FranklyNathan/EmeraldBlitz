@@ -58,6 +58,7 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_PostWarpBattle:
 @ OnTransition
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_OnTransition:
+	callnative Script_SetTextSpeedFast
 	goto_if_set FLAG_MUSEUM_3F_BATTLE, Museum3F_OnTransition_BattleSetup
 	settrainerflag TRAINER_MUSEUM_JASON
 	settrainerflag TRAINER_MUSEUM_KCH42
