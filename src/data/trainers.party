@@ -14907,7 +14907,7 @@ Level: 19
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Swarm
-- Mega Drain
+- Absorb
 - Gust
 - Bug Bite
 - Whirlwind
@@ -15007,7 +15007,7 @@ Level: 29
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Swarm
-- Giga Drain
+- Mega Drain
 - Air Cutter
 - Bug Bite
 - Whirlwind
@@ -16238,7 +16238,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Cursed Body
 - Overheat
-- Shadow Bone
+- Shadow Punch
 - Will O Wisp
 - Sunny Day
 
@@ -17742,25 +17742,35 @@ Items: Full Heal
 Double Battle: Yes
 AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
+Luvdisc (M)
+Level: 12
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Swift Swim
+- Safeguard
+- Flip Turn
+- Agility
+- Tackle
+
+Tatsugiri Stretchy (M)
+Level: 10
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Commander
+- Water Pulse
+- Rapid Spin
+- Harden
+- Splash
+
 Dondozo (M) @ Oran Berry
 Level: 15
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Unaware
-- Tackle
-- Waterfall
-- Noble Roar
+- Order Up
 - Water Gun
-
-Tatsugiri (M)
-Level: 13
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-Nature: Serious
-Ability: Commander
-- Harden
-- Water Pulse
-- Rapid Spin
-- Splash
+- Noble Roar
+- Tackle
 
 === TRAINER_JUAN_2 ===
 Name: JUAN&WALCE
@@ -17772,25 +17782,35 @@ Items: Full Heal
 Double Battle: Yes
 AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
+Luvdisc (M)
+Level: 16
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Swift Swim
+- Safeguard
+- Flip Turn
+- Agility
+- Tackle
+
+Tatsugiri Stretchy (M)
+Level: 14
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Commander
+- Water Pulse
+- Rapid Spin
+- Harden
+- Splash
+
 Dondozo (M) @ Oran Berry
 Level: 19
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Unaware
-- Lick
-- Waterfall
-- Noble Roar
+- Order Up
 - Water Gun
-
-Tatsugiri (M)
-Level: 17
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-Nature: Serious
-Ability: Commander
-- Harden
-- Water Pulse
-- Rapid Spin
-- Splash
+- Noble Roar
+- Lick
 
 === TRAINER_JUAN_3 ===
 Name: JUAN&WALCE
@@ -17830,9 +17850,9 @@ Ability: Unaware
 - Lick
 - Waterfall
 - Noble Roar
-- Water Gun
+- Order Up
 
-Tatsugiri (M)
+Tatsugiri Droopy (M)
 Level: 23
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
@@ -17880,9 +17900,9 @@ Ability: Unaware
 - Lick
 - Waterfall
 - Order Up
-- Water Gun
+- Noble Roar
 
-Tatsugiri (M)
+Tatsugiri Droopy (M)
 Level: 27
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
@@ -17912,7 +17932,7 @@ Ability: Unaware
 - Order Up
 - Surf
 
-Tatsugiri (M)
+Tatsugiri Curly (M)
 Level: 29
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
@@ -17962,7 +17982,7 @@ Ability: Unaware
 - Order Up
 - Surf
 
-Tatsugiri (M)
+Tatsugiri Curly (M)
 Level: 31
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
@@ -18022,7 +18042,7 @@ Ability: Unaware
 - Order Up
 - Surf
 
-Tatsugiri (M)
+Tatsugiri Curly (M)
 Level: 38
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
@@ -18082,7 +18102,7 @@ Ability: Unaware
 - Order Up
 - Surf
 
-Tatsugiri (M)
+Tatsugiri Curly (M)
 Level: 43
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
@@ -18351,7 +18371,7 @@ Nature: Serious
 Ability: Own Tempo
 - Giga Drain
 - Surf
-- Ice Beam
+- Ice Punch
 - Astonish
 
 Breloom (M) @ Sitrus Berry

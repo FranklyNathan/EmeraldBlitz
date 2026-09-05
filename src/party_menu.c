@@ -275,6 +275,7 @@ struct PartyMenuBox
 
 static IWRAM_DATA s8 sLastPartySlotBeforePc = 0;
 static IWRAM_DATA s8 sLastPcSlot = 0;
+static IWRAM_DATA bool8 sPartyMenuBerriesOnly = FALSE;
 static IWRAM_DATA bool8 sBerryMode = FALSE;
 static IWRAM_DATA bool8 sBerryTransitionActive = FALSE;
 static IWRAM_DATA u16 sBerryItemIds[PARTY_PC_SLOT_COUNT] = {0};
@@ -424,7 +425,7 @@ static void ClampCursorAfterBerryToggle(void)
 
 static u32 GetPartyMenuBoxCount(void)
 {
-    if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC)
+    if (gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC && !sPartyMenuBerriesOnly)
         return PARTY_SIZE + PARTY_PC_SLOT_COUNT;
     return PARTY_SIZE;
 }
@@ -886,6 +887,44 @@ static void DestroyBerrySlotSprites(void)
     }
 }
 
+// In berries-only menus (Elite Four) the bottom-left always shows berries.
+// (Re)creates the berry display after the party mon sprites are (re)built.
+static void RebuildBerrySlots(void)
+{
+    u8 i;
+
+    if (!sPartyMenuBerriesOnly)
+        return;
+    CollectPartyBerries();
+    CreateBerrySlotSprites();
+    // ReserveBerryPalettes may have called FreeTransientMonIconPalettes,
+    // which resets all sprites with fainted palettes back to normal.
+    // Re-apply fainted status to party mon sprites (0..5) that were affected.
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (sPartyMenuBoxes[i].monSpriteId != SPRITE_NONE
+            && GetMonData(&GetPartyMenuParty()[i], MON_DATA_HP) == 0)
+        {
+            MakeMonIconSpriteFainted(&gSprites[sPartyMenuBoxes[i].monSpriteId]);
+        }
+    }
+}
+
+// When berries run out in berries-only mode, there is no PC display to fall
+// back on: blank the berry slots and return the cursor to the party instead.
+// Elsewhere this just exits berry mode as before.
+static void HandleEmptyBerryDisplay(u8 taskId)
+{
+    if (!sPartyMenuBerriesOnly)
+    {
+        ToggleBerryMode(taskId);
+        return;
+    }
+    sBerryMode = TRUE;
+    DestroyBerrySlotSprites();
+    ClampCursorAfterBerryToggle();
+}
+
 // While in berry mode, re-scans the bag for berry types to display and
 // rebuilds the berry slots if the set of displayed berries changed (e.g. a
 // berry was taken from a party mon and is newly available).
@@ -1065,6 +1104,19 @@ static void InitPartyMenu(u8 menuType, u8 layout, u8 partyAction, bool8 keepCurs
         if (layout != KEEP_PARTY_LAYOUT)
             gPartyMenu.layout = layout;
 
+        // In the Elite Four building the party menu hides the PC box slots. The
+        // bottom-left area then shows the player's berries instead — and stays
+        // on berries only, because there is no PC display to toggle to.
+        if (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
+            && IsInEliteFourBuilding()
+            && gPartyMenu.exitCallback == CB2_ReturnToFieldWithOpenMenu
+            && (layout == PARTY_LAYOUT_SINGLE || gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC))
+        {
+            gPartyMenu.layout = PARTY_LAYOUT_SINGLE_PC;
+            sPartyMenuBerriesOnly = TRUE;
+            sBerryMode = TRUE;
+        }
+
         for (i = 0; i < ARRAY_COUNT(sPartyMenuInternal->data); i++)
             sPartyMenuInternal->data[i] = 0;
         for (i = 0; i < ARRAY_COUNT(sPartyMenuInternal->windowId); i++)
@@ -1218,6 +1270,7 @@ static bool8 ShowPartyMenu(void)
         if (CreatePartyMonSpritesLoop())
         {
             sPartyMenuInternal->data[0] = 0;
+            RebuildBerrySlots();
             gMain.state++;
         }
         break;
@@ -1324,6 +1377,7 @@ static bool8 ReloadPartyMenu(void)
         if (CreatePartyMonSpritesLoop())
         {
             sPartyMenuInternal->data[0] = 0;
+            RebuildBerrySlots();
             gMain.state++;
         }
         break;
@@ -1384,6 +1438,7 @@ static void ResetPartyMenu(void)
     sPartyMenuBoxes = NULL;
     sPartyBgGfxTilemap = NULL;
     sReturnToPartyMenuAfterEvo = FALSE;
+    sPartyMenuBerriesOnly = FALSE;
     sBerryMode = FALSE;
     sBerryTransitionActive = FALSE;
     sBerryGiving = FALSE;
@@ -2108,7 +2163,8 @@ void Task_HandleChooseMonInput(u8 taskId)
             return;
         }
         else if (JOY_NEW(L_BUTTON) && gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
-            && gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC)
+            && gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC
+            && !sPartyMenuBerriesOnly)
         {
             // Berries are only accessible from the overworld pause menu,
             // not when the party menu was opened for item use, daycare, etc.
@@ -2180,7 +2236,7 @@ static void Task_HandleBerryGiveAnimation(u8 taskId)
     }
     else
     {
-        ToggleBerryMode(taskId);
+        HandleEmptyBerryDisplay(taskId);
     }
     gTasks[taskId].func = Task_AfterBerryGiveNotice;
 }
@@ -2228,7 +2284,7 @@ static void HandleChooseMonSelection(u8 taskId, s8 *slotPtr)
                 if (sBerryCount > 0)
                     CreateBerrySlotSprites();
                 else
-                    ToggleBerryMode(taskId);
+                    HandleEmptyBerryDisplay(taskId);
                 gTasks[taskId].func = Task_AfterBerryGiveNotice;
             }
         }
@@ -4421,7 +4477,7 @@ static void Task_HandleBerrySwapYesNoInput(u8 taskId)
         if (sBerryCount > 0)
             CreateBerrySlotSprites();
         else
-            ToggleBerryMode(taskId);
+            HandleEmptyBerryDisplay(taskId);
         DisplayGaveBerriesNotice(berryItemId, 1);
         gTasks[taskId].func = Task_AfterBerryGiveNotice;
         break;
@@ -4546,7 +4602,7 @@ void CB2_ReturnToPartyMenuFromSummaryScreen(void)
 
 static void CursorCb_Switch(u8 taskId)
 {
-    if (sBerryMode)
+    if (sBerryMode && !sPartyMenuBerriesOnly)
     {
         PlaySE(SE_SELECT);
         PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
@@ -5157,7 +5213,7 @@ static void CursorCb_Withdraw(u8 taskId)
 
 static void CursorCb_Deposit(u8 taskId)
 {
-    if (sBerryMode)
+    if (sBerryMode && !sPartyMenuBerriesOnly)
     {
         PlaySE(SE_SELECT);
         PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
@@ -5283,7 +5339,7 @@ static void CursorCb_GiveAllBerries(u8 taskId)
             AnimatePartySlot(gPartyMenu.slotId, 1);
     }
     else
-        ToggleBerryMode(taskId);
+        HandleEmptyBerryDisplay(taskId);
     gPartyMenu.action = PARTY_ACTION_CHOOSE_MON;
     DisplayGaveBerriesNotice(berryItemId, monsToGive);
     gTasks[taskId].func = Task_AfterBerryGiveNotice;
