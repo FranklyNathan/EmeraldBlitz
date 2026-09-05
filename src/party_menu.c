@@ -370,6 +370,12 @@ static bool8 IsPcSlotSelectable(s8 slotId)
 {
     if (!IsPcSlot(slotId))
         return FALSE;
+    if (sPartyMenuBerriesOnly
+        && (gPartyMenu.action == PARTY_ACTION_SWITCH
+         || gPartyMenu.action == PARTY_ACTION_SWITCHING
+         || gPartyMenu.action == PARTY_ACTION_SOFTBOILED
+         || gPartyMenu.action == PARTY_ACTION_CHOOSE_FAINTED_MON))
+        return FALSE;
     if (sBerryMode)
     {
         u8 index = slotId - PARTY_PC_SLOT_START;
