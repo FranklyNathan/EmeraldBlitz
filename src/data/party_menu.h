@@ -116,18 +116,19 @@ static const u8 sPartyMenuSpriteCoords[PARTY_LAYOUT_COUNT][PARTY_SIZE][4 * 2] =
 };
 
 // Sprite coords for the 6 PC box slots, laid out as a 3x2 grid below the lead
-// mon box. The icons sit on openable Poké Balls like the party slots; only the
-// icon and Poké Ball coords are used (item/status coords are unused). The whole
-// grid is shifted 3px left of the previous version, and each icon sits an extra
-// 4px left of its Poké Ball (centered on the ball art).
+// mon box. The icons sit on openable Poké Balls like the party slots; the held
+// item box sits 4px right and 10px below the icon, matching the party slots
+// (status coords are unused). The whole grid is shifted 3px left of the
+// previous version, and each icon sits an extra 4px left of its Poké Ball
+// (centered on the ball art).
 static const u8 sPcSlotSpriteCoords[PARTY_PC_SLOT_COUNT][4 * 2] =
 {
-    {19, 88, 19, 88, 19, 88, 23, 95},      // column 0, row 0
-    {45, 88, 45, 88, 45, 88, 49, 95},      // column 1, row 0
-    {71, 88, 71, 88, 71, 88, 75, 95},      // column 2, row 0
-    {19, 112, 19, 112, 19, 112, 23, 119},  // column 0, row 1
-    {45, 112, 45, 112, 45, 112, 49, 119},  // column 1, row 1
-    {71, 112, 71, 112, 71, 112, 75, 119},  // column 2, row 1
+    {19, 88, 23, 98, 19, 88, 23, 95},      // column 0, row 0
+    {45, 88, 49, 98, 45, 88, 49, 95},      // column 1, row 0
+    {71, 88, 75, 98, 71, 88, 75, 95},      // column 2, row 0
+    {19, 112, 23, 122, 19, 112, 23, 119},  // column 0, row 1
+    {45, 112, 49, 122, 45, 112, 49, 119},  // column 1, row 1
+    {71, 112, 75, 122, 71, 112, 75, 119},  // column 2, row 1
 };
 
 // Used only when both Cancel and Confirm are present
@@ -868,6 +869,9 @@ struct
     [MENU_DEPOSIT]         = {COMPOUND_STRING("DEPOSIT"),         CursorCb_Deposit},
     [MENU_BERRY_GIVE]      = {COMPOUND_STRING("GIVE"),            CursorCb_GiveBerry},
     [MENU_GIVE_ALL]        = {COMPOUND_STRING("GIVE ALL"),        CursorCb_GiveAllBerries},
+    [MENU_PC_GIVE]         = {COMPOUND_STRING("GIVE"),            CursorCb_PCGive},
+    [MENU_PC_TAKE]         = {COMPOUND_STRING("TAKE"),            CursorCb_PCTakeItem},
+    [MENU_PC_MOVE]         = {COMPOUND_STRING("MOVE"),            CursorCb_MoveItemPC},
 };
 
 static const u8 sPartyMenuAction_SummarySwitchCancel[] = {MENU_SUMMARY, MENU_SWITCH, MENU_CANCEL1};

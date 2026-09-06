@@ -158,6 +158,9 @@ enum {
     MENU_DEPOSIT,
     MENU_BERRY_GIVE,
     MENU_GIVE_ALL,
+    MENU_PC_GIVE,
+    MENU_PC_TAKE,
+    MENU_PC_MOVE,
     MENU_FIELD_MOVES
 };
 
@@ -285,6 +288,7 @@ static IWRAM_DATA s8 sBerryGiveFromSlot = 0;
 static IWRAM_DATA bool8 sBerryGiving = FALSE;
 static IWRAM_DATA bool8 sPendingSwitchAfterBerryExit = FALSE;
 static IWRAM_DATA bool8 sPendingDepositAfterBerryExit = FALSE;
+static IWRAM_DATA bool8 sPendingMoveAfterBerryExit = FALSE;
 
 // EWRAM vars
 static EWRAM_DATA struct PartyMenuInternal *sPartyMenuInternal = NULL;
@@ -569,6 +573,8 @@ static u8 GetPartyMenuActionsTypeInBattle(struct Pokemon *);
 static u8 GetPartySlotEntryStatus(s8);
 static void Task_UpdateHeldItemSprite(u8);
 static void Task_HandleSelectionMenuInput(u8);
+static void UpdatePartyMonHeldItemSprite(struct Pokemon *, struct PartyMenuBox *);
+static void UpdatePartyMonHeldItemSpritePC(struct BoxPokemon *, struct PartyMenuBox *);
 static void CB2_ShowPokemonSummaryScreen(void);
 static void UpdatePartyToBattleOrder(void);
 static void SlidePartyMenuBoxOneStep(u8);
@@ -587,14 +593,21 @@ static void Task_GiveHoldItem(u8);
 static void Task_SwitchItemsYesNo(u8);
 static void Task_HandleSwitchItemsYesNoInput(u8);
 static void Task_WriteMailToGiveMonAfterText(u8);
-static void CB2_ReturnToPartyMenuFromWritingMail(void);
-static void Task_DisplayGaveMailFromPartyMessage(u8);
-static void UpdatePartyMonHeldItemSprite(struct Pokemon *, struct PartyMenuBox *);
-static void Task_TossHeldItemYesNo(u8 taskId);
+static void CB2_SelectBagItemToGivePC(void);
+static void CB2_GiveHoldItemPC(void);
+static void Task_GiveHoldItemPC(u8);
+static void Task_SwitchItemsYesNoPC(u8);
+static void Task_SwitchItemsYesNoPCInput(u8);
+static void Task_UpdateHeldItemSpritePC(u8);
+static void Task_UpdateTakenItemSpriteAndAwaitNoticeDismissPC(u8);
+static void DisplayAlreadyHoldingItemSwitchMessageBox(struct BoxPokemon *, u16, bool8);
 static void Task_HandleTossHeldItemYesNoInput(u8);
 static void Task_TossHeldItem(u8);
+static void Task_TossHeldItemYesNo(u8) __attribute__((used));
 static void CB2_ReadHeldMail(void);
 static void CB2_ReturnToPartyMenuFromReadingMail(void);
+static void CB2_ReturnToPartyMenuFromWritingMail(void);
+static void Task_DisplayGaveMailFromPartyMessage(u8);
 static void Task_SendMailToPCYesNo(u8);
 static void Task_HandleSendMailToPCYesNoInput(u8);
 static void Task_LoseMailMessageYesNo(u8);
@@ -694,6 +707,9 @@ static void CursorCb_Item(u8);
 static void CursorCb_Give(u8);
 static void CursorCb_TakeItem(u8);
 static void CursorCb_MoveItem(u8);
+static void CursorCb_MoveItemPC(u8);
+static void CursorCb_PCGive(u8);
+static void CursorCb_PCTakeItem(u8);
 static void CursorCb_Mail(u8);
 static void CursorCb_Read(u8);
 static void CursorCb_TakeMail(u8);
@@ -978,9 +994,12 @@ static void SlidePcDisplaySprites(s16 xOffset, bool8 berryDisplay)
             if (sBerryItemSpriteIds[i] != SPRITE_NONE)
                 gSprites[sBerryItemSpriteIds[i]].x2 = xOffset;
         }
-        else if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
+        else
         {
-            gSprites[sPartyMenuBoxes[slot].monSpriteId].x2 = xOffset;
+            if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
+                gSprites[sPartyMenuBoxes[slot].monSpriteId].x2 = xOffset;
+            if (sPartyMenuBoxes[slot].itemSpriteId != SPRITE_NONE)
+                gSprites[sPartyMenuBoxes[slot].itemSpriteId].x2 = xOffset;
         }
     }
 }
@@ -1452,6 +1471,7 @@ static void ResetPartyMenu(void)
     sBerryGiveFromSlot = -1;
     sPendingSwitchAfterBerryExit = FALSE;
     sPendingDepositAfterBerryExit = FALSE;
+    sPendingMoveAfterBerryExit = FALSE;
     sBerryCount = 0;
     for (u8 i = 0; i < PARTY_PC_SLOT_COUNT; i++)
         sBerryItemSpriteIds[i] = SPRITE_NONE;
@@ -1899,6 +1919,8 @@ static void CreatePartyMonSprites(u8 slot)
             u16 species = GetBoxMonData(boxMon, MON_DATA_SPECIES);
             u32 personality = GetBoxMonData(boxMon, MON_DATA_PERSONALITY);
             CreatePartyMonIconSpriteParameterized(species, personality, &sPartyMenuBoxes[slot], 1);
+            CreatePartyMonHeldItemSpriteParameterized(species, GetBoxMonData(boxMon, MON_DATA_HELD_ITEM), &sPartyMenuBoxes[slot]);
+            gSprites[sPartyMenuBoxes[slot].itemSpriteId].oam.priority = 1;
             CreatePartyMonPokeballSpriteParameterized(species, GetBoxMonData(boxMon, MON_DATA_LEVEL), &sPartyMenuBoxes[slot], GetBoxMonData(boxMon, MON_DATA_HP) == 0);
             gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.priority = 1;
             if (GetBoxMonData(boxMon, MON_DATA_HP) == 0)
@@ -2150,6 +2172,13 @@ void Task_HandleChooseMonInput(u8 taskId)
         {
             sPendingDepositAfterBerryExit = FALSE;
             CursorCb_Deposit(taskId);
+            return;
+        }
+
+        if (sPendingMoveAfterBerryExit)
+        {
+            sPendingMoveAfterBerryExit = FALSE;
+            CursorCb_MoveItem(taskId);
             return;
         }
 
@@ -3008,9 +3037,40 @@ static void Task_ReturnToChooseMonAfterText(u8 taskId)
     }
 }
 
+static u8 *GetDisplayName(struct Pokemon *mon, u8 *dest)
+{
+    GetMonData(mon, MON_DATA_NICKNAME, dest);
+    if (dest[0] == EOS)
+    {
+        const u8 *speciesName = GetSpeciesName(GetMonData(mon, MON_DATA_SPECIES));
+        StringCopy(dest, speciesName);
+    }
+    return StringGet_Nickname(dest);
+}
+
+static u8 *GetDisplayNameBox(struct BoxPokemon *boxMon, u8 *dest)
+{
+    GetBoxMonData(boxMon, MON_DATA_NICKNAME, dest);
+    if (dest[0] == EOS)
+    {
+        const u8 *speciesName = GetSpeciesName(GetBoxMonData(boxMon, MON_DATA_SPECIES));
+        StringCopy(dest, speciesName);
+    }
+    return StringGet_Nickname(dest);
+}
+
 static void DisplayGaveHeldItemMessage(struct Pokemon *mon, u16 item, bool8 keepOpen, u8 unused)
 {
-    GetMonNickname(mon, gStringVar1);
+    GetDisplayName(mon, gStringVar1);
+    CopyItemName(item, gStringVar2);
+    StringExpandPlaceholders(gStringVar4, gText_PkmnWasGivenItem);
+    DisplayPartyMenuMessage(gStringVar4, keepOpen);
+    ScheduleBgCopyTilemapToVram(2);
+}
+
+static void DisplayGaveHeldItemMessageBox(struct BoxPokemon *boxMon, u16 item, bool8 keepOpen, u8 unused)
+{
+    GetDisplayNameBox(boxMon, gStringVar1);
     CopyItemName(item, gStringVar2);
     StringExpandPlaceholders(gStringVar4, gText_PkmnWasGivenItem);
     DisplayPartyMenuMessage(gStringVar4, keepOpen);
@@ -3020,6 +3080,15 @@ static void DisplayGaveHeldItemMessage(struct Pokemon *mon, u16 item, bool8 keep
 static void DisplayAlreadyHoldingItemSwitchMessage(struct Pokemon *mon, u16 item, bool8 keepOpen)
 {
     GetMonNickname(mon, gStringVar1);
+    CopyItemName(item, gStringVar2);
+    StringExpandPlaceholders(gStringVar4, gText_PkmnAlreadyHoldingItemSwitch);
+    DisplayPartyMenuMessage(gStringVar4, keepOpen);
+    ScheduleBgCopyTilemapToVram(2);
+}
+
+static void DisplayAlreadyHoldingItemSwitchMessageBox(struct BoxPokemon *boxMon, u16 item, bool8 keepOpen)
+{
+    GetDisplayNameBox(boxMon, gStringVar1);
     CopyItemName(item, gStringVar2);
     StringExpandPlaceholders(gStringVar4, gText_PkmnAlreadyHoldingItemSwitch);
     DisplayPartyMenuMessage(gStringVar4, keepOpen);
@@ -4298,7 +4367,9 @@ static bool8 CreateSelectionWindow(u8 taskId)
             return FALSE;
 
         if (!sBerryMode)
-            GetBoxMonNickname(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], gStringVar1);
+        {
+            GetDisplayNameBox(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], gStringVar1);
+        }
         else
         {
             u8 berryIndex = gPartyMenu.slotId - PARTY_PC_SLOT_START;
@@ -4324,6 +4395,7 @@ static bool8 CreateSelectionWindow(u8 taskId)
         {
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SWITCH);
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_ITEM);
             if (gPlayerPartyCount < PARTY_SIZE)
                 AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_WITHDRAW);
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL1);
@@ -5378,8 +5450,29 @@ static void CursorCb_Cancel1(u8 taskId)
     gTasks[taskId].func = Task_HandleChooseMonInput;
 }
 
+static void OpenPcItemSubmenu(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+    sPartyMenuInternal->numActions = 0;
+    AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_PC_GIVE);
+    AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_PC_TAKE);
+    AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_PC_MOVE);
+    AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL2);
+    DisplaySelectionWindow(SELECTWINDOW_ITEM);
+    DisplayPartyMenuStdMessage(PARTY_MSG_DO_WHAT_WITH_ITEM);
+    gTasks[taskId].data[0] = 0xFF;
+    gTasks[taskId].func = Task_HandleSelectionMenuInput;
+}
+
 static void CursorCb_Item(u8 taskId)
 {
+    if (IsPcSlot(gPartyMenu.slotId))
+    {
+        OpenPcItemSubmenu(taskId);
+        return;
+    }
     PlaySE(SE_SELECT);
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
@@ -5455,6 +5548,22 @@ static void Task_SwitchHoldItemsPrompt(u8 taskId)
     {
         DisplayAlreadyHoldingItemSwitchMessage(&gPlayerParty[gPartyMenu.slotId], sPartyMenuItemId, TRUE);
         gTasks[taskId].func = Task_SwitchItemsYesNo;
+    }
+}
+
+static void Task_SwitchHoldItemsPromptPC(u8 taskId)
+{
+    u8 boxPos;
+
+    if (!gPaletteFade.active)
+    {
+        boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+        if (boxPos != 0xFF)
+        {
+            struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+            DisplayAlreadyHoldingItemSwitchMessageBox(boxMon, sPartyMenuItemId, TRUE);
+        }
+        gTasks[taskId].func = Task_SwitchItemsYesNoPC;
     }
 }
 
@@ -5596,6 +5705,30 @@ static void Task_UpdateTakenItemSpriteAndAwaitNoticeDismiss(u8 taskId)
     gTasks[taskId].func = Task_AfterBerryGiveNotice;
 }
 
+// Like Task_UpdateHeldItemSprite, but for PC box slots, which must not index
+// gPlayerParty with a PC slot id.
+static void Task_UpdateHeldItemSpritePC(u8 taskId)
+{
+    if (IsPartyMenuTextPrinterActive() != TRUE)
+    {
+        u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+        if (boxPos != 0xFF)
+            UpdatePartyMonHeldItemSpritePC(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &sPartyMenuBoxes[gPartyMenu.slotId]);
+        TryRefreshBerryDisplay();
+        Task_ReturnToChooseMonAfterText(taskId);
+    }
+}
+
+// Like Task_UpdateTakenItemSpriteAndAwaitNoticeDismiss, but for PC box slots.
+static void Task_UpdateTakenItemSpriteAndAwaitNoticeDismissPC(u8 taskId)
+{
+    u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+    if (boxPos != 0xFF)
+        UpdatePartyMonHeldItemSpritePC(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &sPartyMenuBoxes[gPartyMenu.slotId]);
+    TryRefreshBerryDisplay();
+    gTasks[taskId].func = Task_AfterBerryGiveNotice;
+}
+
 static void CursorCb_TakeItem(u8 taskId)
 {
     struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
@@ -5649,6 +5782,169 @@ static void CursorCb_Toss(u8 taskId)
         StringExpandPlaceholders(gStringVar4, gText_ThrowAwayItem);
         DisplayPartyMenuMessage(gStringVar4, TRUE);
         gTasks[taskId].func = Task_TossHeldItemYesNo;
+    }
+}
+
+static void CursorCb_PCGive(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    sPartyMenuInternal->exitCallback = CB2_SelectBagItemToGivePC;
+    Task_ClosePartyMenu(taskId);
+}
+
+static void CB2_SelectBagItemToGivePC(void)
+{
+    if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
+        GoToBagMenu(ITEMMENULOCATION_PARTY, POCKETS_COUNT, CB2_GiveHoldItemPC);
+    else
+        GoToBattlePyramidBagMenu(PYRAMIDBAG_LOC_PARTY, CB2_GiveHoldItemPC);
+}
+
+static void CB2_GiveHoldItemPC(void)
+{
+    u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+    if (boxPos == 0xFF)
+    {
+        InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, gPartyMenu.exitCallback);
+        return;
+    }
+
+    struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+
+    if (gSpecialVar_ItemId == ITEM_NONE)
+    {
+        InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_NONE, Task_TryCreateSelectionWindow, gPartyMenu.exitCallback);
+    }
+    else
+    {
+        u16 heldItem = GetBoxMonData(boxMon, MON_DATA_HELD_ITEM);
+
+        // Already holding item
+        if (heldItem != ITEM_NONE)
+        {
+            sPartyMenuItemId = heldItem;
+            InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_NONE, Task_SwitchHoldItemsPromptPC, gPartyMenu.exitCallback);
+        }
+        // Give item
+        else
+        {
+            InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_NONE, Task_GiveHoldItemPC, gPartyMenu.exitCallback);
+        }
+    }
+}
+
+static void Task_GiveHoldItemPC(u8 taskId)
+{
+    u16 item;
+
+    if (!gPaletteFade.active)
+    {
+        u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+        if (boxPos != 0xFF)
+        {
+            struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+
+            item = gSpecialVar_ItemId;
+            DisplayGaveHeldItemMessageBox(boxMon, item, FALSE, 0);
+            SetBoxMonData(boxMon, MON_DATA_HELD_ITEM, &item);
+            RemoveBagItem(item, 1);
+        }
+        gTasks[taskId].func = Task_UpdateHeldItemSpritePC;
+    }
+}
+
+static void Task_SwitchItemsYesNoPC(u8 taskId)
+{
+    if (IsPartyMenuTextPrinterActive() != TRUE)
+    {
+        PartyMenuDisplayYesNoMenu();
+        gTasks[taskId].func = Task_SwitchItemsYesNoPCInput;
+    }
+}
+
+static void Task_SwitchItemsYesNoPCInput(u8 taskId)
+{
+    u8 boxPos;
+
+    switch (Menu_ProcessInputNoWrapClearOnChoose())
+    {
+    case 0: // Yes
+        PlaySE(SE_SELECT);
+        boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+        if (boxPos == 0xFF)
+        {
+            gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
+            break;
+        }
+        RemoveBagItem(gSpecialVar_ItemId, 1);
+        // No room to return held item to bag
+        if (AddBagItem(sPartyMenuItemId, 1) == FALSE)
+        {
+            AddBagItem(gSpecialVar_ItemId, 1);
+            BufferBagFullCantTakeItemMessage(sPartyMenuItemId);
+            DisplayPartyMenuMessage(gStringVar4, FALSE);
+            gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
+        }
+        else
+        {
+            struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+
+            SetBoxMonData(boxMon, MON_DATA_HELD_ITEM, &gSpecialVar_ItemId);
+            DisplaySwitchedHeldItemMessage(gSpecialVar_ItemId, sPartyMenuItemId, TRUE);
+            gPartyMenu.action = PARTY_ACTION_CHOOSE_MON;
+            gTasks[taskId].func = Task_UpdateHeldItemSpritePC;
+        }
+        break;
+    case MENU_B_PRESSED:
+    case 1: // No
+        PlaySE(SE_SELECT);
+        gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
+        break;
+    }
+}
+
+static void CursorCb_PCTakeItem(u8 taskId)
+{
+    u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+    struct BoxPokemon *boxMon;
+    u16 item;
+
+    if (boxPos == 0xFF)
+        return;
+
+    boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+    item = GetBoxMonData(boxMon, MON_DATA_HELD_ITEM);
+
+    PlaySE(SE_SELECT);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+
+    if (item == ITEM_NONE)
+    {
+        GetDisplayNameBox(boxMon, gStringVar1);
+        StringExpandPlaceholders(gStringVar4, gText_PkmnNotHolding);
+        DisplayPartyMenuMessage(gStringVar4, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = Task_UpdateHeldItemSpritePC;
+    }
+    else
+    {
+        // Try to take item to bag
+        if (AddBagItem(item, 1) == FALSE)
+        {
+            BufferBagFullCantTakeItemMessage(item);
+            DisplayPartyMenuMessage(gStringVar4, TRUE);
+            ScheduleBgCopyTilemapToVram(2);
+            gTasks[taskId].func = Task_UpdateHeldItemSpritePC;
+        }
+        else
+        {
+            SetBoxMonData(boxMon, MON_DATA_HELD_ITEM, &(u16){ITEM_NONE});
+            CopyItemName(item, gStringVar2);
+            StringExpandPlaceholders(gStringVar4, sText_ReceivedTheItem);
+            DisplayBerryNotice(gStringVar4);
+            gTasks[taskId].func = Task_UpdateTakenItemSpriteAndAwaitNoticeDismissPC;
+        }
     }
 }
 
@@ -5812,11 +6108,17 @@ static void Task_HandleLoseMailMessageYesNoInput(u8 taskId)
 
 static void CursorCb_Cancel2(u8 taskId)
 {
-    struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
+    struct Pokemon *mon;
 
     PlaySE(SE_SELECT);
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+    if (IsPcSlot(gPartyMenu.slotId))
+    {
+        Task_TryCreateSelectionWindow(taskId);
+        return;
+    }
+    mon = &gPlayerParty[gPartyMenu.slotId];
     SetPartyMonSelectionActions(gPlayerParty, gPartyMenu.slotId, GetPartyMenuActionsType(mon));
     if (gPartyMenu.menuType != PARTY_MENU_TYPE_STORE_PYRAMID_HELD_ITEMS)
     {
@@ -6489,6 +6791,11 @@ static void CreatePartyMonHeldItemSpriteParameterized(u16 species, u16 item, str
 static void UpdatePartyMonHeldItemSprite(struct Pokemon *mon, struct PartyMenuBox *menuBox)
 {
     ShowOrHideHeldItemSprite(GetMonData(mon, MON_DATA_HELD_ITEM), menuBox);
+}
+
+static void UpdatePartyMonHeldItemSpritePC(struct BoxPokemon *boxMon, struct PartyMenuBox *menuBox)
+{
+    ShowOrHideHeldItemSprite(GetBoxMonData(boxMon, MON_DATA_HELD_ITEM), menuBox);
 }
 
 static void ShowOrHideHeldItemSprite(u16 item, struct PartyMenuBox *menuBox)
@@ -10914,6 +11221,7 @@ void CursorCb_MoveItemCallback(u8 taskId)
 {
     u16 item1, item2;
     u8 buffer[100];
+    struct BoxPokemon *boxMon = NULL;
 
     if (gPaletteFade.active || MenuHelpers_ShouldWaitForLinkRecv())
         return;
@@ -10925,46 +11233,142 @@ void CursorCb_MoveItemCallback(u8 taskId)
         break;
     case 1:     // User hit A on a Pokemon
         // Pokemon can't give away items to eggs or themselves
-        if (GetMonData(&gPlayerParty[gPartyMenu.slotId2], MON_DATA_IS_EGG)
-            || gPartyMenu.slotId == gPartyMenu.slotId2)
+        if (gPartyMenu.slotId == gPartyMenu.slotId2)
         {
             PlaySE(SE_FAILURE);
             return;
+        }
+        if (IsPcSlot(gPartyMenu.slotId))
+        {
+            // Source is a PC box slot
+            u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+            if (boxPos == 0xFF)
+            {
+                PlaySE(SE_FAILURE);
+                return;
+            }
+            boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+            if (GetBoxMonData(boxMon, MON_DATA_IS_EGG))
+            {
+                PlaySE(SE_FAILURE);
+                return;
+            }
+
+            // look up held items
+            item1 = GetBoxMonData(boxMon, MON_DATA_HELD_ITEM);
+
+            if (IsPcSlot(gPartyMenu.slotId2))
+            {
+                // swap between two PC box slots
+                u8 destBoxPos = GetPcSlotBoxPosition(gPartyMenu.slotId2);
+                if (destBoxPos == 0xFF || GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][destBoxPos], MON_DATA_IS_EGG))
+                {
+                    PlaySE(SE_FAILURE);
+                    return;
+                }
+                item2 = GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][destBoxPos], MON_DATA_HELD_ITEM);
+
+                SetBoxMonData(boxMon, MON_DATA_HELD_ITEM, &item2);
+                SetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][destBoxPos], MON_DATA_HELD_ITEM, &item1);
+
+                UpdatePartyMonHeldItemSpritePC(boxMon, &sPartyMenuBoxes[gPartyMenu.slotId]);
+                UpdatePartyMonHeldItemSpritePC(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][destBoxPos], &sPartyMenuBoxes[gPartyMenu.slotId2]);
+            }
+            else
+            {
+                // swap a PC box slot with a party slot
+                if (GetMonData(&gPlayerParty[gPartyMenu.slotId2], MON_DATA_IS_EGG))
+                {
+                    PlaySE(SE_FAILURE);
+                    return;
+                }
+                item2 = GetMonData(&gPlayerParty[gPartyMenu.slotId2], MON_DATA_HELD_ITEM);
+
+                SetBoxMonData(boxMon, MON_DATA_HELD_ITEM, &item2);
+                SetMonData(&gPlayerParty[gPartyMenu.slotId2], MON_DATA_HELD_ITEM, &item1);
+
+                TryItemHoldFormChange(&gPlayerParty[gPartyMenu.slotId2], gPartyMenu.slotId2);
+
+                UpdatePartyMonHeldItemSpritePC(boxMon, &sPartyMenuBoxes[gPartyMenu.slotId]);
+                UpdatePartyMonHeldItemSprite(&gPlayerParty[gPartyMenu.slotId2], &sPartyMenuBoxes[gPartyMenu.slotId2]);
+            }
+        }
+        else if (IsPcSlot(gPartyMenu.slotId2))
+        {
+            u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId2);
+            if (boxPos == 0xFF || GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], MON_DATA_IS_EGG))
+            {
+                PlaySE(SE_FAILURE);
+                return;
+            }
+            boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+
+            // look up held items
+            item1 = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HELD_ITEM);
+            item2 = GetBoxMonData(boxMon, MON_DATA_HELD_ITEM);
+
+            // swap the held items
+            SetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HELD_ITEM, &item2);
+            SetBoxMonData(boxMon, MON_DATA_HELD_ITEM, &item1);
+
+            TryItemHoldFormChange(&gPlayerParty[gPartyMenu.slotId], gPartyMenu.slotId);
+
+            // update the held item icons
+            UpdatePartyMonHeldItemSprite(&gPlayerParty[gPartyMenu.slotId], &sPartyMenuBoxes[gPartyMenu.slotId]);
+            UpdatePartyMonHeldItemSpritePC(boxMon, &sPartyMenuBoxes[gPartyMenu.slotId2]);
+        }
+        else
+        {
+            // Pokemon can't give away items to eggs
+            if (GetMonData(&gPlayerParty[gPartyMenu.slotId2], MON_DATA_IS_EGG))
+            {
+                PlaySE(SE_FAILURE);
+                return;
+            }
+
+            // look up held items
+            item1 = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HELD_ITEM);
+            item2 = GetMonData(&gPlayerParty[gPartyMenu.slotId2], MON_DATA_HELD_ITEM);
+
+            // swap the held items
+            SetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HELD_ITEM, &item2);
+            SetMonData(&gPlayerParty[gPartyMenu.slotId2], MON_DATA_HELD_ITEM, &item1);
+
+            TryItemHoldFormChange(&gPlayerParty[gPartyMenu.slotId], gPartyMenu.slotId);
+            TryItemHoldFormChange(&gPlayerParty[gPartyMenu.slotId2], gPartyMenu.slotId2);
+
+            // update the held item icons
+            UpdatePartyMonHeldItemSprite(&gPlayerParty[gPartyMenu.slotId], &sPartyMenuBoxes[gPartyMenu.slotId]);
+            UpdatePartyMonHeldItemSprite(&gPlayerParty[gPartyMenu.slotId2], &sPartyMenuBoxes[gPartyMenu.slotId2]);
         }
 
         PlaySE(SE_SELECT);
         gPartyMenu.action = PARTY_ACTION_CHOOSE_MON;
 
-        // look up held items
-        item1 = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HELD_ITEM);
-        item2 = GetMonData(&gPlayerParty[gPartyMenu.slotId2], MON_DATA_HELD_ITEM);
-
-        // swap the held items
-        SetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HELD_ITEM, &item2);
-        SetMonData(&gPlayerParty[gPartyMenu.slotId2], MON_DATA_HELD_ITEM, &item1);
-
-        TryItemHoldFormChange(&gPlayerParty[gPartyMenu.slotId], gPartyMenu.slotId);
-        TryItemHoldFormChange(&gPlayerParty[gPartyMenu.slotId2], gPartyMenu.slotId2);
-
-        // update the held item icons
-        UpdatePartyMonHeldItemSprite(&gPlayerParty[gPartyMenu.slotId], &sPartyMenuBoxes[gPartyMenu.slotId]);
-        UpdatePartyMonHeldItemSprite(&gPlayerParty[gPartyMenu.slotId2], &sPartyMenuBoxes[gPartyMenu.slotId2]);
-
         // create the string describing the move
         if (item2 == ITEM_NONE)
         {
-            GetMonNickname(&gPlayerParty[gPartyMenu.slotId2], gStringVar1);
+            if (IsPcSlot(gPartyMenu.slotId2))
+                GetDisplayNameBox(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][GetPcSlotBoxPosition(gPartyMenu.slotId2)], gStringVar1);
+            else
+                GetDisplayName(&gPlayerParty[gPartyMenu.slotId2], gStringVar1);
             CopyItemName(item1, gStringVar2);
             StringExpandPlaceholders(gStringVar4, gText_PkmnWasGivenItem);
         }
         else
         {
-            GetMonNickname(&gPlayerParty[gPartyMenu.slotId], gStringVar1);
+            if (IsPcSlot(gPartyMenu.slotId))
+                GetDisplayNameBox(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][GetPcSlotBoxPosition(gPartyMenu.slotId)], gStringVar1);
+            else
+                GetDisplayName(&gPlayerParty[gPartyMenu.slotId], gStringVar1);
             CopyItemName(item1, gStringVar2);
             StringExpandPlaceholders(buffer, gText_XsYAnd);
 
             StringAppend(buffer, gText_XsYWereSwapped);
-            GetMonNickname(&gPlayerParty[gPartyMenu.slotId2], gStringVar1);
+            if (IsPcSlot(gPartyMenu.slotId2))
+                GetDisplayNameBox(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][GetPcSlotBoxPosition(gPartyMenu.slotId2)], gStringVar1);
+            else
+                GetDisplayName(&gPlayerParty[gPartyMenu.slotId2], gStringVar1);
             CopyItemName(item2, gStringVar2);
             StringExpandPlaceholders(gStringVar4, buffer);
         }
@@ -10978,7 +11382,10 @@ void CursorCb_MoveItemCallback(u8 taskId)
 
         // return to the main party menu
         ScheduleBgCopyTilemapToVram(2);
-        gTasks[taskId].func = Task_UpdateHeldItemSprite;
+        if (IsPcSlot(gPartyMenu.slotId))
+            gTasks[taskId].func = Task_UpdateHeldItemSpritePC;
+        else
+            gTasks[taskId].func = Task_UpdateHeldItemSprite;
         break;
     }
 }
@@ -10992,6 +11399,16 @@ void CursorCb_MoveItem(u8 taskId)
     // delete old windows
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+
+    // If the bottom-left is showing berries, swap it back to the PC box mons
+    // so the moved item can only be given to a Pokemon, never a berry.
+    if (sBerryMode && !sPartyMenuBerriesOnly)
+    {
+        sPendingMoveAfterBerryExit = TRUE;
+        gTasks[taskId].func = Task_HandleChooseMonInput;
+        ToggleBerryMode(taskId);
+        return;
+    }
 
     if (GetMonData(mon, MON_DATA_HELD_ITEM) != ITEM_NONE)
     {
@@ -11009,13 +11426,66 @@ void CursorCb_MoveItem(u8 taskId)
     else
     {
         // create and display string about lack of hold item
-        GetMonNickname(mon, gStringVar1);
+        GetDisplayName(mon, gStringVar1);
         StringExpandPlaceholders(gStringVar4, gText_PkmnNotHolding);
         DisplayPartyMenuMessage(gStringVar4, TRUE);
-
-        // return to the main party menu
         ScheduleBgCopyTilemapToVram(2);
         gTasks[taskId].func = Task_UpdateHeldItemSprite;
+    }
+}
+
+// Like CursorCb_MoveItem, but for PC box slots. Its target callback
+// (CursorCb_MoveItemCallback) handles both party and PC destinations.
+static void CursorCb_MoveItemPC(u8 taskId)
+{
+    u8 boxPos = GetPcSlotBoxPosition(gPartyMenu.slotId);
+    struct BoxPokemon *boxMon;
+    u16 item;
+
+    PlaySE(SE_SELECT);
+
+    // delete old windows
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+
+    // If the bottom-left is showing berries, swap it back to the PC box mons
+    // so the moved item can only be given to a Pokemon, never a berry.
+    if (sBerryMode && !sPartyMenuBerriesOnly)
+    {
+        sPendingMoveAfterBerryExit = TRUE;
+        gTasks[taskId].func = Task_HandleChooseMonInput;
+        ToggleBerryMode(taskId);
+        return;
+    }
+
+    // An empty slot has no item menu, so a position should always exist here.
+    if (boxPos == 0xFF)
+        return;
+
+    boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
+    item = GetBoxMonData(boxMon, MON_DATA_HELD_ITEM);
+
+    if (item != ITEM_NONE)
+    {
+        gPartyMenu.action = PARTY_ACTION_SWITCH;
+
+        // show "Move item to where" in bottom left
+        DisplayPartyMenuStdMessage(PARTY_MSG_MOVE_ITEM_WHERE);
+        // update color of first selected box
+        AnimatePartySlot(gPartyMenu.slotId, 1);
+
+        // set up callback (handles party and PC destinations)
+        gPartyMenu.slotId2 = gPartyMenu.slotId;
+        gTasks[taskId].func = CursorCb_MoveItemCallback;
+    }
+    else
+    {
+        // create and display string about lack of hold item
+        GetDisplayNameBox(boxMon, gStringVar1);
+        StringExpandPlaceholders(gStringVar4, gText_PkmnNotHolding);
+        DisplayPartyMenuMessage(gStringVar4, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = Task_UpdateHeldItemSpritePC;
     }
 }
 
