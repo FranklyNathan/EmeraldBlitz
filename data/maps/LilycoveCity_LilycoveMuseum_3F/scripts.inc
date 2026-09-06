@@ -528,6 +528,7 @@ LilycoveCity_LilycoveMuseum_3F_EventScript_BattleFreez:
 @ Battle Won
 @ ============================================================
 LilycoveCity_LilycoveMuseum_3F_EventScript_BattleWon:
+	copyvar VAR_0x8004, VAR_MUSEUM_3F_TRAINER
 	call Museum3F_MarkDefeated
 	call Museum3F_CheckAllDefeated
 	compare VAR_RESULT, 1
