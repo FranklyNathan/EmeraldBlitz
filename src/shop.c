@@ -192,10 +192,6 @@ static bool8 sScottTmPreviewMode = FALSE; // Temporary inversion for previewing 
 static u16 sScottTmSavedPal2; // Saved palette entry 2 for preview restore
 static u16 sScottTmSavedPal3; // Saved palette entry 3 for preview restore
 static EWRAM_DATA struct ListMenuItem *sListMenuItems = NULL;
-static EWRAM_DATA u16 sSeenScottTmPairs[ARRAY_COUNT(sScottTmPartners)] = {0}; // Track which partner pairs have been seen
-static EWRAM_DATA u8 sScottShopLoadCount = 0; // Track how many times the shop has been loaded
-static EWRAM_DATA u32 sLastOfferedTypeMask = 0; // Bitmask of partner pair indices offered in the last visit
-static EWRAM_DATA bool8 sHasPreviousVisit = FALSE; // Whether a previous Scott TM shop visit has occurred
 
 // Special item ID for Scott's TM shop option
 #define ITEM_SCOTT_TM_INVERT  0xFFFD
@@ -507,161 +503,125 @@ static u16 GetScottTmPairIndex(u16 tmId)
     return ARRAY_COUNT(sScottTmPartners);
 }
 
+static u32 GetScottTmMask(u16 varLow, u16 varHigh)
+{
+    return (u32)VarGet(varLow) | ((u32)VarGet(varHigh) << 16);
+}
+
+static void SetScottTmMask(u16 varLow, u16 varHigh, u32 mask)
+{
+    VarSet(varLow, (u16)(mask & 0xFFFF));
+    VarSet(varHigh, (u16)(mask >> 16));
+}
+
 static void PrepareScottTmShopInventory(void)
 {
     u16 poolItems[ARRAY_COUNT(sScottTmPool)] = {0};
     u16 poolSize = 0;
-    u16 i, j;
+    u16 unseenPairs[ARRAY_COUNT(sScottTmPartners)];
+    u16 numUnseen = 0;
+    bool8 isLastVisit;
+    u32 seenMask;
+    u32 lastOfferedMask;
+    u32 offeredThisVisitMask = 0;
+    u16 i = 0, j;
 
-    // If 5th load, prioritize unseen pairs
-    if (sScottShopLoadCount >= 4)
+    // Scott's shop memory is kept in save data (vars), not RAM, because RAM is
+    // wiped on every boot - otherwise he would forget the last gym's offer and
+    // could roll the partner TM of that stock at the next gym. He only ever
+    // avoids his most recent visit, so anything older may show up again.
+    seenMask = GetScottTmMask(VAR_SCOTT_TM_SEEN_PAIRS_L, VAR_SCOTT_TM_SEEN_PAIRS_H);
+    lastOfferedMask = GetScottTmMask(VAR_SCOTT_TM_LAST_OFFERED_L, VAR_SCOTT_TM_LAST_OFFERED_H);
+
+    // The badge-8 visit is Scott's last one, so guarantee that every type the
+    // player has never been offered before finally shows up.
+    isLastVisit = (VarGet(VAR_BADGE_COUNT) >= 8);
+
+    if (isLastVisit)
     {
-        u16 unseenPairs[ARRAY_COUNT(sScottTmPartners)];
-        u16 numUnseen = 0;
-        u32 offeredThisVisitMask = 0;
-    for (i = 0; i < ARRAY_COUNT(sScottTmPartners); i++)
-    {
-            if (!sSeenScottTmPairs[i])
+        for (i = 0; i < ARRAY_COUNT(sScottTmPartners); i++)
+        {
+            if (!(seenMask & (1u << i)))
                 unseenPairs[numUnseen++] = i;
-    }
-
-        // Shuffle or pick from unseenPairs...
+        }
+        // Shuffle the unseen pairs so the selection stays random.
+        for (i = 0; i < numUnseen; i++)
+        {
+            u16 swapIdx = Random() % numUnseen;
+            u16 tmp = unseenPairs[i];
+            unseenPairs[i] = unseenPairs[swapIdx];
+            unseenPairs[swapIdx] = tmp;
+        }
+        // Force the never-seen types onto the table first.
         for (i = 0; i < 5 && i < numUnseen; i++)
-{
+        {
             u16 pairIdx = unseenPairs[i];
             sScottTmItemList[i] = sScottTmPartners[pairIdx][Random() % 2];
-            sSeenScottTmPairs[pairIdx] = 1; // Mark as seen
-            offeredThisVisitMask |= (1 << pairIdx);
-        }
-        // Build pool once, excluding pairs offered last visit or earlier this visit
-        for (j = 0; sScottTmPool[j] != ITEM_NONE; j++)
-        {
-            u16 pairIdx = GetScottTmPairIndex(sScottTmPool[j]);
-            if ((sHasPreviousVisit && (sLastOfferedTypeMask & (1 << pairIdx)))
-                || (offeredThisVisitMask & (1 << pairIdx)))
-                continue;
-            poolItems[poolSize++] = sScottTmPool[j];
-        }
-        // Fill remainder if any
-        for (; i < 5; i++)
-        {
-            bool8 validItemFound = FALSE;
-            while (!validItemFound)
-    {
-                u16 chosenIndex = Random() % poolSize;
-                u16 chosenItem = poolItems[chosenIndex];
-                bool8 isPartnerPresent = FALSE;
-
-                // Check if partner is already in our list (sScottTmItemList 0 to i-1)
-                for (j = 0; j < i; j++)
-                {
-                    if (sScottTmItemList[j] == GetScottTmPartner(chosenItem))
-{
-                        isPartnerPresent = TRUE;
-        break;
-                    }
-                }
-
-                if (!isPartnerPresent)
-{
-                    sScottTmItemList[i] = chosenItem;
-                    // Mark this pair as seen
-                    for (j = 0; j < ARRAY_COUNT(sScottTmPartners); j++)
-{
-                        if (sScottTmPartners[j][0] == chosenItem || sScottTmPartners[j][1] == chosenItem)
-{
-                            sSeenScottTmPairs[j] = 1;
-        break;
-                        }
-                    }
-                    // Remove the chosen TM and its partner from the pool so the
-                    // same type can never be offered twice in one visit.
-                    for (j = chosenIndex; j < poolSize - 1; j++)
-                        poolItems[j] = poolItems[j + 1];
-                    poolSize--;
-                    for (j = 0; j < poolSize; j++)
-                    {
-                        if (poolItems[j] == GetScottTmPartner(chosenItem))
-                        {
-                            u16 k;
-                            for (k = j; k < poolSize - 1; k++)
-                                poolItems[k] = poolItems[k + 1];
-                            poolSize--;
-                            break;
-                        }
-                    }
-                    validItemFound = TRUE;
-                }
-            }
+            offeredThisVisitMask |= (1u << pairIdx);
         }
     }
-    else
-{
-        for (i = 0; sScottTmPool[i] != ITEM_NONE; i++)
-        {
-            if (sHasPreviousVisit && (sLastOfferedTypeMask & (1 << GetScottTmPairIndex(sScottTmPool[i]))))
-                continue;
-            poolItems[poolSize++] = sScottTmPool[i];
-        }
 
-        // Select 5 random TMs ensuring no partners
-            for (i = 0; i < 5; i++)
+    // Build the pool from every pair except the ones offered last visit and the
+    // ones already put on the table this visit.
+    for (j = 0; sScottTmPool[j] != ITEM_NONE; j++)
+    {
+        u16 pairIdx = GetScottTmPairIndex(sScottTmPool[j]);
+        if (lastOfferedMask & (1u << pairIdx))
+            continue;
+        if (offeredThisVisitMask & (1u << pairIdx))
+            continue;
+        poolItems[poolSize++] = sScottTmPool[j];
+    }
+
+    // Select the remaining TMs at random, ensuring no two from one pair.
+    for (; i < 5; i++)
+    {
+        bool8 validItemFound = FALSE;
+        while (!validItemFound)
+        {
+            u16 chosenIndex = Random() % poolSize;
+            u16 chosenItem = poolItems[chosenIndex];
+            bool8 isPartnerPresent = FALSE;
+
+            // Check if partner is already in our list (sScottTmItemList 0 to i-1)
+            for (j = 0; j < i; j++)
             {
-            bool8 validItemFound = FALSE;
-            while (!validItemFound)
+                if (sScottTmItemList[j] == GetScottTmPartner(chosenItem))
                 {
-                u16 chosenIndex = Random() % poolSize;
-                u16 chosenItem = poolItems[chosenIndex];
-                bool8 isPartnerPresent = FALSE;
-
-                // Check if partner is already in our list (sScottTmItemList 0 to i-1)
-                for (j = 0; j < i; j++)
-                {
-                    if (sScottTmItemList[j] == GetScottTmPartner(chosenItem))
-                    {
-                        isPartnerPresent = TRUE;
-        break;
-                    }
-                }
-
-                if (!isPartnerPresent)
-{
-                    sScottTmItemList[i] = chosenItem;
-                    // Mark this pair as seen
-                    for (j = 0; j < ARRAY_COUNT(sScottTmPartners); j++)
-{
-                        if (sScottTmPartners[j][0] == chosenItem || sScottTmPartners[j][1] == chosenItem)
-    {
-                            sSeenScottTmPairs[j] = 1;
+                    isPartnerPresent = TRUE;
                     break;
-                        }
-                    }
-                    // Remove the chosen TM and its partner from the pool so the
-                    // same type can never be offered twice in one visit.
-                    for (j = chosenIndex; j < poolSize - 1; j++)
-                        poolItems[j] = poolItems[j + 1];
-                    poolSize--;
-                    for (j = 0; j < poolSize; j++)
-                    {
-                        if (poolItems[j] == GetScottTmPartner(chosenItem))
-                        {
-                            u16 k;
-                            for (k = j; k < poolSize - 1; k++)
-                                poolItems[k] = poolItems[k + 1];
-                            poolSize--;
-                            break;
-                        }
-                    }
-                    validItemFound = TRUE;
                 }
+            }
+
+            if (!isPartnerPresent)
+            {
+                sScottTmItemList[i] = chosenItem;
+                offeredThisVisitMask |= (1u << GetScottTmPairIndex(chosenItem));
+                // Remove the chosen TM and its partner from the pool so the
+                // same type can never be offered twice in one visit.
+                for (j = chosenIndex; j < poolSize - 1; j++)
+                    poolItems[j] = poolItems[j + 1];
+                poolSize--;
+                for (j = 0; j < poolSize; j++)
+                {
+                    if (poolItems[j] == GetScottTmPartner(chosenItem))
+                    {
+                        u16 k;
+                        for (k = j; k < poolSize - 1; k++)
+                            poolItems[k] = poolItems[k + 1];
+                        poolSize--;
+                        break;
+                    }
+                }
+                validItemFound = TRUE;
             }
         }
     }
-    // Record current selection so these types are excluded from the next visit
-    sLastOfferedTypeMask = 0;
-    for (i = 0; i < 5; i++)
-        sLastOfferedTypeMask |= (1 << GetScottTmPairIndex(sScottTmItemList[i]));
-    sHasPreviousVisit = TRUE;
+
+    // Persist the tracking so the next visit respects it even after a reboot.
+    SetScottTmMask(VAR_SCOTT_TM_SEEN_PAIRS_L, VAR_SCOTT_TM_SEEN_PAIRS_H, seenMask | offeredThisVisitMask);
+    SetScottTmMask(VAR_SCOTT_TM_LAST_OFFERED_L, VAR_SCOTT_TM_LAST_OFFERED_H, offeredThisVisitMask);
+
     // Assign initial prices for TMs (all 4000). These are effectively dummy values for TMs
     // because GetMartItemPrice will calculate the actual dynamic price.
     for (i = 0; i < 5; i++)
@@ -2126,7 +2086,6 @@ void CreateScottTmShopMenu(void)
 {
     u8 i;
     PrepareScottTmShopInventory();
-    sScottShopLoadCount++;
     SetShopItemsForSale(sScottTmItemList);
     sMartInfo.priceList = sScottTmPriceList;
     ClearItemPurchases();

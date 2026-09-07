@@ -279,6 +279,17 @@
 #define VAR_TRUCK_SAVE_TRIGGER                           0x40FE // Force a save when you white out
 #define VAR_TRUCK_SCENARIO                               0x40FF // Store selected truck scenario
 
+// Scott's TM shop tracking. Kept in save data (vars), not RAM, because RAM is
+// wiped on every boot - without it Scott would forget his most recent gym's
+// offer and could roll that pair's partner TM at the next gym. The masks are
+// bitfields over sScottTmPartners; the low var stores pairs 0-15 and the high
+// var stores pairs 16+ in its low bits. Scott only ever avoids his most recent
+// set, so anything older may be offered again.
+#define VAR_SCOTT_TM_SEEN_PAIRS_L                         0x4083 // Every pair ever offered this run
+#define VAR_SCOTT_TM_SEEN_PAIRS_H                         0x408B
+#define VAR_SCOTT_TM_LAST_OFFERED_L                       0x40B6 // Pairs offered on the previous visit
+#define VAR_SCOTT_TM_LAST_OFFERED_H                       0x40DC
+
 #define VARS_END                                         0x40FF
 #define VARS_COUNT                                       (VARS_END - VARS_START + 1)
 
