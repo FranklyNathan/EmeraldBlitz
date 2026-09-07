@@ -564,7 +564,6 @@ static void Task_PrintAndWaitForText(u8);
 static bool16 IsMonAllowedInPokemonJump(struct Pokemon *);
 static bool16 IsMonAllowedInDodrioBerryPicking(struct Pokemon *);
 static void Task_CancelParticipationYesNo(u8);
-static bool8 IsInEliteFourBuilding(void);
 static void Task_HandleCancelParticipationYesNoInput(u8);
 static bool8 ShouldUseChooseMonText(void);
 static void SetPartyMonFieldSelectionActions(struct Pokemon *, u8);
@@ -1133,7 +1132,7 @@ static void InitPartyMenu(u8 menuType, u8 layout, u8 partyAction, bool8 keepCurs
         // bottom-left area then shows the player's berries instead — and stays
         // on berries only, because there is no PC display to toggle to.
         if (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
-            && IsInEliteFourBuilding()
+            && IsInEliteFourArea()
             && gPartyMenu.exitCallback == CB2_ReturnToFieldWithOpenMenu
             && (layout == PARTY_LAYOUT_SINGLE || gPartyMenu.layout == PARTY_LAYOUT_SINGLE_PC))
         {
@@ -7012,7 +7011,7 @@ void CB2_ShowPartyMenuForItemUse(void)
     else
     {
         menuType = PARTY_MENU_TYPE_FIELD;
-        if (!IsInEliteFourBuilding()
+        if (!IsInEliteFourArea()
             && (GetItemPocket(gSpecialVar_ItemId) == POCKET_TM_HM
                 || CheckIfItemIsTMHMOrEvolutionStone(gSpecialVar_ItemId) == 2))
             partyLayout = PARTY_LAYOUT_SINGLE_PC;
@@ -9737,26 +9736,10 @@ static void TryTutorSelectedMon(u8 taskId)
     }
 }
 
-// Returns TRUE while in an Elite Four / Champion building, where the party menu
-// keeps the vanilla layout limited to the party instead of showing PC box slots.
-static bool8 IsInEliteFourBuilding(void)
-{
-    u8 mapGroup = gSaveBlock1Ptr->location.mapGroup;
-    u8 mapNum = gSaveBlock1Ptr->location.mapNum;
-
-    if (mapGroup != MAP_GROUP(MAP_EVER_GRANDE_CITY_SIDNEYS_ROOM))
-        return FALSE;
-
-    // E4 member chambers (0-3), Champion's room (4),
-    // Frontier Brain chambers (15-18),
-    // hallways (5-9), Pokemon League entrance 1F (10), 2F (14)
-    return (mapNum <= 10 || mapNum == 14 || mapNum >= 15);
-}
-
 void CB2_PartyMenuFromStartMenu(void)
 {
     InitPartyMenu(PARTY_MENU_TYPE_FIELD,
-                  (IsInEliteFourBuilding() ? PARTY_LAYOUT_SINGLE : PARTY_LAYOUT_SINGLE_PC),
+                  (IsInEliteFourArea() ? PARTY_LAYOUT_SINGLE : PARTY_LAYOUT_SINGLE_PC),
                   PARTY_ACTION_CHOOSE_MON, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, CB2_ReturnToFieldWithOpenMenu);
 }
 
@@ -10597,7 +10580,7 @@ static void SlideMultiPartyMenuBoxSpritesOneStep(u8 taskId)
 
 void ChooseMonForDaycare(void)
 {
-    InitPartyMenu(PARTY_MENU_TYPE_DAYCARE, IsInEliteFourBuilding() ? PARTY_LAYOUT_SINGLE : PARTY_LAYOUT_SINGLE_PC, PARTY_ACTION_CHOOSE_MON, FALSE, PARTY_MSG_CHOOSE_MON_2, Task_HandleChooseMonInput, BufferMonSelection);
+    InitPartyMenu(PARTY_MENU_TYPE_DAYCARE, IsInEliteFourArea() ? PARTY_LAYOUT_SINGLE : PARTY_LAYOUT_SINGLE_PC, PARTY_ACTION_CHOOSE_MON, FALSE, PARTY_MSG_CHOOSE_MON_2, Task_HandleChooseMonInput, BufferMonSelection);
 }
 
 static void UNUSED ChoosePartyMonByMenuType(u8 menuType)
@@ -10670,7 +10653,7 @@ static void Task_ChoosePartyMon(u8 taskId)
     if (!gPaletteFade.active)
     {
         CleanupOverworldWindowsAndTilemaps();
-        InitPartyMenu(PARTY_MENU_TYPE_CHOOSE_MON, IsInEliteFourBuilding() ? PARTY_LAYOUT_SINGLE : PARTY_LAYOUT_SINGLE_PC, PARTY_ACTION_CHOOSE_AND_CLOSE, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, BufferMonSelection);
+        InitPartyMenu(PARTY_MENU_TYPE_CHOOSE_MON, IsInEliteFourArea() ? PARTY_LAYOUT_SINGLE : PARTY_LAYOUT_SINGLE_PC, PARTY_ACTION_CHOOSE_AND_CLOSE, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, BufferMonSelection);
         DestroyTask(taskId);
     }
 }

@@ -1161,10 +1161,10 @@ bool8 IsInEliteFourArea(void)
     if (mapGroup != MAP_GROUP(MAP_EVER_GRANDE_CITY_SIDNEYS_ROOM))
         return FALSE;
 
-    // E4 member chambers: Sidney(0), Phoebe(1), Glacia(2), Drake(3)
-    // E4 hallways: HALL1-5 (5-9)
-    // Pokemon League entrance floors: 1F (10), 2F (14)
-    return (mapNum <= 3 || (mapNum >= 5 && mapNum <= 9) || mapNum == 10 || mapNum == 14);
+    // E4 member chambers (0-3), Champion's room (4),
+    // Frontier Brain chambers (15-18),
+    // hallways (5-9), Pokemon League entrance 1F (10), 2F (14)
+    return (mapNum <= 10 || mapNum == 14 || mapNum >= 15);
 }
 
 void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds)
