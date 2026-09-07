@@ -45515,7 +45515,7 @@ F_TRAINER_FEMALE |
 #line 17788
             .ability = ABILITY_SWIFT_SWIM,
 #line 17785
-            .lvl = 15,
+            .lvl = 16,
 #line 17787
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
@@ -45638,53 +45638,53 @@ F_TRAINER_FEMALE |
                 MOVE_MUD_SLAP,
                 MOVE_WATERFALL,
                 MOVE_AMNESIA,
-                MOVE_DRAGON_DANCE,
+                MOVE_WATER_GUN,
             },
             },
             {
 #line 17843
-            .species = SPECIES_DONDOZO,
+            .species = SPECIES_TATSUGIRI_DROOPY,
 #line 17843
             .gender = TRAINER_MON_MALE,
-#line 17843
-            .heldItem = ITEM_SITRUS_BERRY,
 #line 17845
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 17847
-            .ability = ABILITY_UNAWARE,
+            .ability = ABILITY_COMMANDER,
 #line 17844
-            .lvl = 24,
+            .lvl = 23,
 #line 17846
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17848
-                MOVE_LICK,
-                MOVE_WATERFALL,
-                MOVE_NOBLE_ROAR,
-                MOVE_ORDER_UP,
+                MOVE_HELPING_HAND,
+                MOVE_WATER_PULSE,
+                MOVE_RAPID_SPIN,
+                MOVE_FEINT_ATTACK,
             },
             },
             {
 #line 17853
-            .species = SPECIES_TATSUGIRI_DROOPY,
+            .species = SPECIES_DONDOZO,
 #line 17853
             .gender = TRAINER_MON_MALE,
+#line 17853
+            .heldItem = ITEM_SITRUS_BERRY,
 #line 17855
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 17857
-            .ability = ABILITY_COMMANDER,
+            .ability = ABILITY_UNAWARE,
 #line 17854
-            .lvl = 23,
+            .lvl = 24,
 #line 17856
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17858
-                MOVE_HELPING_HAND,
-                MOVE_WATER_PULSE,
-                MOVE_RAPID_SPIN,
-                MOVE_FEINT_ATTACK,
+                MOVE_ORDER_UP,
+                MOVE_WATERFALL,
+                MOVE_NOBLE_ROAR,
+                MOVE_LICK,
             },
             },
         },
@@ -45758,48 +45758,48 @@ F_TRAINER_FEMALE |
             },
             {
 #line 17893
-            .species = SPECIES_DONDOZO,
+            .species = SPECIES_TATSUGIRI_DROOPY,
 #line 17893
             .gender = TRAINER_MON_MALE,
-#line 17893
-            .heldItem = ITEM_SITRUS_BERRY,
 #line 17895
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 17897
-            .ability = ABILITY_UNAWARE,
+            .ability = ABILITY_COMMANDER,
 #line 17894
-            .lvl = 29,
+            .lvl = 27,
 #line 17896
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17898
-                MOVE_LICK,
-                MOVE_WATERFALL,
-                MOVE_ORDER_UP,
-                MOVE_NOBLE_ROAR,
+                MOVE_HELPING_HAND,
+                MOVE_WATER_PULSE,
+                MOVE_RAPID_SPIN,
+                MOVE_FEINT_ATTACK,
             },
             },
             {
 #line 17903
-            .species = SPECIES_TATSUGIRI_DROOPY,
+            .species = SPECIES_DONDOZO,
 #line 17903
             .gender = TRAINER_MON_MALE,
+#line 17903
+            .heldItem = ITEM_SITRUS_BERRY,
 #line 17905
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 17907
-            .ability = ABILITY_COMMANDER,
+            .ability = ABILITY_UNAWARE,
 #line 17904
-            .lvl = 27,
+            .lvl = 29,
 #line 17906
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17908
-                MOVE_HELPING_HAND,
-                MOVE_WATER_PULSE,
-                MOVE_RAPID_SPIN,
-                MOVE_FEINT_ATTACK,
+                MOVE_ORDER_UP,
+                MOVE_WATERFALL,
+                MOVE_NOBLE_ROAR,
+                MOVE_LICK,
             },
             },
         },

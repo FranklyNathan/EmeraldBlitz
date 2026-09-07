@@ -17782,7 +17782,7 @@ Double Battle: Yes
 AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
 Luvdisc (M)
-Level: 15
+Level: 16
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Swift Swim
@@ -17838,17 +17838,7 @@ Ability: Oblivious
 - Mud Slap
 - Waterfall
 - Amnesia
-- Dragon Dance
-
-Dondozo (M) @ Sitrus Berry
-Level: 24
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-Nature: Serious
-Ability: Unaware
-- Lick
-- Waterfall
-- Noble Roar
-- Order Up
+- Water Gun
 
 Tatsugiri Droopy (M)
 Level: 23
@@ -17859,6 +17849,16 @@ Ability: Commander
 - Water Pulse
 - Rapid Spin
 - Feint Attack
+
+Dondozo (M) @ Sitrus Berry
+Level: 24
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Unaware
+- Order Up
+- Waterfall
+- Noble Roar
+- Lick
 
 === TRAINER_JUAN_4 ===
 Name: JUAN&WALCE
@@ -17890,16 +17890,6 @@ Ability: Oblivious
 - Amnesia
 - Dragon Dance
 
-Dondozo (M) @ Sitrus Berry
-Level: 29
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-Nature: Serious
-Ability: Unaware
-- Lick
-- Waterfall
-- Order Up
-- Noble Roar
-
 Tatsugiri Droopy (M)
 Level: 27
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
@@ -17909,6 +17899,16 @@ Ability: Commander
 - Water Pulse
 - Rapid Spin
 - Feint Attack
+
+Dondozo (M) @ Sitrus Berry
+Level: 29
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Unaware
+- Order Up
+- Waterfall
+- Noble Roar
+- Lick
 
 === TRAINER_JUAN_5 ===
 Name: JUAN&WALCE
