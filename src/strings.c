@@ -1356,5 +1356,9 @@ const u8 gText_GhostTown_Shuppet1[] = _("SHUPPET floats eerily nearby…$");
 const u8 gText_GhostTown_Shuppet2[] = _("SHUPPET watches you silently.$");
 const u8 gText_GhostTown_Shuppet3[] = _("SHUPPET seems to like you!$");
 const u8 gText_GhostTown_Shuppet4[] = _("SHUPPET is studying you carefully…$");
+const u8 gText_GhostTown_Shuppet5[] = _("SHUPPET is guarding the way.$");
+const u8 gText_GhostTown_Shuppet6[] = _("SHUPPET doesn't want you to go this way.$");
+const u8 gText_GhostTown_Shuppet7[] = _("SHUPPET is blocking the path.$");
+
 
 const u8 gText_GymShuppet[] = _("BANETTE guards the way…\nYou've already beaten this gym!$");
