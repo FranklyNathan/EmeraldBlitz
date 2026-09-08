@@ -20,6 +20,7 @@
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
+#include "pokemon_storage_system.h"
 #include "pokemon_summary_screen.h"
 #include "script.h"
 #include "sound.h"
@@ -27,6 +28,7 @@
 #include "string_util.h"
 #include "strings.h"
 #include "task.h"
+#include "constants/party_menu.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
@@ -185,6 +187,13 @@ static EWRAM_DATA struct {
     u16 listRow;
     bool8 showContestInfo;
 } sMoveRelearnerMenuState = {0};
+
+// State for temporarily withdrawing a PC box mon into the party while the
+// relearner runs (see WithdrawRelearnerMonFromPC / SwapBackRelearnerMonToPC).
+static bool8 sRelearnerDidSwap;
+static u8 sRelearnerSwapPartySlot;
+static u8 sRelearnerOriginalBoxPos;
+static struct Pokemon sRelearnerSwappedPartyMon;
 
 EWRAM_DATA enum MoveRelearnerStates gMoveRelearnerState = MOVE_RELEARNER_LEVEL_UP_MOVES;
 EWRAM_DATA enum RelearnMode gRelearnMode = RELEARN_MODE_NONE;
@@ -368,6 +377,8 @@ static s32 GetCurrentSelectedMove(void);
 static void FreeMoveRelearnerResources(void);
 static void RemoveScrollArrows(void);
 static void HideHeartSpritesAndShowTeachMoveText(bool8);
+static void WithdrawRelearnerMonFromPC(void);
+static void SwapBackRelearnerMonToPC(void);
 
 static void VBlankCB_MoveRelearner(void)
 {
@@ -376,9 +387,61 @@ static void VBlankCB_MoveRelearner(void)
     TransferPlttBuffer();
 }
 
+// If the selected mon is stored in the PC (chosen via a PC party menu slot),
+// withdraw it into a party slot for the duration of the relearner so all the
+// existing logic keeps operating on gPlayerParty. The mon is written back to
+// the PC box when the relearner exits (see SwapBackRelearnerMonToPC).
+static void WithdrawRelearnerMonFromPC(void)
+{
+    u8 boxPos;
+    u8 partySlot;
+
+    if (!IsPcSlot(gSpecialVar_0x8004))
+        return;
+
+    boxPos = GetPcSlotBoxPosition(gSpecialVar_0x8004);
+    if (boxPos == 0xFF)
+        return;
+
+    partySlot = GetFirstEmptyPartySlot();
+    if (partySlot >= PARTY_SIZE)
+    {
+        partySlot = PARTY_SIZE - 1;
+        sRelearnerSwappedPartyMon = gPlayerParty[partySlot];
+        BoxMonToMon(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &gPlayerParty[partySlot]);
+        gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos] = sRelearnerSwappedPartyMon.box;
+    }
+    else
+    {
+        BoxMonToMon(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &gPlayerParty[partySlot]);
+        ZeroBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos]);
+    }
+    CalculatePlayerPartyCount();
+    sRelearnerSwapPartySlot = partySlot;
+    sRelearnerOriginalBoxPos = boxPos;
+    sRelearnerDidSwap = TRUE;
+    gSpecialVar_0x8004 = partySlot;
+}
+
+// Restores the withdrawn mon to the PC box, puts any displaced party member
+// back into the party, and updates the party count.
+static void SwapBackRelearnerMonToPC(void)
+{
+    if (sRelearnerDidSwap)
+    {
+        u8 partySlot = sRelearnerSwapPartySlot;
+        struct BoxPokemon trainedBox = gPlayerParty[partySlot].box;
+        gPlayerParty[partySlot] = sRelearnerSwappedPartyMon;
+        gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][sRelearnerOriginalBoxPos] = trainedBox;
+        CalculatePlayerPartyCount();
+        sRelearnerDidSwap = FALSE;
+    }
+}
+
 // Script arguments: The Pokémon to teach is in VAR_0x8004
 void TeachMoveRelearnerMove(void)
 {
+    WithdrawRelearnerMonFromPC();
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     // Fade to black
@@ -753,6 +816,8 @@ static void DoMoveRelearnerMain(void)
             }
             else
             {
+                if (sRelearnerDidSwap)
+                    SwapBackRelearnerMonToPC();
                 SetMainCallback2(CB2_ReturnToField);
             }
 

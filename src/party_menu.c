@@ -10671,35 +10671,58 @@ static void Task_ChooseMonForMoveRelearner(u8 taskId)
     if (!gPaletteFade.active)
     {
         CleanupOverworldWindowsAndTilemaps();
-        InitPartyMenu(PARTY_MENU_TYPE_MOVE_RELEARNER, PARTY_LAYOUT_SINGLE, PARTY_ACTION_CHOOSE_AND_CLOSE, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, CB2_ChooseMonForMoveRelearner);
+        InitPartyMenu(PARTY_MENU_TYPE_MOVE_RELEARNER, IsInEliteFourArea() ? PARTY_LAYOUT_SINGLE : PARTY_LAYOUT_SINGLE_PC, PARTY_ACTION_CHOOSE_AND_CLOSE, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, CB2_ChooseMonForMoveRelearner);
         DestroyTask(taskId);
+    }
+}
+
+static void SetMoveRelearnerHasMovesVar(struct Pokemon *mon)
+{
+    switch(gMoveRelearnerState)
+    {
+    case MOVE_RELEARNER_EGG_MOVES:
+        gSpecialVar_0x8005 = HasRelearnerEggMoves(mon);
+        break;
+    case MOVE_RELEARNER_TM_MOVES:
+        gSpecialVar_0x8005 = HasRelearnerTMMoves(mon);
+        break;
+    case MOVE_RELEARNER_TUTOR_MOVES:
+        gSpecialVar_0x8005 = HasRelearnerTutorMoves(mon);
+        break;
+    default:
+        gSpecialVar_0x8005 = HasRelearnerLevelUpMoves(mon);
+        break;
     }
 }
 
 static void CB2_ChooseMonForMoveRelearner(void)
 {
+    struct Pokemon tempMon;
+
     gSpecialVar_0x8004 = GetCursorSelectionMonId();
-    if (gSpecialVar_0x8004 >= PARTY_SIZE)
+    if (gSpecialVar_0x8004 < PARTY_SIZE || IsPcSlot(gSpecialVar_0x8004))
     {
-        gSpecialVar_0x8004 = PARTY_NOTHING_CHOSEN;
+        if (IsPcSlot(gSpecialVar_0x8004))
+        {
+            u8 boxPos = GetPcSlotBoxPosition(gSpecialVar_0x8004);
+            if (boxPos != 0xFF)
+            {
+                BoxMonToMon(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &tempMon);
+                SetMoveRelearnerHasMovesVar(&tempMon);
+            }
+            else
+            {
+                gSpecialVar_0x8005 = FALSE;
+            }
+        }
+        else
+        {
+            SetMoveRelearnerHasMovesVar(&gPlayerParty[gSpecialVar_0x8004]);
+        }
     }
     else
     {
-        switch(gMoveRelearnerState)
-        {
-        case MOVE_RELEARNER_EGG_MOVES:
-            gSpecialVar_0x8005 = HasRelearnerEggMoves(&gPlayerParty[gSpecialVar_0x8004]);
-            break;
-        case MOVE_RELEARNER_TM_MOVES:
-            gSpecialVar_0x8005 = HasRelearnerTMMoves(&gPlayerParty[gSpecialVar_0x8004]);
-            break;
-        case MOVE_RELEARNER_TUTOR_MOVES:
-            gSpecialVar_0x8005 = HasRelearnerTutorMoves(&gPlayerParty[gSpecialVar_0x8004]);
-            break;
-        default:
-            gSpecialVar_0x8005 = HasRelearnerLevelUpMoves(&gPlayerParty[gSpecialVar_0x8004]);
-            break;
-        }
+        gSpecialVar_0x8004 = PARTY_NOTHING_CHOSEN;
     }
     gFieldCallback2 = CB2_FadeFromPartyMenu;
     SetMainCallback2(CB2_ReturnToField);
