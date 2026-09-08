@@ -17820,16 +17820,6 @@ Items: Full Heal
 Double Battle: Yes
 AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
-Wailmer (M)
-Level: 22
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-Nature: Serious
-Ability: Water Veil
-- Astonish
-- Defense Curl
-- Rollout
-- Water Pulse
-
 Barboach (M)
 Level: 20
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
@@ -17840,8 +17830,18 @@ Ability: Oblivious
 - Amnesia
 - Water Gun
 
-Tatsugiri Droopy (M)
+Wailmer (M)
 Level: 23
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Water Veil
+- Astonish
+- Defense Curl
+- Rollout
+- Water Pulse
+
+Tatsugiri Droopy (M)
+Level: 21
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Commander
@@ -17870,16 +17870,6 @@ Items: Full Heal
 Double Battle: Yes
 AI: Basic Trainer / Smart Mon Choices / Smart Switching
 
-Wailmer (M)
-Level: 26
-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-Nature: Serious
-Ability: Water Veil
-- Astonish
-- Defense Curl
-- Rollout
-- Water Pulse
-
 Barboach (M)
 Level: 25
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
@@ -17890,8 +17880,18 @@ Ability: Oblivious
 - Amnesia
 - Dragon Dance
 
-Tatsugiri Droopy (M)
+Wailmer (M)
 Level: 27
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+Nature: Serious
+Ability: Water Veil
+- Astonish
+- Defense Curl
+- Rollout
+- Water Pulse
+
+Tatsugiri Droopy (M)
+Level: 26
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Commander

@@ -2185,8 +2185,7 @@ void Task_HandleChooseMonInput(u8 taskId)
         {
             // Don't allow Select or L shortcuts while selecting a berry target
         }
-        else if (JOY_NEW(SELECT_BUTTON) && (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD
-            || gPartyMenu.menuType == PARTY_MENU_TYPE_IN_BATTLE))
+        else if (JOY_NEW(SELECT_BUTTON) && gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD)
         {
             if (gPartyMenu.action != PARTY_ACTION_USE_ITEM)
             {

@@ -42807,7 +42807,7 @@ F_TRAINER_FEMALE |
 #line 16619
             .ability = ABILITY_ILLUSION,
 #line 16616
-            .lvl = 23,
+            .lvl = 22,
 #line 16618
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
@@ -42829,7 +42829,7 @@ F_TRAINER_FEMALE |
 #line 16629
             .ability = ABILITY_QUICK_FEET,
 #line 16626
-            .lvl = 23,
+            .lvl = 22,
 #line 16628
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
@@ -45599,46 +45599,46 @@ F_TRAINER_FEMALE |
         {
             {
 #line 17823
-            .species = SPECIES_WAILMER,
+            .species = SPECIES_BARBOACH,
 #line 17823
             .gender = TRAINER_MON_MALE,
 #line 17825
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 17827
-            .ability = ABILITY_WATER_VEIL,
+            .ability = ABILITY_OBLIVIOUS,
 #line 17824
-            .lvl = 22,
+            .lvl = 20,
 #line 17826
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17828
-                MOVE_ASTONISH,
-                MOVE_DEFENSE_CURL,
-                MOVE_ROLLOUT,
-                MOVE_WATER_PULSE,
+                MOVE_MUD_SLAP,
+                MOVE_WATERFALL,
+                MOVE_AMNESIA,
+                MOVE_WATER_GUN,
             },
             },
             {
 #line 17833
-            .species = SPECIES_BARBOACH,
+            .species = SPECIES_WAILMER,
 #line 17833
             .gender = TRAINER_MON_MALE,
 #line 17835
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 17837
-            .ability = ABILITY_OBLIVIOUS,
+            .ability = ABILITY_WATER_VEIL,
 #line 17834
-            .lvl = 20,
+            .lvl = 23,
 #line 17836
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17838
-                MOVE_MUD_SLAP,
-                MOVE_WATERFALL,
-                MOVE_AMNESIA,
-                MOVE_WATER_GUN,
+                MOVE_ASTONISH,
+                MOVE_DEFENSE_CURL,
+                MOVE_ROLLOUT,
+                MOVE_WATER_PULSE,
             },
             },
             {
@@ -45651,7 +45651,7 @@ F_TRAINER_FEMALE |
 #line 17847
             .ability = ABILITY_COMMANDER,
 #line 17844
-            .lvl = 23,
+            .lvl = 21,
 #line 17846
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
@@ -45714,46 +45714,46 @@ F_TRAINER_FEMALE |
         {
             {
 #line 17873
-            .species = SPECIES_WAILMER,
+            .species = SPECIES_BARBOACH,
 #line 17873
             .gender = TRAINER_MON_MALE,
 #line 17875
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 17877
-            .ability = ABILITY_WATER_VEIL,
+            .ability = ABILITY_OBLIVIOUS,
 #line 17874
-            .lvl = 26,
+            .lvl = 25,
 #line 17876
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17878
-                MOVE_ASTONISH,
-                MOVE_DEFENSE_CURL,
-                MOVE_ROLLOUT,
-                MOVE_WATER_PULSE,
+                MOVE_MUD_BOMB,
+                MOVE_WATERFALL,
+                MOVE_AMNESIA,
+                MOVE_DRAGON_DANCE,
             },
             },
             {
 #line 17883
-            .species = SPECIES_BARBOACH,
+            .species = SPECIES_WAILMER,
 #line 17883
             .gender = TRAINER_MON_MALE,
 #line 17885
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 17887
-            .ability = ABILITY_OBLIVIOUS,
+            .ability = ABILITY_WATER_VEIL,
 #line 17884
-            .lvl = 25,
+            .lvl = 27,
 #line 17886
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 17888
-                MOVE_MUD_BOMB,
-                MOVE_WATERFALL,
-                MOVE_AMNESIA,
-                MOVE_DRAGON_DANCE,
+                MOVE_ASTONISH,
+                MOVE_DEFENSE_CURL,
+                MOVE_ROLLOUT,
+                MOVE_WATER_PULSE,
             },
             },
             {
@@ -45766,7 +45766,7 @@ F_TRAINER_FEMALE |
 #line 17897
             .ability = ABILITY_COMMANDER,
 #line 17894
-            .lvl = 27,
+            .lvl = 26,
 #line 17896
             .nature = NATURE_SERIOUS,
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
