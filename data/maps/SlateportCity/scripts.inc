@@ -270,9 +270,11 @@ SlateportCity_EventScript_CookChoosePokemon::
 	special ChoosePartyMon
 	waitstate
 	// Exit if player cancels party menu
-	compare VAR_0x8004, PARTY_SIZE
-	goto_if_ge SlateportCity_EventScript_CookCancel
-	// Apply the status
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, SlateportCity_EventScript_CookCancel
+	goto_if_eq VAR_0x8004, PARTY_SIZE, SlateportCity_EventScript_CookCancel
+	goto_if_eq VAR_0x8004, PARTY_SIZE + 1, SlateportCity_EventScript_CookCancel
+	goto_if_ge VAR_0x8004, PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT, SlateportCity_EventScript_CookCancel
+	// Apply the status (party or PC mon)
 	setstatus1 VAR_0x8005, VAR_0x8004
 	msgbox SlateportCity_Text_CookDone, MSGBOX_DEFAULT
 	release

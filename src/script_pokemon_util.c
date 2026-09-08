@@ -26,6 +26,7 @@
 #include "wild_encounter.h"
 #include "constants/abilities.h"
 #include "constants/items.h"
+#include "constants/party_menu.h"
 #include "constants/battle_frontier.h"
 
 static void CB2_ReturnFromChooseHalfParty(void);
@@ -658,7 +659,13 @@ void Script_SetStatus1(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
-    if (slot >= PARTY_SIZE)
+    if (IsPcSlot(slot))
+    {
+        u8 boxPos = GetPcSlotBoxPosition(slot);
+        if (boxPos != 0xFF)
+            SetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], MON_DATA_STATUS, &status1);
+    }
+    else if (slot >= PARTY_SIZE)
     {
         u16 species;
 

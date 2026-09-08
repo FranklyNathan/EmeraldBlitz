@@ -36,8 +36,7 @@ OldaleTown_House2_EventScript_LevelCapNPC::
     clearflag FLAG_SYS_OPPONENT_LEVEL_1
 	lock
 	faceplayer
-	message OldaleTown_House2_Text_LevelCapIntro
-	waitmessage
+	msgbox OldaleTown_House2_Text_LevelCapIntro, MSGBOX_DEFAULT
 	dynmultipush OldaleTown_House2_Text_LevelCaps0, 0
 	dynmultipush OldaleTown_House2_Text_LevelCaps1, 1
 	dynmultipush OldaleTown_House2_Text_LevelCaps2, 2
@@ -262,8 +261,7 @@ OldaleTown_House2_Basement_EventScript_Shopkeeper::
 	faceplayer
 	setflag FLAG_FREE_SHOP
 	setflag FLAG_IN_BASEMENT
-	message OldaleTown_House2_Basement_Text_HowMayIHelpYou
-	waitmessage
+	msgbox OldaleTown_House2_Basement_Text_HowMayIHelpYou, MSGBOX_DEFAULT
 OldaleTown_House2_Basement_EventScript_Shopkeeper_Menu::
 	dynmultipush OldaleTown_House2_Basement_Text_CategoryTMs, 0
 	dynmultipush OldaleTown_House2_Basement_Text_CategoryMegaStones, 1
@@ -617,8 +615,7 @@ OldaleTown_House2_Basement_EventScript_MoveTutorNPC::
 	msgbox OldaleTown_House2_Basement_Text_MoveTutorIntro, MSGBOX_DEFAULT
 
 OldaleTown_House2_Basement_EventScript_MoveTutorMenu::
-	message OldaleTown_House2_Basement_Text_WhichMoveToTeach
-	waitmessage
+	msgbox OldaleTown_House2_Basement_Text_WhichMoveToTeach, MSGBOX_DEFAULT
 	dynmultipush OldaleTown_House2_Basement_Text_DoubleEdge, 0
 	dynmultipush OldaleTown_House2_Basement_Text_DynamicPunch, 1
 	dynmultipush OldaleTown_House2_Basement_Text_Explosion, 2
@@ -1671,8 +1668,7 @@ OldaleTown_House2_Basement_Text_HypnoDecline:
 OldaleTown_House2_Basement_EventScript_E4WarpNPC::
 	lock
 	faceplayer
-	message OldaleTown_House2_Basement_Text_E4WarpIntro
-	waitmessage
+	msgbox OldaleTown_House2_Basement_Text_E4WarpIntro, MSGBOX_DEFAULT
 	dynmultipush OldaleTown_House2_Basement_Text_E4WarpSidney, 0
 	dynmultipush OldaleTown_House2_Basement_Text_E4WarpPhoebe, 1
 	dynmultipush OldaleTown_House2_Basement_Text_E4WarpGlacia, 2
