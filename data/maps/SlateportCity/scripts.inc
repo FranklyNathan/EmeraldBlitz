@@ -2734,7 +2734,9 @@ SlateportCity_EventScript_HiddenPowerNPC::
 	msgbox SlateportCity_Text_HiddenPowerNPC_ChooseMon, MSGBOX_DEFAULT
 	special ChoosePartyMon
 	waitstate
-	goto_if_eq VAR_0x8004, 255, SlateportCity_EventScript_HiddenPowerNPC_Decline
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, SlateportCity_EventScript_HiddenPowerNPC_Decline
+	goto_if_eq VAR_0x8004, PARTY_SIZE + 1, SlateportCity_EventScript_HiddenPowerNPC_Decline
+	goto_if_ge VAR_0x8004, PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT, SlateportCity_EventScript_HiddenPowerNPC_Decline
 	special IsSelectedMonEgg
 	goto_if_eq VAR_RESULT, TRUE, SlateportCity_EventScript_HiddenPowerNPC_Egg
 	callnative CheckHiddenPower

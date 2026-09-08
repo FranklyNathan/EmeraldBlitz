@@ -5,6 +5,7 @@
 #include "battle_tower.h"
 #include "cable_club.h"
 #include "daycare.h"
+#include "constants/party_menu.h"
 #include "data.h"
 #include "decoration.h"
 #include "diploma.h"
@@ -4513,14 +4514,20 @@ void SetAbility(void)
 
 void SetHiddenPowerType(void)
 {
-    u32 partyIdx = gSpecialVar_0x8004;
+    u32 slot = gSpecialVar_0x8004;
     u32 type = gSpecialVar_0x8005;
 
-    if (partyIdx >= gPlayerPartyCount)
-        return;
-
-    SetMonData(&gPlayerParty[partyIdx], MON_DATA_HIDDEN_POWER_TYPE, &type);
-    CalculateMonStats(&gPlayerParty[partyIdx]);
+    if (IsPcSlot(slot))
+    {
+        u8 boxPos = GetPcSlotBoxPosition(slot);
+        if (boxPos != 0xFF)
+            SetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], MON_DATA_HIDDEN_POWER_TYPE, &type);
+    }
+    else if (slot < gPlayerPartyCount)
+    {
+        SetMonData(&gPlayerParty[slot], MON_DATA_HIDDEN_POWER_TYPE, &type);
+        CalculateMonStats(&gPlayerParty[slot]);
+    }
 }
 
 void Special_GetEggSpecies(void)
@@ -4530,22 +4537,37 @@ void Special_GetEggSpecies(void)
 
 void CheckHiddenPower(void)
 {
-    u32 partyIdx = gSpecialVar_0x8004;
+    u32 slot = gSpecialVar_0x8004;
     u16 move;
     u8 i;
 
     gSpecialVar_Result = FALSE;
 
-    if (partyIdx >= gPlayerPartyCount)
-        return;
-
-    for (i = 0; i < MAX_MON_MOVES; i++)
+    if (IsPcSlot(slot))
     {
-        move = GetMonData(&gPlayerParty[partyIdx], MON_DATA_MOVE1 + i);
-        if (move == MOVE_HIDDEN_POWER)
+        u8 boxPos = GetPcSlotBoxPosition(slot);
+        if (boxPos == 0xFF)
+            return;
+        for (i = 0; i < MAX_MON_MOVES; i++)
         {
-            gSpecialVar_Result = TRUE;
-            break;
+            move = GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], MON_DATA_MOVE1 + i);
+            if (move == MOVE_HIDDEN_POWER)
+            {
+                gSpecialVar_Result = TRUE;
+                break;
+            }
+        }
+    }
+    else if (slot < gPlayerPartyCount)
+    {
+        for (i = 0; i < MAX_MON_MOVES; i++)
+        {
+            move = GetMonData(&gPlayerParty[slot], MON_DATA_MOVE1 + i);
+            if (move == MOVE_HIDDEN_POWER)
+            {
+                gSpecialVar_Result = TRUE;
+                break;
+            }
         }
     }
 }

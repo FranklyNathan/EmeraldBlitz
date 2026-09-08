@@ -10799,10 +10799,24 @@ static void ShiftMoveSlot(struct Pokemon *mon, u8 slotTo, u8 slotFrom)
 
 void IsSelectedMonEgg(void)
 {
-    if (GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_IS_EGG))
+    u32 slot = gSpecialVar_0x8004;
+
+    gSpecialVar_Result = FALSE;
+
+    if (IsPcSlot(slot))
+    {
+        u8 boxPos = GetPcSlotBoxPosition(slot);
+        if (boxPos != 0xFF
+            && GetBoxMonData(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], MON_DATA_IS_EGG))
+        {
+            gSpecialVar_Result = TRUE;
+        }
+    }
+    else if (slot < gPlayerPartyCount
+             && GetMonData(&gPlayerParty[slot], MON_DATA_IS_EGG))
+    {
         gSpecialVar_Result = TRUE;
-    else
-        gSpecialVar_Result = FALSE;
+    }
 }
 
 void IsLastMonThatKnowsSurf(void)
