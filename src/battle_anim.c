@@ -439,6 +439,7 @@ void LaunchBattleAnimation(u32 animType, u32 animId)
         switch (animId)
         {
         case MOVE_LUNGE:
+        case MOVE_FLAME_CHARGE:
         case MOVE_SMOG:
         case MOVE_BULLET_SEED:
         case MOVE_ICICLE_SPEAR:
