@@ -5623,13 +5623,13 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
         .name = COMPOUND_STRING("Milk Drink"),
         .description = COMPOUND_STRING(
             "Recovers up to half the\n"
-            "user's maximum HP."),
+            "target's maximum HP."),
         .effect = EFFECT_SOFTBOILED,
         .power = 0,
         .type = TYPE_NORMAL,
         .accuracy = 0,
         .pp = 1,
-        .target = MOVE_TARGET_USER,
+        .target = MOVE_TARGET_USER | MOVE_TARGET_ALLY,
         .priority = 0,
         .category = DAMAGE_CATEGORY_STATUS,
         .zMove = { .effect = Z_EFFECT_RESET_STATS },
