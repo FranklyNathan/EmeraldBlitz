@@ -71771,6 +71771,7 @@
     ],
     "PreEvoMoves": [],
     "TMMoves": [
+      "MOVE_BULK_UP",
       "MOVE_TAKE_DOWN",
       "MOVE_CHARM",
       "MOVE_FAKE_TEARS",

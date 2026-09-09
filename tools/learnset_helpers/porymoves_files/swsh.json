@@ -73653,6 +73653,7 @@
       "MOVE_RAIN_DANCE",
       "MOVE_SUNNY_DAY",
       "MOVE_FACADE",
+      "MOVE_BULK_UP",
       "MOVE_U_TURN",
       "MOVE_PAYBACK",
       "MOVE_ASSURANCE",
@@ -73913,6 +73914,7 @@
     ],
     "PreEvoMoves": [],
     "TMMoves": [
+      "MOVE_AERIAL_ACE",
       "MOVE_SOLAR_BLADE",
       "MOVE_REST",
       "MOVE_SNORE",
@@ -79763,6 +79765,7 @@
     ],
     "PreEvoMoves": [],
     "TMMoves": [
+      "MOVE_AERIAL_ACE",
       "MOVE_SOLAR_BLADE",
       "MOVE_REST",
       "MOVE_SNORE",

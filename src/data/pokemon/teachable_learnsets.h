@@ -3132,6 +3132,7 @@ static const u16 sFarfetchdTeachableLearnset[] = {
 
 #if P_GALARIAN_FORMS
 static const u16 sFarfetchdGalarTeachableLearnset[] = {
+    MOVE_AERIAL_ACE,
     MOVE_BRICK_BREAK,
     MOVE_DOUBLE_EDGE,
     MOVE_DUAL_WINGBEAT,
@@ -3147,6 +3148,7 @@ static const u16 sFarfetchdGalarTeachableLearnset[] = {
 };
 
 static const u16 sSirfetchdTeachableLearnset[] = {
+    MOVE_AERIAL_ACE,
     MOVE_BRICK_BREAK,
     MOVE_DOUBLE_EDGE,
     MOVE_DUAL_WINGBEAT,

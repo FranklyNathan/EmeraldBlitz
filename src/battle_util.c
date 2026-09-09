@@ -5972,6 +5972,9 @@ u32 IsAbilityOnFieldExcept(u32 battler, enum Ability ability)
 
 u32 IsAbilityPreventingEscape(u32 battler)
 {
+    if (GetBattlerAbility(battler) == ABILITY_RUN_AWAY) // Run Away ignores trapping abilities
+        return 0;
+
     if (B_GHOSTS_ESCAPE >= GEN_6 && IS_BATTLER_OF_TYPE(battler, TYPE_GHOST))
         return 0;
 
@@ -5996,10 +5999,12 @@ u32 IsAbilityPreventingEscape(u32 battler)
     return 0;
 }
 
-bool32 CanBattlerEscape(u32 battler) // no ability check
+bool32 CanBattlerEscape(u32 battler) // doesn't check opposing abilities (e.g. Shadow Tag)
 {
     if (gBattleStruct->battlerState[battler].commanderSpecies != SPECIES_NONE)
         return FALSE;
+    else if (GetBattlerAbility(battler) == ABILITY_RUN_AWAY) // Run Away ignores trapping effects
+        return TRUE;
     else if (B_GHOSTS_ESCAPE >= GEN_6 && IS_BATTLER_OF_TYPE(battler, TYPE_GHOST))
         return TRUE;
     else if (gBattleMons[battler].volatiles.escapePrevention)

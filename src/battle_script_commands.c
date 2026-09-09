@@ -1132,7 +1132,7 @@ bool32 EmergencyExitCanBeTriggered(u32 battler)
 {
     enum Ability ability = GetBattlerAbility(battler);
 
-    if (ability != ABILITY_EMERGENCY_EXIT && ability != ABILITY_WIMP_OUT  && ability != ABILITY_RUN_AWAY)
+    if (ability != ABILITY_EMERGENCY_EXIT && ability != ABILITY_WIMP_OUT)
         return FALSE;
 
     if (IsBattlerAlive(battler)
