@@ -114,6 +114,7 @@ static void SetDefaultOptions(void)
     gSaveBlock2Ptr->optionsBattleSceneOff = FALSE;
     gSaveBlock2Ptr->regionMapZoom = FALSE;
     gSaveBlock2Ptr->optionsShuppetGuides = OPTIONS_SHUPPET_GUIDES_ON;
+    gSaveBlock2Ptr->optionsAutoHeal = OPTIONS_AUTO_HEAL_ON;
 }
 
 static void ClearPokedexFlags(void)

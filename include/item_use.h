@@ -41,6 +41,7 @@ void ItemUseOutOfBattle_Fusion(u8 taskId);
 void ItemUseOutOfBattle_Honey(u8 taskId);
 void ItemUseOutOfBattle_MedKit(u8 taskId);
 void ItemUseOutOfBattle_MedKitFullHeal(u8 taskId);
+bool8 MedKitSemiHealParty(void);
 void ItemUseOutOfBattle_PortablePC(u8 taskId);
 void ItemUseOutOfBattle_CannotUse(u8 taskId);
 void ItemUseOutOfBattle_ExpShare(u8 taskId);

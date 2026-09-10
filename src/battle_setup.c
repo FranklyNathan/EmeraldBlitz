@@ -5,6 +5,7 @@
 #include "battle_tower.h"
 #include "battle_transition.h"
 #include "battle_script_commands.h"
+#include "item_use.h"
 #include "main.h"
 #include "task.h"
 #include "safari_zone.h"
@@ -273,6 +274,8 @@ static void CreateBattleStartTask(enum BattleTransition transition, u16 song)
     u8 taskId = CreateTask(Task_BattleStart, 1);
 
     gTasks[taskId].tTransition = transition;
+    if (gSaveBlock2Ptr->optionsAutoHeal == OPTIONS_AUTO_HEAL_ON)
+        MedKitSemiHealParty();
     PlayMapChosenOrBattleBGM(song);
 }
 

@@ -31,6 +31,7 @@
 #include "io_reg.h"
 #include "item.h"
 #include "item_icon.h"
+#include "item_use.h"
 #include "link.h"
 #include "link_rfu.h"
 #include "load_save.h"
@@ -950,6 +951,36 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
     }
 }
 
+static bool8 IsCurrentMapGym(void)
+{
+    static const struct {
+        u8 mapGroup;
+        u8 mapNum;
+    } sGymMaps[] = {
+        {MAP_GROUP(MAP_RUSTBORO_CITY_GYM),             MAP_NUM(MAP_RUSTBORO_CITY_GYM)},
+        {MAP_GROUP(MAP_RUSTBORO_CITY_GYM_VIOLA_EDITION), MAP_NUM(MAP_RUSTBORO_CITY_GYM_VIOLA_EDITION)},
+        {MAP_GROUP(MAP_DEWFORD_TOWN_GYM),              MAP_NUM(MAP_DEWFORD_TOWN_GYM)},
+        {MAP_GROUP(MAP_MAUVILLE_CITY_GYM),             MAP_NUM(MAP_MAUVILLE_CITY_GYM)},
+        {MAP_GROUP(MAP_LAVARIDGE_TOWN_GYM_1F),         MAP_NUM(MAP_LAVARIDGE_TOWN_GYM_1F)},
+        {MAP_GROUP(MAP_LAVARIDGE_TOWN_GYM_B1F),        MAP_NUM(MAP_LAVARIDGE_TOWN_GYM_B1F)},
+        {MAP_GROUP(MAP_PETALBURG_CITY_GYM),            MAP_NUM(MAP_PETALBURG_CITY_GYM)},
+        {MAP_GROUP(MAP_FORTREE_CITY_GYM),              MAP_NUM(MAP_FORTREE_CITY_GYM)},
+        {MAP_GROUP(MAP_MOSSDEEP_CITY_GYM),             MAP_NUM(MAP_MOSSDEEP_CITY_GYM)},
+        {MAP_GROUP(MAP_SOOTOPOLIS_CITY_GYM_1F),        MAP_NUM(MAP_SOOTOPOLIS_CITY_GYM_1F)},
+        {MAP_GROUP(MAP_SOOTOPOLIS_CITY_GYM_B1F),       MAP_NUM(MAP_SOOTOPOLIS_CITY_GYM_B1F)},
+    };
+    u32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sGymMaps); i++)
+    {
+        if (gSaveBlock1Ptr->location.mapGroup == sGymMaps[i].mapGroup
+         && gSaveBlock1Ptr->location.mapNum == sGymMaps[i].mapNum)
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
 static void LoadMapFromWarp(bool32 a1)
 {
     bool8 isOutdoors;
@@ -993,6 +1024,8 @@ static void LoadMapFromWarp(bool32 a1)
     SetDefaultFlashLevel();
     Overworld_ClearSavedMusic();
     RunOnTransitionMapScript();
+    if (gSaveBlock2Ptr->optionsAutoHeal == OPTIONS_AUTO_HEAL_ON && IsCurrentMapGym())
+        MedKitSemiHealParty();
     UpdateLocationHistoryForRoamer();
     MoveAllRoamersToOtherLocationSets();
     gChainFishingDexNavStreak = 0;

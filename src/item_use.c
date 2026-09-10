@@ -1528,7 +1528,7 @@ void ItemUseOutOfBattle_Honey(u8 taskId)
     Task_FadeAndCloseBagMenu(taskId);
 }
 
-void ItemUseOutOfBattle_MedKit(u8 taskId)
+bool8 MedKitSemiHealParty(void)
 {
     u32 i;
     bool8 canRestore = FALSE;
@@ -1565,9 +1565,6 @@ void ItemUseOutOfBattle_MedKit(u8 taskId)
 
     if (canRestore)
     {
-        gSpecialVar_Result = 1;
-        gSpecialVar_Result = TRUE;
-        PlaySE(SE_USE_ITEM);
         for (i = 0; i < gPlayerPartyCount; i++)
         {
             u16 maxHp;
@@ -1579,6 +1576,19 @@ void ItemUseOutOfBattle_MedKit(u8 taskId)
                 MonRestorePP(&gPlayerParty[i]);
             }
         }
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+void ItemUseOutOfBattle_MedKit(u8 taskId)
+{
+    if (MedKitSemiHealParty())
+    {
+        gSpecialVar_Result = 1;
+        gSpecialVar_Result = TRUE;
+        PlaySE(SE_USE_ITEM);
         if (!gTasks[taskId].tUsingRegisteredKeyItem) // tUsingRegisteredKeyItem is set in item_menu.c
             DisplayItemMessage(taskId, FONT_NORMAL, gText_MonsHealed, CloseItemMessage);
         else
