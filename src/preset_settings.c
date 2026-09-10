@@ -2,6 +2,8 @@
 #include "preset_settings.h"
 #include "event_data.h"
 #include "string_util.h"
+#include "random.h"
+#include "text_window.h"
 
 // Presets are applied when a new game is created.
 // To add a preset, just append a new entry below. The name is matched
@@ -92,6 +94,13 @@ const struct PlayerNamePreset gPlayerNamePresets[] =
         .windowFrameType = PRESET_FRAME(40),
         .playerPalette = PRESET_PALETTE_PINK,
     },
+    {
+        .name = _("Thanh$"),
+        .shuppetGuides = OPTIONS_SHUPPET_GUIDES_ON,
+        .flygonDust = 0, // Off
+        .windowFrameType = PRESET_FRAME_RANDOM,
+        .playerPalette = PRESET_PALETTE_RANDOM,
+    },
 };
 
 static const struct PlayerNamePreset *FindPlayerNamePreset(const u8 *playerName)
@@ -121,6 +130,14 @@ void ApplyPlayerNamePresetSettings(void)
 
     gSaveBlock2Ptr->optionsShuppetGuides = preset->shuppetGuides;
     gSaveBlock2Ptr->optionsBattleStyle = preset->flygonDust;
-    gSaveBlock2Ptr->optionsWindowFrameType = preset->windowFrameType;
-    VarSet(VAR_PLAYER_PALETTE_CHOICE, preset->playerPalette);
+
+    if (preset->windowFrameType == PRESET_FRAME_RANDOM)
+        gSaveBlock2Ptr->optionsWindowFrameType = RandomUniform(RNG_NONE, 0, WINDOW_FRAMES_COUNT - 1);
+    else
+        gSaveBlock2Ptr->optionsWindowFrameType = preset->windowFrameType;
+
+    if (preset->playerPalette == PRESET_PALETTE_RANDOM)
+        VarSet(VAR_PLAYER_PALETTE_CHOICE, RandomUniform(RNG_NONE, 0, PRESET_PALETTE_SKY_BLUE));
+    else
+        VarSet(VAR_PLAYER_PALETTE_CHOICE, preset->playerPalette);
 }

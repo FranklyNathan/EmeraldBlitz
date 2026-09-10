@@ -6,6 +6,10 @@
 // The frame number shown in the Options menu is 1-based ("TYPE 1" - "TYPE 40").
 #define PRESET_FRAME(displayNumber) ((displayNumber) - 1)
 
+// Sentinel values that resolve to a random choice at new-game time.
+#define PRESET_FRAME_RANDOM    0xFF
+#define PRESET_PALETTE_RANDOM  0xFF
+
 #define PRESET_PALETTE_DEFAULT      0
 #define PRESET_PALETTE_BLUE         1
 #define PRESET_PALETTE_YELLOW       2
@@ -23,8 +27,8 @@ struct PlayerNamePreset
     const u8 name[PLAYER_NAME_LENGTH + 1]; // Matched case-insensitively against the player's name.
     u8 shuppetGuides;                      // OPTIONS_SHUPPET_GUIDES_[OFF/ON]
     u8 flygonDust;                         // 0 = off, 1 = on (stored in optionsBattleStyle)
-    u8 windowFrameType;                    // 0-based; use PRESET_FRAME() with the in-menu number
-    u8 playerPalette;                      // VAR_PLAYER_PALETTE_CHOICE; use PRESET_PALETTE_*
+    u8 windowFrameType;                    // 0-based; use PRESET_FRAME() with the in-menu number, or PRESET_FRAME_RANDOM
+    u8 playerPalette;                      // VAR_PLAYER_PALETTE_CHOICE; use PRESET_PALETTE_*, or PRESET_PALETTE_RANDOM
 };
 
 extern const struct PlayerNamePreset gPlayerNamePresets[];
