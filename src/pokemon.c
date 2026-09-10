@@ -745,7 +745,7 @@ const u8 gStatStageRatios[MAX_STAT_STAGE + 1][2] =
     {10, 20}, // -2
     {10, 15}, // -1
     {10, 10}, //  0, DEFAULT_STAT_STAGE
-    {15, 10}, // +1, New MAX_STAT_STAGE
+    {15, 10}, // +1, MAX_STAT_STAGE
 };
 
 // The classes used by other players in the Union Room.

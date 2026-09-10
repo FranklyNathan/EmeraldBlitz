@@ -10187,6 +10187,22 @@ static void ObjectEventUpdateSubpriority(struct ObjectEvent *objEvent, struct Sp
     if (objEvent->fixedPriority)
         return;
 
+    // While jumping (e.g. the player hopping over a smashable rock or cut tree on
+    // their bike), an object event is airborne, so draw it in front of whatever it
+    // passes over instead of relying on tile y ordering.
+    if (!objEvent->heldMovementFinished)
+    {
+        switch (objEvent->movementActionId)
+        {
+        case MOVEMENT_ACTION_JUMP_2_DOWN:
+        case MOVEMENT_ACTION_JUMP_2_UP:
+        case MOVEMENT_ACTION_JUMP_2_LEFT:
+        case MOVEMENT_ACTION_JUMP_2_RIGHT:
+            sprite->subpriority = 0;
+            return;
+        }
+    }
+
     // If transitioning between elevations, use the player's elevation
     if (!objEvent->currentElevation && (objEvent->localId == OBJ_EVENT_ID_FOLLOWER || objEvent->localId == OBJ_EVENT_ID_NPC_FOLLOWER))
         objEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
