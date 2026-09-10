@@ -1025,7 +1025,10 @@ static void LoadMapFromWarp(bool32 a1)
     Overworld_ClearSavedMusic();
     RunOnTransitionMapScript();
     if (gSaveBlock2Ptr->optionsAutoHeal == OPTIONS_AUTO_HEAL_ON && IsCurrentMapGym())
+    {
         MedKitSemiHealParty();
+        MedKitSemiHealBox1();
+    }
     UpdateLocationHistoryForRoamer();
     MoveAllRoamersToOtherLocationSets();
     gChainFishingDexNavStreak = 0;

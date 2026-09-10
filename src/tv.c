@@ -3347,10 +3347,7 @@ u8 CheckForPlayersHouseNews(void)
     if (FlagGet(FLAG_SYS_TV_LATIAS_LATIOS) == TRUE)
         return PLAYERS_HOUSE_TV_LATI;
 
-    if (FlagGet(FLAG_SYS_TV_HOME) == TRUE)
-        return PLAYERS_HOUSE_TV_MOVIE;
-
-    return PLAYERS_HOUSE_TV_LATI;
+    return PLAYERS_HOUSE_TV_MOVIE;
 }
 
 void GetMomOrDadStringForTVMessage(void)

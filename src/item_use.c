@@ -37,6 +37,7 @@
 #include "party_menu.h"
 #include "pokeblock.h"
 #include "pokemon.h"
+#include "pokemon_storage_system.h"
 #include "script.h"
 #include "sound.h"
 #include "strings.h"
@@ -1574,6 +1575,62 @@ bool8 MedKitSemiHealParty(void)
                 maxHp = GetMonData(&gPlayerParty[i], MON_DATA_MAX_HP);
                 SetMonData(&gPlayerParty[i], MON_DATA_HP, &maxHp);
                 MonRestorePP(&gPlayerParty[i]);
+            }
+        }
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+bool8 MedKitSemiHealBox1(void)
+{
+    const u32 box = 0;
+    u32 i;
+    bool8 canRestore = FALSE;
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_SANITY_HAS_SPECIES)
+         && GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_IS_EGG) == FALSE
+         && GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_HP) != 0)
+        {
+            u16 hp = GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_HP);
+            u16 maxHp = GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_MAX_HP);
+            if (hp < maxHp)
+            {
+                canRestore = TRUE;
+                break;
+            }
+
+            u32 j;
+            for (j = 0; j < MAX_MON_MOVES; j++)
+            {
+                u16 move = GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_MOVE1 + j);
+                u16 pp = GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_PP1 + j);
+                u16 maxPP = CalculatePPWithBonus(move, GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_PP_BONUSES), j);
+                if (move != MOVE_NONE && pp < maxPP)
+                {
+                    canRestore = TRUE;
+                    break;
+                }
+            }
+            if (canRestore)
+                break;
+        }
+    }
+
+    if (canRestore)
+    {
+        for (i = 0; i < IN_BOX_COUNT; i++)
+        {
+            u16 hpLost = 0;
+            if (GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_SANITY_HAS_SPECIES)
+             && GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_IS_EGG) == FALSE
+             && GetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_HP) != 0)
+            {
+                SetBoxMonData(&gPokemonStoragePtr->boxes[box][i], MON_DATA_HP_LOST, &hpLost);
+                BoxMonRestorePP(&gPokemonStoragePtr->boxes[box][i]);
             }
         }
         return TRUE;
