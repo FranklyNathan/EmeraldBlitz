@@ -981,6 +981,30 @@ static bool8 IsCurrentMapGym(void)
     return FALSE;
 }
 
+static bool8 IsCurrentMapEverGrandeHallway(void)
+{
+    static const struct {
+        u8 mapGroup;
+        u8 mapNum;
+    } sEverGrandeHallways[] = {
+        {MAP_GROUP(MAP_EVER_GRANDE_CITY_HALL1), MAP_NUM(MAP_EVER_GRANDE_CITY_HALL1)},
+        {MAP_GROUP(MAP_EVER_GRANDE_CITY_HALL2), MAP_NUM(MAP_EVER_GRANDE_CITY_HALL2)},
+        {MAP_GROUP(MAP_EVER_GRANDE_CITY_HALL3), MAP_NUM(MAP_EVER_GRANDE_CITY_HALL3)},
+        {MAP_GROUP(MAP_EVER_GRANDE_CITY_HALL4), MAP_NUM(MAP_EVER_GRANDE_CITY_HALL4)},
+        {MAP_GROUP(MAP_EVER_GRANDE_CITY_HALL5), MAP_NUM(MAP_EVER_GRANDE_CITY_HALL5)},
+    };
+    u32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sEverGrandeHallways); i++)
+    {
+        if (gSaveBlock1Ptr->location.mapGroup == sEverGrandeHallways[i].mapGroup
+         && gSaveBlock1Ptr->location.mapNum == sEverGrandeHallways[i].mapNum)
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
 static void LoadMapFromWarp(bool32 a1)
 {
     bool8 isOutdoors;
@@ -1000,7 +1024,7 @@ static void LoadMapFromWarp(bool32 a1)
     isOutdoors = IsMapTypeOutdoors(gMapHeader.mapType);
     isIndoors = IsMapTypeIndoors(gMapHeader.mapType);
 
-    CheckLeftFriendsSecretBase();
+    // CheckLeftFriendsSecretBase();
     TrySetMapSaveWarpStatus();
     ClearTempFieldEventData();
     ResetDexNavSearch();
@@ -1029,9 +1053,13 @@ static void LoadMapFromWarp(bool32 a1)
         MedKitSemiHealParty();
         MedKitSemiHealBox1();
     }
+    if (gSaveBlock2Ptr->optionsAutoHeal == OPTIONS_AUTO_HEAL_ON && IsCurrentMapEverGrandeHallway())
+    {
+        MedKitSemiHealParty();
+    }
     UpdateLocationHistoryForRoamer();
     MoveAllRoamersToOtherLocationSets();
-    gChainFishingDexNavStreak = 0;
+    //gChainFishingDexNavStreak = 0;
     if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)
         InitBattlePyramidMap(FALSE);
     else if (InTrainerHill())
