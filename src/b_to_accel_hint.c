@@ -12,7 +12,7 @@
 #define B_TO_ACCEL_HINT_X_0        (-32)
 #define B_TO_ACCEL_HINT_X_F        16
 #define B_TO_ACCEL_HINT_Y          92
-#define B_TO_ACCEL_HINT_HOLD_TIME  180
+#define B_TO_ACCEL_HINT_HOLD_TIME  100
 
 #define sHide  data[0]
 #define sTimer data[1]

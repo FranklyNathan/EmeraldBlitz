@@ -21,6 +21,8 @@
 #define PRESET_PALETTE_PERIWINKLE   8
 #define PRESET_PALETTE_FOREST       9
 #define PRESET_PALETTE_SKY_BLUE     10
+#define PRESET_PALETTE_RED          11
+#define PRESET_PALETTE_BLACK        12
 
 struct PlayerNamePreset
 {

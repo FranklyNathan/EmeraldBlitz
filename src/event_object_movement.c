@@ -563,6 +563,14 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_MaySkyBlue,            OBJ_EVENT_PAL_TAG_MAY_SKYBLUE},
     {gObjectEventPal_FlygonBikeSkyBlue,     OBJ_EVENT_PAL_TAG_FLYGON_BIKE_SKYBLUE},
     {gObjectEventPal_FlygonBike_MaySkyBlue, OBJ_EVENT_PAL_TAG_FLYGON_BIKE_MAY_SKYBLUE},
+    {gObjectEventPal_BrendanRed,            OBJ_EVENT_PAL_TAG_BRENDAN_RED},
+    {gObjectEventPal_MayRed,                OBJ_EVENT_PAL_TAG_MAY_RED},
+    {gObjectEventPal_FlygonBikeRed,         OBJ_EVENT_PAL_TAG_FLYGON_BIKE_RED},
+    {gObjectEventPal_FlygonBike_MayRed,     OBJ_EVENT_PAL_TAG_FLYGON_BIKE_MAY_RED},
+    {gObjectEventPal_BrendanBlack,          OBJ_EVENT_PAL_TAG_BRENDAN_BLACK},
+    {gObjectEventPal_MayBlack,              OBJ_EVENT_PAL_TAG_MAY_BLACK},
+    {gObjectEventPal_FlygonBikeBlack,       OBJ_EVENT_PAL_TAG_FLYGON_BIKE_BLACK},
+    {gObjectEventPal_FlygonBike_MayBlack,   OBJ_EVENT_PAL_TAG_FLYGON_BIKE_MAY_BLACK},
     {gObjectEventPal_Viola,                 OBJ_EVENT_PAL_TAG_VIOLA},
     {gObjectEventPal_RedLeaf,               OBJ_EVENT_PAL_TAG_RED_LEAF},
     {gObjectEventPal_Deoxys,                OBJ_EVENT_PAL_TAG_DEOXYS},
@@ -3267,6 +3275,12 @@ static u16 GetPlayerPaletteTag(u8 gender)
                 case 10:
                     paletteTag = OBJ_EVENT_PAL_TAG_BRENDAN_SKYBLUE;
                     break;
+                case 11:
+                    paletteTag = OBJ_EVENT_PAL_TAG_BRENDAN_RED;
+                    break;
+                case 12:
+                    paletteTag = OBJ_EVENT_PAL_TAG_BRENDAN_BLACK;
+                    break;
                 default:
                     paletteTag = OBJ_EVENT_PAL_TAG_BRENDAN;
                     break;
@@ -3304,6 +3318,12 @@ static u16 GetPlayerPaletteTag(u8 gender)
                     break;
                 case 10:
                     paletteTag = OBJ_EVENT_PAL_TAG_MAY_SKYBLUE;
+                    break;
+                case 11:
+                    paletteTag = OBJ_EVENT_PAL_TAG_MAY_RED;
+                    break;
+                case 12:
+                    paletteTag = OBJ_EVENT_PAL_TAG_MAY_BLACK;
                     break;
                 default:
                     paletteTag = OBJ_EVENT_PAL_TAG_MAY;
@@ -3372,6 +3392,12 @@ u8 LoadPlayerBikePalette(u8 gender)
                 case 10:
                     paletteTag = OBJ_EVENT_PAL_TAG_FLYGON_BIKE_SKYBLUE;
                     break;
+                case 11:
+                    paletteTag = OBJ_EVENT_PAL_TAG_FLYGON_BIKE_RED;
+                    break;
+                case 12:
+                    paletteTag = OBJ_EVENT_PAL_TAG_FLYGON_BIKE_BLACK;
+                    break;
                 default:
                     paletteTag = OBJ_EVENT_PAL_TAG_FLYGON_BIKE;
                     break;
@@ -3409,6 +3435,12 @@ u8 LoadPlayerBikePalette(u8 gender)
                     break;
                 case 10:
                     paletteTag = OBJ_EVENT_PAL_TAG_FLYGON_BIKE_MAY_SKYBLUE;
+                    break;
+                case 11:
+                    paletteTag = OBJ_EVENT_PAL_TAG_FLYGON_BIKE_MAY_RED;
+                    break;
+                case 12:
+                    paletteTag = OBJ_EVENT_PAL_TAG_FLYGON_BIKE_MAY_BLACK;
                     break;
                 default:
                     paletteTag = OBJ_EVENT_PAL_TAG_FLYGON_BIKE_MAY;
@@ -11907,6 +11939,12 @@ void UpdatePlayerPalette(void)
                 case 10:
                     paletteTag = OBJ_EVENT_PAL_TAG_BRENDAN_SKYBLUE;
                     break;
+                case 11:
+                    paletteTag = OBJ_EVENT_PAL_TAG_BRENDAN_RED;
+                    break;
+                case 12:
+                    paletteTag = OBJ_EVENT_PAL_TAG_BRENDAN_BLACK;
+                    break;
                 default:
                     paletteTag = OBJ_EVENT_PAL_TAG_BRENDAN;
                     break;
@@ -11944,6 +11982,12 @@ void UpdatePlayerPalette(void)
                     break;
                 case 10:
                     paletteTag = OBJ_EVENT_PAL_TAG_MAY_SKYBLUE;
+                    break;
+                case 11:
+                    paletteTag = OBJ_EVENT_PAL_TAG_MAY_RED;
+                    break;
+                case 12:
+                    paletteTag = OBJ_EVENT_PAL_TAG_MAY_BLACK;
                     break;
                 default:
                     paletteTag = OBJ_EVENT_PAL_TAG_MAY;

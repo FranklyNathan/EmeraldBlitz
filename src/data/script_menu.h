@@ -83,6 +83,8 @@ static const struct MenuAction MultichoiceList_PaletteChoice[] =
     {COMPOUND_STRING("Blue")},
     {COMPOUND_STRING("Forest")},
     {COMPOUND_STRING("Sky")},
+    {COMPOUND_STRING("Red")},
+    {COMPOUND_STRING("Black")},
 };
 
 static const struct MenuAction MultichoiceList_StatusInfo[] =

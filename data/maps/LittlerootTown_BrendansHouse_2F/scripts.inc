@@ -293,6 +293,8 @@ PlayersHouse_2F_EventScript_ShowPaletteMenu::
 	case 8, PlayersHouse_2F_EventScript_SelectPeriwinklePalette
 	case 9, PlayersHouse_2F_EventScript_SelectForestPalette
 	case 10, PlayersHouse_2F_EventScript_SelectSkyBluePalette
+	case 11, PlayersHouse_2F_EventScript_SelectRedPalette
+	case 12, PlayersHouse_2F_EventScript_SelectBlackPalette
 	return
 
 PlayersHouse_2F_EventScript_SelectDefaultPalette::
@@ -348,6 +350,16 @@ PlayersHouse_2F_EventScript_SelectForestPalette::
 PlayersHouse_2F_EventScript_SelectSkyBluePalette::
 	setvar VAR_PLAYER_PALETTE_CHOICE, 10
 	msgbox LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedSkyBlue, MSGBOX_DEFAULT
+	return
+
+PlayersHouse_2F_EventScript_SelectRedPalette::
+	setvar VAR_PLAYER_PALETTE_CHOICE, 11
+	msgbox LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedRed, MSGBOX_DEFAULT
+	return
+
+PlayersHouse_2F_EventScript_SelectBlackPalette::
+	setvar VAR_PLAYER_PALETTE_CHOICE, 12
+	msgbox LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedBlack, MSGBOX_DEFAULT
 	return
 
 PlayersHouse_2F_EventScript_PCTurnOn::
@@ -504,6 +516,12 @@ LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedForest:
 
 LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedSkyBlue:
 	.string "Palette set to Sky.$"
+
+LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedRed:
+	.string "Palette set to Red.$"
+
+LittlerootTown_BrendansHouse_2F_Text_PaletteSelectedBlack:
+	.string "Palette set to Black.$"
 
 LittlerootTown_BrendansHouse_2F_Text_MailBoxIntro:
 	.string "{PLAYER} peered into the box.\n"

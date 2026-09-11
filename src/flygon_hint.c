@@ -13,7 +13,7 @@
 #define L_FLY_HINT_X_0        (-32)
 #define L_FLY_HINT_X_F        16
 #define L_FLY_HINT_Y          92
-#define L_FLY_HINT_HOLD_TIME  180
+#define L_FLY_HINT_HOLD_TIME  100
 
 #define sHide  data[0]
 #define sTimer data[1]

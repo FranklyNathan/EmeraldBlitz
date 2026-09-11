@@ -137,7 +137,7 @@ void ApplyPlayerNamePresetSettings(void)
         gSaveBlock2Ptr->optionsWindowFrameType = preset->windowFrameType;
 
     if (preset->playerPalette == PRESET_PALETTE_RANDOM)
-        VarSet(VAR_PLAYER_PALETTE_CHOICE, RandomUniform(RNG_NONE, 0, PRESET_PALETTE_SKY_BLUE));
+        VarSet(VAR_PLAYER_PALETTE_CHOICE, RandomUniform(RNG_NONE, 0, PRESET_PALETTE_BLACK));
     else
         VarSet(VAR_PLAYER_PALETTE_CHOICE, preset->playerPalette);
 }
