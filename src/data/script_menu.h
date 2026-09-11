@@ -827,7 +827,6 @@ static const struct MenuAction MultichoiceList_MailSelect[] =
 {
     {COMPOUND_STRING("Welcome to Blitz!")},
     {COMPOUND_STRING("Select Shortcuts")},
-    {COMPOUND_STRING("Flygon Controls")},
     {COMPOUND_STRING("Pro Letter")},
     {gText_Exit},
 };

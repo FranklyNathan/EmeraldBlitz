@@ -7,6 +7,8 @@
 #include "event_scripts.h"
 #include "fieldmap.h"
 #include "field_specials.h"
+#include "b_to_accel_hint.h"
+#include "flygon_hint.h"
 #include "metatile_behavior.h"
 #include "oras_dowse.h"
 #include "overworld.h"
@@ -1086,6 +1088,8 @@ void GetOnOffBike(u8 transitionFlags)
 {
     if (gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
     {
+        TryToHideLFlyHint();
+        TryToHideBToAccelHint();
         SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_ON_FOOT);
         Overworld_ClearSavedMusic();
         Overworld_PlaySpecialMapMusic();
@@ -1094,6 +1098,11 @@ void GetOnOffBike(u8 transitionFlags)
     {
         EndORASDowsing();
         SetPlayerAvatarTransitionFlags(transitionFlags);
+        if (transitionFlags == PLAYER_AVATAR_FLAG_ACRO_BIKE)
+        {
+            TryToShowLFlyHint();
+            TryToShowBToAccelHint();
+        }
         Overworld_SetSavedMusic(MUS_CYCLING);
         Overworld_ChangeMusicTo(MUS_CYCLING);
     }

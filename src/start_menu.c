@@ -14,6 +14,8 @@
 #include "field_specials.h"
 #include "field_weather.h"
 #include "field_screen_effect.h"
+#include "b_to_accel_hint.h"
+#include "flygon_hint.h"
 #include "frontier_pass.h"
 #include "frontier_util.h"
 #include "gpu_regs.h"
@@ -613,6 +615,8 @@ void Task_ShowStartMenu(u8 taskId)
 
 void ShowStartMenu(void)
 {
+    TryToHideLFlyHint();
+    TryToHideBToAccelHint();
     if (!IsOverworldLinkActive())
     {
         FreezeObjectEvents();

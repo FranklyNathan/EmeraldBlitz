@@ -408,8 +408,6 @@ EventScript_MailBoxMenu:
 	compare VAR_RESULT, 1
 	goto_if_eq EventScript_MailBoxReadHarbor
 	compare VAR_RESULT, 2
-	goto_if_eq EventScript_MailBoxReadFab
-	compare VAR_RESULT, 3
 	goto_if_eq EventScript_MailBoxReadPro
 	goto EventScript_MailBoxCancel
 EventScript_MailBoxReadOrange:
@@ -419,11 +417,6 @@ EventScript_MailBoxReadOrange:
 	goto EventScript_MailBoxMenu
 EventScript_MailBoxReadHarbor:
 	setvar VAR_0x8004, ITEM_HARBOR_MAIL
-	special Special_ReadScriptMail
-	waitstate
-	goto EventScript_MailBoxMenu
-EventScript_MailBoxReadFab:
-	setvar VAR_0x8004, ITEM_FAB_MAIL
 	special Special_ReadScriptMail
 	waitstate
 	goto EventScript_MailBoxMenu

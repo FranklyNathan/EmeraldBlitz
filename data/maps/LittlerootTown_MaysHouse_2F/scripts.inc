@@ -430,8 +430,6 @@ LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu:
 	compare VAR_RESULT, 1
 	goto_if_eq LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadHarbor
 	compare VAR_RESULT, 2
-	goto_if_eq LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadFab
-	compare VAR_RESULT, 3
 	goto_if_eq LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadPro
 	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxCancel
 LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadOrange:
@@ -441,11 +439,6 @@ LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadOrange:
 	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu
 LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadHarbor:
 	setvar VAR_0x8004, ITEM_HARBOR_MAIL
-	special Special_ReadScriptMail
-	waitstate
-	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu
-LittlerootTown_MaysHouse_2F_EventScript_MailBoxReadFab:
-	setvar VAR_0x8004, ITEM_FAB_MAIL
 	special Special_ReadScriptMail
 	waitstate
 	goto LittlerootTown_MaysHouse_2F_EventScript_MailBoxMenu

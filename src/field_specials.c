@@ -19,6 +19,8 @@
 #include "field_screen_effect.h"
 #include "field_specials.h"
 #include "field_weather.h"
+#include "b_to_accel_hint.h"
+#include "flygon_hint.h"
 #include "graphics.h"
 #include "international_string_util.h"
 #include "item.h"
@@ -4465,6 +4467,8 @@ void ReleaseObjectEventSpritePalettes(void)
 
 void Special_AcroBikeFly(void)
 {
+    TryToHideLFlyHint();
+    TryToHideBToAccelHint();
     VarSet(VAR_TEMP_2, 1);
     gSkipShowMonAnim = TRUE;
     ScriptContext_Stop();
@@ -4623,7 +4627,6 @@ struct ProLetterEntry
 };
 
 static const u8 sNathan[] = _("Nathan");
-static const u8 sBirch[] = _("Birch");
 
 // Orange Mail: "Welcome to Blitz!"
 static const u8 sOrange_0[] = _("Welcome to Emerald Blitz!");
@@ -4631,11 +4634,6 @@ static const u8 sOrange_1[] = _("For full documentation,");
 static const u8 sOrange_2[] = _("check out emeraldblitz.com");
 static const u8 sOrange_3[] = _("Join the discord for");
 static const u8 sOrange_4[] = _("daily community races!");
-
-// Fab Mail: "Flygon Controls"
-static const u8 sFab_0[] = _("Flygon Controls:");
-static const u8 sFab_1[] = _("Press B to accelerate");
-static const u8 sFab_2[] = _("Press L to Fly");
 
 // Harbor Mail: "Select Shortcuts"
 static const u8 sHarbor_0[] = _("Press Select...");
@@ -4955,14 +4953,6 @@ void Special_ReadScriptMail(void)
         customLines[4] = sOrange_4;
         numLines = 5;
         sender = sNathan;
-        break;
-    case ITEM_FAB_MAIL:
-        sScriptMail.itemId = ITEM_FAB_MAIL;
-        customLines[0] = sFab_0;
-        customLines[1] = sFab_1;
-        customLines[2] = sFab_2;
-        numLines = 3;
-        sender = sBirch;
         break;
     case ITEM_HARBOR_MAIL:
         sScriptMail.itemId = ITEM_HARBOR_MAIL;
