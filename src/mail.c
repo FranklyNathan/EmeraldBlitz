@@ -110,6 +110,9 @@ void Mail_SetCustomSender(const u8 *name)
     sMailRead->playerName[i] = EOS;
 }
 
+static void CB2_StartMailReadFade(void);
+static void CB2_WaitForMailFadeOut(void);
+static void VBlankCB_MailFadeOut(void);
 static void CB2_InitMailRead(void);
 static void BufferMailText(void);
 static void PrintMailText(void);
@@ -528,7 +531,7 @@ void ReadMail(struct Mail *mail, MainCallback exitCallback, bool8 hasText)
     sMailRead->mail = mail;
     sMailRead->exitCallback = exitCallback;
     sMailRead->hasText = hasText;
-    SetMainCallback2(CB2_InitMailRead);
+    SetMainCallback2(CB2_StartMailReadFade);
 }
 
 static bool8 MailReadBuildGraphics(void)
@@ -642,12 +645,14 @@ static bool8 MailReadBuildGraphics(void)
             }
             break;
         case 18:
+            gPaletteFade.bufferTransferDisabled = FALSE;
+            BlendPalettes(PALETTES_ALL, 16, 0);
+            CpuCopy32(gPlttBufferFaded, (void *)PLTT, PLTT_SIZE);
             SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP);
             ShowBg(0);
             ShowBg(1);
             ShowBg(2);
             BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
-            gPaletteFade.bufferTransferDisabled = FALSE;
             sMailRead->callback = CB2_WaitForPaletteExitOnKeyPress;
             return TRUE;
         default:
@@ -655,6 +660,27 @@ static bool8 MailReadBuildGraphics(void)
     }
     gMain.state++;
     return FALSE;
+}
+
+static void CB2_StartMailReadFade(void)
+{
+    gPaletteFade.bufferTransferDisabled = FALSE;
+    SetVBlankCallback(VBlankCB_MailFadeOut);
+    if (BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK))
+        SetMainCallback2(CB2_WaitForMailFadeOut);
+    else
+        SetMainCallback2(CB2_InitMailRead);
+}
+
+static void CB2_WaitForMailFadeOut(void)
+{
+    if (!UpdatePaletteFade())
+        SetMainCallback2(CB2_InitMailRead);
+}
+
+static void VBlankCB_MailFadeOut(void)
+{
+    TransferPlttBuffer();
 }
 
 static void CB2_InitMailRead(void)
