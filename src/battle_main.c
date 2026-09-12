@@ -2004,26 +2004,6 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
             u32 abilityNum = 0;
             u16 species = partyData[monIndex].species;
 
-            if (species == SPECIES_TATSUGIRI)
-            {
-                u16 trainerNum = (firstTrainer) ? TRAINER_BATTLE_PARAM.opponentA : TRAINER_BATTLE_PARAM.opponentB;
-                if (trainerNum >= TRAINER_JUAN_1 && trainerNum <= TRAINER_JUAN_8)
-                {
-                    switch (Random() % 3)
-                    {
-                    case 0:
-                        species = SPECIES_TATSUGIRI;
-                        break;
-                    case 1:
-                        species = SPECIES_TATSUGIRI_DROOPY;
-                        break;
-                    case 2:
-                        species = SPECIES_TATSUGIRI_STRETCHY;
-                        break;
-                    }
-                }
-            }
-
             if (trainer->battleType != TRAINER_BATTLE_TYPE_SINGLES)
                 personalityValue = 0x80;
             else if (trainer->encounterMusic_gender & F_TRAINER_FEMALE)
