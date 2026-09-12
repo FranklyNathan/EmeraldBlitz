@@ -4611,8 +4611,7 @@ static s32 AI_CalcMoveEffectScore(u32 battlerAtk, u32 battlerDef, u32 move, stru
             switch (ShouldPivot(battlerAtk, battlerDef, aiData->abilities[battlerDef], move, movesetIndex))
             {
             case DONT_PIVOT:
-                ADJUST_SCORE(-10);    // technically should go in CheckBadMove, but this is easier/less computationally demanding
-                break;
+                break; // Don't penalize for no switch target, move still does damage
             case CAN_TRY_PIVOT:
                 break;
             case SHOULD_PIVOT:
@@ -4623,7 +4622,7 @@ static s32 AI_CalcMoveEffectScore(u32 battlerAtk, u32 battlerDef, u32 move, stru
         else //Double Battle
         {
             if (CountUsablePartyMons(battlerAtk) == 0)
-                break; // Can't switch
+                break; // Can't switch, but don't penalize the move for damage
 
             //if (switchAbility == ABILITY_INTIMIDATE && PartyHasMoveCategory(battlerDef, DAMAGE_CATEGORY_PHYSICAL))
                 //ADJUST_SCORE(7);
