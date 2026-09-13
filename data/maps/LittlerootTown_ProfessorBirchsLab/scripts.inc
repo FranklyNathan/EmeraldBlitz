@@ -130,6 +130,8 @@ LittlerootTown_ProfessorBirchsLab_EventScript_GiveStarterEvent::
 	clearflag FLAG_RECEIVED_BURMY_BINDER 
 	@ Is Oricorio in the game? If not, set this flag^
 
+	setflag FLAG_SYS_OPPONENT_LEVEL_1
+
 	@ Roxanne Flags
 	setflag FLAG_RETURNED_DEVON_GOODS
 	setflag FLAG_HIDE_RUSTBORO_CITY_DEVON_EMPLOYEE_1

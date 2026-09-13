@@ -818,10 +818,16 @@ static void SpriteCB_BerryBob(struct Sprite *sprite)
     sprite->data[0]++;
     if (sprite->data[0] >= 16)
         sprite->data[0] = 0;
-    if (sprite->data[0] < 8)
-        sprite->y2 = -1;
-    else
-        sprite->y2 = 0;
+    // data[1] is the hover flag (set in SetBerrySlotHover): when set, the berry
+    // rests 2px higher and bobs a 3px range from that raised position.
+    sprite->y2 = -2 * sprite->data[1] - (2 * sprite->data[1] + 1) * (sprite->data[0] < 8);
+}
+
+// Rests the berry 2px higher while its slot is the currently selected (hovered) one.
+static void SetBerrySlotHover(u8 berryIndex, bool8 hovered)
+{
+    if (berryIndex < PARTY_PC_SLOT_COUNT && sBerryItemSpriteIds[berryIndex] != SPRITE_NONE)
+        gSprites[sBerryItemSpriteIds[berryIndex]].data[1] = hovered;
 }
 
 // Object palette RAM only has 16 slots and the party menu uses most of them,
@@ -877,6 +883,8 @@ static void CreateBerrySlotSprites(void)
         sprite->y = sPcSlotSpriteCoords[i][1] + 4;
         sprite->oam.priority = 1;
         sprite->callback = SpriteCB_BerryBob;
+        if (gPartyMenu.slotId == slot)
+            sprite->data[1] = 1;
     }
 }
 
@@ -2017,6 +2025,8 @@ void AnimatePartySlot(u8 slot, u8 animNum)
             gSprites[sPartyMenuBoxes[slot].pokeballSpriteId].oam.paletteNum = IndexOfSpritePaletteTag(pokeballTag);
             if (sPartyMenuBoxes[slot].monSpriteId != SPRITE_NONE)
                 AnimateSelectedPartyIcon(sPartyMenuBoxes[slot].monSpriteId, animNum, TRUE);
+            if (sBerryMode)
+                SetBerrySlotHover(slot - PARTY_PC_SLOT_START, animNum != 0);
             PartyMenuStartSpriteAnim(sPartyMenuBoxes[slot].pokeballSpriteId, animNum);
         }
         return;

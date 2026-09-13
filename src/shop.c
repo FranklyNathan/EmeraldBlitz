@@ -1223,6 +1223,20 @@ void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds)
                 }
             }
         }
+        for (i = 0; i < DAYCARE_MON_COUNT && count < 10; i++)
+        {
+            u16 species = GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_SPECIES);
+            u16 hp = GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_HP);
+            if (species != SPECIES_NONE && hp != 0 && CanLearnTeachableMove(species, move))
+            {
+                u16 x = 16 + (count % 4) * 24;
+                u16 y = 112 + (count / 4) * 24;
+                u32 personality = GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_PERSONALITY);
+                spriteId = CreateMonIcon(species, SpriteCallbackDummy, x, y, 4, personality);
+                spriteIds[count] = spriteId;
+                count++;
+            }
+        }
     }
 }
 
