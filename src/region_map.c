@@ -121,11 +121,24 @@ struct FlyHintEntry
     const u8 *name1;
     const u8 *name2;
     u16 hideIfFlagSet;
+    u16 showIfFlagSet;
 };
 
 static const struct FlyHintEntry sFlyHintEntries[] =
 {
-    {0, 0, 7,  1, 2, gText_FlyHintBerries, NULL, 0},                       // Route 104, top 2 tiles
+    {0, 0, 5,  1, 2, gText_FlyHintFirstGym, NULL, 0},                       // Rustboro City
+    {1, 0, 5,  1, 2, gText_FlyHintSecondGym, NULL, FLAG_GYM_SHUPPET_RUSTBORO}, // Rustboro City
+    {1, 2, 14, 1, 1, gText_FlyHintSecondGym, NULL, FLAG_GYM_SHUPPET_DEWFORD, FLAG_GYM_SHUPPET_RUSTBORO}, // Dewford Town
+    {2, 0, 5,  1, 2, gText_FlyHintThirdGym, NULL, FLAG_GYM_SHUPPET_RUSTBORO}, // Rustboro City
+    {2, 2, 14, 1, 1, gText_FlyHintThirdGym, NULL, FLAG_GYM_SHUPPET_DEWFORD, FLAG_GYM_SHUPPET_RUSTBORO}, // Dewford Town
+    {2, 8, 6,  2, 1, gText_FlyHintThirdGym, NULL, FLAG_GYM_SHUPPET_MAUVILLE, FLAG_GYM_SHUPPET_DEWFORD}, // Mauville City
+    {3, 0, 5,  1, 2, gText_FlyHintFourthGym, NULL, FLAG_GYM_SHUPPET_RUSTBORO}, // Rustboro City
+    {3, 2, 14, 1, 1, gText_FlyHintFourthGym, NULL, FLAG_GYM_SHUPPET_DEWFORD, FLAG_GYM_SHUPPET_RUSTBORO}, // Dewford Town
+    {3, 8, 6,  2, 1, gText_FlyHintFourthGym, NULL, FLAG_GYM_SHUPPET_MAUVILLE, FLAG_GYM_SHUPPET_DEWFORD}, // Mauville City
+    {3, 5, 3,  1, 1, gText_FlyHintFourthGym, NULL, FLAG_GYM_SHUPPET_LAVARIDGE, FLAG_GYM_SHUPPET_MAUVILLE}, // Lavaridge Town
+    {7, 21, 7, 1, 1, gText_FlyHintEighthGym, NULL, FLAG_GYM_SHUPPET_SOOTOPOLIS}, // Sootopolis City
+    {7, 24, 5, 2, 1, gText_FlyHintEighthGym, NULL, FLAG_GYM_SHUPPET_MOSSDEEP, FLAG_GYM_SHUPPET_SOOTOPOLIS}, // Mossdeep City
+    {0, 0, 7,  1, 1, gText_FlyHintBerries, NULL, 0},                       // Route 104, top 2 tiles
     {1, 0, 9,  1, 1, gText_FlyHintBriney, NULL, FLAG_VISITED_DEWFORD_TOWN}, // Route 104, lowermost tile; hides after visiting Dewford
     {1, 6, 6,  2, 1, gText_FlyHintDaycare, NULL, 0},                       // Route 117, two rightmost tiles
     {1, 8, 10, 1, 2, gText_FlyHintItems, NULL, 0},                         // Slateport City
@@ -134,7 +147,7 @@ static const struct FlyHintEntry sFlyHintEntries[] =
     {4, 3, 0,  1, 1, gText_FlyHintRelearner, NULL, 0},                     // Fallarbor Town
     {4, 1, 9,  1, 1, gText_FlyHintFifthGym, NULL, 0},                      // Petalburg City
     {5, 12, 0, 1, 1, gText_FlyHintSixthGym, NULL, 0},                      // Fortree City
-    {6, 0, 7,  1, 2, gText_FlyHintNewBerries, NULL, 0},                    // Route 104, top 2 tiles
+    {6, 0, 7,  1, 1, gText_FlyHintNewBerries, NULL, 0},                    // Route 104, top 2 tiles
     {6, 8, 10, 1, 2, gText_FlyHintMegaStones, gText_FlyHintLinkCable, 0},  // Slateport City
     {6, 24, 5, 2, 1, gText_FlyHintSeventhGym, NULL, 0},                    // Mossdeep City
     {6, 21, 7, 1, 1, gText_FlyHintSeventhGym, NULL, 0},                    // Sootopolis City
@@ -2264,7 +2277,8 @@ static bool8 FlyHintsActiveForCurrentBadgeCount(void)
     for (i = 0; i < ARRAY_COUNT(sFlyHintEntries); i++)
     {
         if (sFlyHintEntries[i].badgeCount == badgeCount
-         && (sFlyHintEntries[i].hideIfFlagSet == 0 || !FlagGet(sFlyHintEntries[i].hideIfFlagSet)))
+         && (sFlyHintEntries[i].hideIfFlagSet == 0 || !FlagGet(sFlyHintEntries[i].hideIfFlagSet))
+         && (sFlyHintEntries[i].showIfFlagSet == 0 || FlagGet(sFlyHintEntries[i].showIfFlagSet)))
             return TRUE;
     }
     return FALSE;
@@ -2285,6 +2299,8 @@ static void BuildFlyHintGlowTilemap(void)
         if (sFlyHintEntries[i].badgeCount != badgeCount)
             continue;
         if (sFlyHintEntries[i].hideIfFlagSet != 0 && FlagGet(sFlyHintEntries[i].hideIfFlagSet))
+            continue;
+        if (sFlyHintEntries[i].showIfFlagSet != 0 && !FlagGet(sFlyHintEntries[i].showIfFlagSet))
             continue;
         for (y = 0; y < sFlyHintEntries[i].height; y++)
         {
@@ -2403,6 +2419,8 @@ static u8 GetHoveredFlyHint(void)
         if (sFlyHintEntries[i].badgeCount != VarGet(VAR_BADGE_COUNT))
             continue;
         if (sFlyHintEntries[i].hideIfFlagSet != 0 && FlagGet(sFlyHintEntries[i].hideIfFlagSet))
+            continue;
+        if (sFlyHintEntries[i].showIfFlagSet != 0 && !FlagGet(sFlyHintEntries[i].showIfFlagSet))
             continue;
         if (x >= sFlyHintEntries[i].x + MAPCURSOR_X_MIN
             && x < sFlyHintEntries[i].x + MAPCURSOR_X_MIN + sFlyHintEntries[i].width
