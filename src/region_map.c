@@ -135,11 +135,11 @@ static const struct FlyHintEntry sFlyHintEntries[] =
     {4, 1, 9,  1, 1, gText_FlyHintFifthGym, NULL, 0},                      // Petalburg City
     {5, 12, 0, 1, 1, gText_FlyHintSixthGym, NULL, 0},                      // Fortree City
     {6, 0, 7,  1, 2, gText_FlyHintNewBerries, NULL, 0},                    // Route 104, top 2 tiles
-    {6, 8, 10, 1, 2, gText_FlyHintLinkCable, gText_FlyHintMegaStones, 0},  // Slateport City
+    {6, 8, 10, 1, 2, gText_FlyHintMegaStones, gText_FlyHintLinkCable, 0},  // Slateport City
     {6, 24, 5, 2, 1, gText_FlyHintSeventhGym, NULL, 0},                    // Mossdeep City
     {6, 21, 7, 1, 1, gText_FlyHintSeventhGym, NULL, 0},                    // Sootopolis City
     {8, 3, 0,  1, 1, gText_FlyHintRelearnerPlus, NULL, 0},                 // Fallarbor Town
-    {8, 21, 7, 1, 1, gText_FlyHintMegaStones, NULL, 0},                    // Sootopolis City
+    {8, 8, 10, 1, 2, gText_FlyHintMegaStones, NULL, 0},                    // Sootopolis City
     {8, 27, 8, 1, 2, gText_FlyHintEliteFour, NULL, 0},                     // Ever Grande City
 };
 
@@ -2490,8 +2490,7 @@ static void UpdateFlyHints(void)
     }
     else if (sFlyHintEntries[hoverEntry].name2 != NULL)
     {
-        // Paired hints alternate every 3 seconds while hovered
-        if (++sHoverFrames >= 180)
+        if (++sHoverFrames >= 100)
         {
             sHoverFrames = 0;
             sAlternateIndex ^= 1;
