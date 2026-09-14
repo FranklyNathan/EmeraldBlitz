@@ -120,24 +120,27 @@ struct FlyHintEntry
     u8 height;
     const u8 *name1;
     const u8 *name2;
+    u16 hideIfFlagSet;
 };
 
 static const struct FlyHintEntry sFlyHintEntries[] =
 {
-    {0, 0, 7,  1, 2, gText_FlyHintBerries, NULL},        // Route 104, top 2 tiles
-    {1, 6, 6,  2, 1, gText_FlyHintDaycare, NULL},        // Route 117, two rightmost tiles
-    {1, 8, 10, 1, 2, gText_FlyHintItems, NULL},          // Slateport City
-    {2, 8, 10, 1, 2, gText_FlyHintGuru, NULL},           // Slateport City
-    {4, 8, 10, 1, 2, gText_FlyHintEvoItems, gText_FlyHintOracle},   // Slateport City
-    {4, 3, 0,  1, 1, gText_FlyHintRelearner, NULL},      // Fallarbor Town
-    {4, 1, 9,  1, 1, gText_FlyHintFifthGym, NULL},       // Petalburg City
-    {6, 0, 7,  1, 2, gText_FlyHintNewBerries, NULL},     // Route 104, top 2 tiles
-    {6, 8, 10, 1, 2, gText_FlyHintLinkCable, gText_FlyHintMegaStones}, // Slateport City
-    {6, 24, 5, 2, 1, gText_FlyHintSeventhGym, NULL},     // Mossdeep City
-    {6, 21, 7, 1, 1, gText_FlyHintSeventhGym, NULL},     // Sootopolis City
-    {8, 3, 0,  1, 1, gText_FlyHintRelearnerPlus, NULL},  // Fallarbor Town
-    {8, 21, 7, 1, 1, gText_FlyHintMegaStones, NULL},     // Sootopolis City
-    {8, 27, 8, 1, 2, gText_FlyHintEliteFour, NULL},      // Ever Grande City
+    {0, 0, 7,  1, 2, gText_FlyHintBerries, NULL, 0},                       // Route 104, top 2 tiles
+    {1, 0, 9,  1, 1, gText_FlyHintBriney, NULL, FLAG_VISITED_DEWFORD_TOWN}, // Route 104, lowermost tile; hides after visiting Dewford
+    {1, 6, 6,  2, 1, gText_FlyHintDaycare, NULL, 0},                       // Route 117, two rightmost tiles
+    {1, 8, 10, 1, 2, gText_FlyHintItems, NULL, 0},                         // Slateport City
+    {2, 8, 10, 1, 2, gText_FlyHintGuru, NULL, 0},                          // Slateport City
+    {4, 8, 10, 1, 2, gText_FlyHintEvoItems, gText_FlyHintOracle, 0},       // Slateport City
+    {4, 3, 0,  1, 1, gText_FlyHintRelearner, NULL, 0},                     // Fallarbor Town
+    {4, 1, 9,  1, 1, gText_FlyHintFifthGym, NULL, 0},                      // Petalburg City
+    {5, 12, 0, 1, 1, gText_FlyHintSixthGym, NULL, 0},                      // Fortree City
+    {6, 0, 7,  1, 2, gText_FlyHintNewBerries, NULL, 0},                    // Route 104, top 2 tiles
+    {6, 8, 10, 1, 2, gText_FlyHintLinkCable, gText_FlyHintMegaStones, 0},  // Slateport City
+    {6, 24, 5, 2, 1, gText_FlyHintSeventhGym, NULL, 0},                    // Mossdeep City
+    {6, 21, 7, 1, 1, gText_FlyHintSeventhGym, NULL, 0},                    // Sootopolis City
+    {8, 3, 0,  1, 1, gText_FlyHintRelearnerPlus, NULL, 0},                 // Fallarbor Town
+    {8, 21, 7, 1, 1, gText_FlyHintMegaStones, NULL, 0},                    // Sootopolis City
+    {8, 27, 8, 1, 2, gText_FlyHintEliteFour, NULL, 0},                     // Ever Grande City
 };
 
 static bool8 sFlyHintsEnabled;
@@ -2260,7 +2263,8 @@ static bool8 FlyHintsActiveForCurrentBadgeCount(void)
 
     for (i = 0; i < ARRAY_COUNT(sFlyHintEntries); i++)
     {
-        if (sFlyHintEntries[i].badgeCount == badgeCount)
+        if (sFlyHintEntries[i].badgeCount == badgeCount
+         && (sFlyHintEntries[i].hideIfFlagSet == 0 || !FlagGet(sFlyHintEntries[i].hideIfFlagSet)))
             return TRUE;
     }
     return FALSE;
@@ -2279,6 +2283,8 @@ static void BuildFlyHintGlowTilemap(void)
     for (i = 0; i < ARRAY_COUNT(sFlyHintEntries); i++)
     {
         if (sFlyHintEntries[i].badgeCount != badgeCount)
+            continue;
+        if (sFlyHintEntries[i].hideIfFlagSet != 0 && FlagGet(sFlyHintEntries[i].hideIfFlagSet))
             continue;
         for (y = 0; y < sFlyHintEntries[i].height; y++)
         {
@@ -2348,6 +2354,12 @@ static void BuildFlyHintGlowTilemap(void)
     }
 }
 
+static const u8 sFlyHintTextColors[3] = {
+    TEXT_COLOR_TRANSPARENT,
+    TEXT_COLOR_GREEN,
+    TEXT_COLOR_LIGHT_GREEN,
+};
+
 static void SetupFlyHintGlow(void)
 {
     if (!FlyHintsActiveForCurrentBadgeCount())
@@ -2390,6 +2402,8 @@ static u8 GetHoveredFlyHint(void)
     {
         if (sFlyHintEntries[i].badgeCount != VarGet(VAR_BADGE_COUNT))
             continue;
+        if (sFlyHintEntries[i].hideIfFlagSet != 0 && FlagGet(sFlyHintEntries[i].hideIfFlagSet))
+            continue;
         if (x >= sFlyHintEntries[i].x + MAPCURSOR_X_MIN
             && x < sFlyHintEntries[i].x + MAPCURSOR_X_MIN + sFlyHintEntries[i].width
             && y >= sFlyHintEntries[i].y + MAPCURSOR_Y_MIN
@@ -2401,10 +2415,15 @@ static u8 GetHoveredFlyHint(void)
 
 static void DrawFlyHintText(const u8 *text)
 {
-    if (text == NULL)
+    bool8 drawHint = (text != NULL);
+
+    if (!drawHint)
         text = gText_FlyToWhere;
     FillWindowPixelBuffer(WIN_FLY_TO_WHERE, PIXEL_FILL(0));
-    AddTextPrinterParameterized(WIN_FLY_TO_WHERE, FONT_NORMAL, text, 0, 1, 0, NULL);
+    if (drawHint)
+        AddTextPrinterParameterized4(WIN_FLY_TO_WHERE, FONT_NORMAL, 0, 1, 0, 0, sFlyHintTextColors, 0, text);
+    else
+        AddTextPrinterParameterized(WIN_FLY_TO_WHERE, FONT_NORMAL, text, 0, 1, 0, NULL);
     ScheduleBgCopyTilemapToVram(0);
     sLastShownHintText = text;
 }

@@ -479,13 +479,9 @@ Route109_EventScript_Elijah::
 
 DewfordTown_Text_BrineyLandedInSlateportDeliverGoods:
 	.string "MR. BRINEY: Ahoy!\n"
-	.string "We've made land in SLATEPORT!\p"
-	.string "I suppose you're going to visit CAPT.\n"
-	.string "STERN and deliver the DEVON GOODS?$"
+	.string "We've made land in SLATEPORT!$"
 
 Route109_Text_BrineySailToDewfordQuestion:
-	.string "MR. BRINEY: I thought you're supposed\n"
-	.string "to deliver the DEVON GOODS.\p"
 	.string "Would you like to sail back to\n"
 	.string "DEWFORD, then?$"
 

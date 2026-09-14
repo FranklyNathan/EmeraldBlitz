@@ -15,7 +15,7 @@ const struct PlayerNamePreset gPlayerNamePresets[] =
         .shuppetGuides = OPTIONS_SHUPPET_GUIDES_ON,
         .flygonDust = 0, // Off
         .windowFrameType = PRESET_FRAME(38),
-        .playerPalette = PRESET_PALETTE_PINK,
+        .playerPalette = PRESET_PALETTE_BLACK,
     },
     {
         .name = _("Kch42$"),
