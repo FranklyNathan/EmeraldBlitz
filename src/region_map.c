@@ -144,6 +144,7 @@ static bool8 sFlyHintsEnabled;
 static u16 sGlowTimer;
 static u16 sShadeBldArgLo;
 static u16 sShadeBldArgHi;
+static bool8 sShadeBldArgsReturning;
 static u8 sHoverEntryIndex;
 static u16 sHoverFrames;
 static u8 sAlternateIndex;
@@ -2370,8 +2371,9 @@ static void SetupFlyHintGlow(void)
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(0, 16));
     sFlyHintsEnabled = TRUE;
     sGlowTimer = 0;
-    sShadeBldArgLo = 0;
-    sShadeBldArgHi = 64;
+    sShadeBldArgLo = 8;
+    sShadeBldArgHi = 72;
+    sShadeBldArgsReturning = FALSE;
     sHoverEntryIndex = 0xFF;
     sHoverFrames = 0;
     sAlternateIndex = 0;
@@ -2416,14 +2418,42 @@ static void UpdateFlyHints(void)
         return;
 
     // Pulse the glow exactly like the Pokedex area screen: sweep the alpha
-    // blend (EVA/EVB) with a sine table so the glow fades to fully
-    // transparent, revealing the map beneath. The sweep only advances every
-    // fourth frame so the pulse is a quarter as fast as the Pokedex's.
+    // blend (EVA/EVB) with a sine table so the glow fades out, revealing the
+    // map beneath. The sweep only advances every fourth frame so the pulse is
+    // a quarter as fast as the Pokedex's, and it bounces between the sine
+    // indices 8 and 120 (EVA=3), so the glow stays lightly visible instead of
+    // ever fading to fully transparent.
     sGlowTimer++;
     if ((sGlowTimer & 3) == 0)
     {
-        sShadeBldArgLo = (sShadeBldArgLo + 4) & 0x7f;
-        sShadeBldArgHi = (sShadeBldArgHi + 4) & 0x7f;
+        if (!sShadeBldArgsReturning)
+        {
+            if (sShadeBldArgLo >= 0x78) // 120
+            {
+                sShadeBldArgLo = 0x78;
+                sShadeBldArgHi = (sShadeBldArgLo + 64) & 0x7f;
+                sShadeBldArgsReturning = TRUE;
+            }
+            else
+            {
+                sShadeBldArgLo += 4;
+                sShadeBldArgHi = (sShadeBldArgLo + 64) & 0x7f;
+            }
+        }
+        else
+        {
+            if (sShadeBldArgLo <= 8)
+            {
+                sShadeBldArgLo = 8;
+                sShadeBldArgHi = (sShadeBldArgLo + 64) & 0x7f;
+                sShadeBldArgsReturning = FALSE;
+            }
+            else
+            {
+                sShadeBldArgLo -= 4;
+                sShadeBldArgHi = (sShadeBldArgLo + 64) & 0x7f;
+            }
+        }
     }
     PokedexAreaScreen_UpdateAreaShadeBlend(sShadeBldArgLo, sShadeBldArgHi);
 
