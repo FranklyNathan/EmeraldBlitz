@@ -136,8 +136,8 @@ static void ClearAreaWindowLabel(enum PokedexAreaLabels labelId);
 
 bool32 ShouldShowAreaUnknownLabel(void);
 
-static const u32 sAreaGlow_Pal[] = INCBIN_U32("graphics/pokedex/area_glow.gbapal");
-static const u32 sAreaGlow_Gfx[] = INCBIN_U32("graphics/pokedex/area_glow.4bpp.smol");
+const u32 gAreaGlow_Pal[] = INCBIN_U32("graphics/pokedex/area_glow.gbapal");
+const u32 gAreaGlow_Gfx[] = INCBIN_U32("graphics/pokedex/area_glow.4bpp.smol");
 
 static const u32 sPokedexPlusHGSS_ScreenSelectBarSubmenu_Tilemap[] = INCBIN_U32("graphics/pokedex/hgss/SelectBar.bin.smolTM");
 static void LoadHGSSScreenSelectBarSubmenu(void);
@@ -276,13 +276,13 @@ static bool8 DrawAreaGlow(void)
         BuildAreaGlowTilemap();
         break;
     case 2:
-        DecompressAndCopyTileDataToVram(2, sAreaGlow_Gfx, 0, 0, 0);
+        DecompressAndCopyTileDataToVram(2, gAreaGlow_Gfx, 0, 0, 0);
         LoadBgTilemap(2, sPokedexAreaScreen->areaGlowTilemap, sizeof(sPokedexAreaScreen->areaGlowTilemap), 0);
         break;
     case 3:
         if (!FreeTempTileDataBuffersIfPossible())
         {
-            CpuCopy32(sAreaGlow_Pal, &gPlttBufferUnfaded[BG_PLTT_ID(GLOW_PALETTE)], sizeof(sAreaGlow_Pal));
+            CpuCopy32(gAreaGlow_Pal, &gPlttBufferUnfaded[BG_PLTT_ID(GLOW_PALETTE)], sizeof(gAreaGlow_Pal));
             sPokedexAreaScreen->drawAreaGlowState++;
         }
         return TRUE;
@@ -578,9 +578,13 @@ static void StartAreaGlow(void)
     DoAreaGlow();
 }
 
+void PokedexAreaScreen_UpdateAreaShadeBlend(u16 shadeBldArgLo, u16 shadeBldArgHi)
+{
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(gSineTable[shadeBldArgLo] >> 4, gSineTable[shadeBldArgHi] >> 4));
+}
+
 static void DoAreaGlow(void)
 {
-    u16 x, y;
     u16 i;
 
     if (!sPokedexAreaScreen->showingMarkers)
@@ -594,9 +598,7 @@ static void DoAreaGlow(void)
             else
                 sPokedexAreaScreen->areaShadeBldArgHi = (sPokedexAreaScreen->areaShadeBldArgHi + 4) & 0x7f;
 
-            x = gSineTable[sPokedexAreaScreen->areaShadeBldArgLo] >> 4;
-            y = gSineTable[sPokedexAreaScreen->areaShadeBldArgHi] >> 4;
-            SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(x, y));
+            PokedexAreaScreen_UpdateAreaShadeBlend(sPokedexAreaScreen->areaShadeBldArgLo, sPokedexAreaScreen->areaShadeBldArgHi);
             sPokedexAreaScreen->markerTimer = 0;
             if (sPokedexAreaScreen->glowTimer == 64)
             {

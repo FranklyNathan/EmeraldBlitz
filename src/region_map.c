@@ -30,6 +30,31 @@
 #include "constants/heal_locations.h"
 #include "constants/rgb.h"
 #include "constants/weather.h"
+#include "pokedex_area_screen.h"
+#include "constants/vars.h"
+
+#define GLOW_FULL      0xFFFF
+#define GLOW_EDGE_R    (1 << 0)
+#define GLOW_EDGE_L    (1 << 1)
+#define GLOW_EDGE_B    (1 << 2)
+#define GLOW_EDGE_T    (1 << 3)
+#define GLOW_CORNER_TL (1 << 4)
+#define GLOW_CORNER_BL (1 << 5)
+#define GLOW_CORNER_TR (1 << 6)
+#define GLOW_CORNER_BR (1 << 7)
+#define GLOW_PALETTE 10
+#define GLOW_TILEMAP_WIDTH 32
+// The region map's tilemap is 64 tiles wide, 64 tall, stored as single-byte
+// entries (the affine screen-entry format). The fly map renders in text mode,
+// which needs full 16-bit screen entries, so the affine bytes are widened
+// into a text tilemap for the static 30x20 view.
+#define REGION_MAP_TEXTURE_WIDTH 64
+#define REGION_MAP_TILEMAP_SIZE 0x1000
+// The fly map renders its map in text mode 0 (it never uses the affine
+// machinery), which unlocks BG3 as a dedicated, blendable glow layer. This
+// matches the Pokedex area screen's own recipe exactly.
+
+#include "data/pokedex_area_glow.h"
 
 const u16 *GetPlayerObjectEventPaletteData(u8 gender);
 
@@ -86,6 +111,50 @@ static EWRAM_DATA struct {
     bool8 choseFlyLocation;
 } *sFlyMap = NULL;
 
+struct FlyHintEntry
+{
+    u8 badgeCount;
+    u8 x;
+    u8 y;
+    u8 width;
+    u8 height;
+    const u8 *name1;
+    const u8 *name2;
+};
+
+static const struct FlyHintEntry sFlyHintEntries[] =
+{
+    {0, 0, 7,  1, 2, gText_FlyHintBerries, NULL},        // Route 104, top 2 tiles
+    {1, 6, 6,  2, 1, gText_FlyHintDaycare, NULL},        // Route 117, two rightmost tiles
+    {1, 8, 10, 1, 2, gText_FlyHintItems, NULL},          // Slateport City
+    {2, 8, 10, 1, 2, gText_FlyHintGuru, NULL},           // Slateport City
+    {4, 8, 10, 1, 2, gText_FlyHintEvoItems, gText_FlyHintOracle},   // Slateport City
+    {4, 3, 0,  1, 1, gText_FlyHintRelearner, NULL},      // Fallarbor Town
+    {4, 1, 9,  1, 1, gText_FlyHintFifthGym, NULL},       // Petalburg City
+    {6, 0, 7,  1, 2, gText_FlyHintNewBerries, NULL},     // Route 104, top 2 tiles
+    {6, 8, 10, 1, 2, gText_FlyHintLinkCable, gText_FlyHintMegaStones}, // Slateport City
+    {6, 24, 5, 2, 1, gText_FlyHintSeventhGym, NULL},     // Mossdeep City
+    {6, 21, 7, 1, 1, gText_FlyHintSeventhGym, NULL},     // Sootopolis City
+    {8, 3, 0,  1, 1, gText_FlyHintRelearnerPlus, NULL},  // Fallarbor Town
+    {8, 21, 7, 1, 1, gText_FlyHintMegaStones, NULL},     // Sootopolis City
+    {8, 27, 8, 1, 2, gText_FlyHintEliteFour, NULL},      // Ever Grande City
+};
+
+static bool8 sFlyHintsEnabled;
+static u16 sGlowTimer;
+static u16 sShadeBldArgLo;
+static u16 sShadeBldArgHi;
+static u8 sHoverEntryIndex;
+static u16 sHoverFrames;
+static u8 sAlternateIndex;
+static const u8 *sLastShownHintText;
+static EWRAM_DATA u16 sFlyHintGlowTilemap[GLOW_TILEMAP_WIDTH * GLOW_TILEMAP_WIDTH];
+
+// True only while the fly map calls InitRegionMap(); LoadRegionMapGfx() then
+// converts the affine byte tilemap into a text 16-bit tilemap for BG2.
+static bool8 sLoadFlyMapTextTilemap;
+static EWRAM_DATA u32 sFlyMapTextTilemapScratch[REGION_MAP_TILEMAP_SIZE / sizeof(u32)];
+
 static bool32 sDrawFlyDestTextWindow;
 
 static u8 ProcessRegionMapInput_Full(void);
@@ -122,6 +191,12 @@ static void SpriteCB_FlyDestIcon(struct Sprite *sprite);
 static void CB_FadeInFlyMap(void);
 static void CB_HandleFlyMapInput(void);
 static void CB_ExitFlyMap(void);
+static bool8 FlyHintsActiveForCurrentBadgeCount(void);
+static void BuildFlyHintGlowTilemap(void);
+static void SetupFlyHintGlow(void);
+static u8 GetHoveredFlyHint(void);
+static void DrawFlyHintText(const u8 *text);
+static void UpdateFlyHints(void);
 
 static const u16 sRegionMapCursorPal[] = INCBIN_U16("graphics/pokenav/region_map/cursor.gbapal");
 static const u32 sRegionMapCursorSmallGfxLZ[] = INCBIN_U32("graphics/pokenav/region_map/cursor_small.4bpp.smol");
@@ -384,9 +459,17 @@ static const struct BgTemplate sFlyMapBgTemplates[] =
         .bg = 2,
         .charBaseIndex = 2,
         .mapBaseIndex = 28,
-        .screenSize = 2,
+        .screenSize = 0,
         .paletteMode = 1,
         .priority = 2
+    },
+    {
+        .bg = 3,
+        .charBaseIndex = 1,
+        .mapBaseIndex = 15,
+        .screenSize = 0,
+        .paletteMode = 0,
+        .priority = 1
     }
 };
 
@@ -563,6 +646,22 @@ bool8 LoadRegionMapGfx(void)
         {
             if (!FreeTempTileDataBuffersIfPossible())
                 DecompressAndCopyTileDataToVram(sRegionMap->bgNum, sRegionMapBg_TilemapLZ, 0, 0, 1);
+        }
+        else if (sLoadFlyMapTextTilemap)
+        {
+            u16 x, y;
+            const u8 *src;
+            u16 *dest;
+
+            DecompressDataWithHeaderWram(sRegionMapBg_TilemapLZ, sFlyMapTextTilemapScratch);
+            src = (const u8 *)sFlyMapTextTilemapScratch;
+            dest = (u16 *)BG_SCREEN_ADDR(28);
+            // Each byte of the affine tilemap is a tile id; widen it into a
+            // 16-bit text screen entry. The visible fly view shows texture
+            // rows 0-19, cols 0-29 at the top-left of the screen.
+            for (y = 0; y < 20; y++)
+                for (x = 0; x < 30; x++)
+                    dest[y * 32 + x] = src[y * REGION_MAP_TEXTURE_WIDTH + x];
         }
         else
         {
@@ -1709,7 +1808,7 @@ void CB2_OpenFlyMap(void)
         break;
     case 1:
         ResetBgsAndClearDma3BusyFlags(0);
-        InitBgsFromTemplates(1, sFlyMapBgTemplates, ARRAY_COUNT(sFlyMapBgTemplates));
+        InitBgsFromTemplates(0, sFlyMapBgTemplates, ARRAY_COUNT(sFlyMapBgTemplates));
         gMain.state++;
         break;
     case 2:
@@ -1723,7 +1822,9 @@ void CB2_OpenFlyMap(void)
         gMain.state++;
         break;
     case 4:
+        sLoadFlyMapTextTilemap = TRUE;
         InitRegionMap(&sFlyMap->regionMap, FALSE);
+        sLoadFlyMapTextTilemap = FALSE;
         CreateRegionMapCursor(TAG_CURSOR, TAG_CURSOR);
         CreateRegionMapPlayerIcon(TAG_PLAYER_ICON, TAG_PLAYER_ICON);
         sFlyMap->mapSecId = sFlyMap->regionMap.mapSecId;
@@ -1764,8 +1865,18 @@ void CB2_OpenFlyMap(void)
         ShowBg(0);
         ShowBg(1);
         ShowBg(2);
+        // In text mode BG2HOFS/VOFS are active and may be stale from the
+        // previous screen (they were irrelevant while the map ran in affine
+        // mode). Reset them so the full map shows instead of scrolled garbage.
+        SetGpuReg(REG_OFFSET_BG2HOFS, 0);
+        SetGpuReg(REG_OFFSET_BG2VOFS, 0);
+        SetupFlyHintGlow();
         SetFlyMapCallback(CB_FadeInFlyMap);
         SetMainCallback2(CB2_FlyMap);
+        gMain.state++;
+        break;
+    case 11:
+        SetFlyMapCallback(CB_ExitFlyMap);
         gMain.state++;
         break;
     }
@@ -2054,6 +2165,7 @@ static void CB_FadeInFlyMap(void)
 
 static void CB_HandleFlyMapInput(void)
 {
+    UpdateFlyHints();
     if (sFlyMap->state == 0)
     {
         if (sRegionMap->cursorMovementFrameCounter == 0 && JOY_NEW(SELECT_BUTTON))
@@ -2102,6 +2214,17 @@ static void CB_ExitFlyMap(void)
     switch (sFlyMap->state)
     {
     case 0:
+        if (sFlyHintsEnabled)
+        {
+            // The glow lives on its own BG3 layer, so the frame's BG1 tilemap
+            // was never touched. Just disable the blend and hide the layer.
+            SetGpuReg(REG_OFFSET_BLDCNT, 0);
+            SetGpuReg(REG_OFFSET_BLDALPHA, 0);
+            HideBg(3);
+            CpuCopy32(gAreaGlow_Pal, &gPlttBufferUnfaded[BG_PLTT_ID(GLOW_PALETTE)], sizeof(gAreaGlow_Pal));
+            CpuCopy32(gAreaGlow_Pal, &gPlttBufferFaded[BG_PLTT_ID(GLOW_PALETTE)], sizeof(gAreaGlow_Pal));
+            sFlyHintsEnabled = FALSE;
+        }
         BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
         sFlyMap->state++;
         break;
@@ -2125,6 +2248,212 @@ static void CB_ExitFlyMap(void)
         }
         break;
     }
+}
+
+// Fly map badge-progression hints. These pulse the Pokedex's area glow on the
+// map and replace the "FLY to where?" text while the cursor hovers them.
+static bool8 FlyHintsActiveForCurrentBadgeCount(void)
+{
+    u16 i;
+    u8 badgeCount = VarGet(VAR_BADGE_COUNT);
+
+    for (i = 0; i < ARRAY_COUNT(sFlyHintEntries); i++)
+    {
+        if (sFlyHintEntries[i].badgeCount == badgeCount)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static void BuildFlyHintGlowTilemap(void)
+{
+    u16 i, j, x, y;
+    u8 badgeCount = VarGet(VAR_BADGE_COUNT);
+
+    // Reset tilemap
+    for (i = 0; i < ARRAY_COUNT(sFlyHintGlowTilemap); i++)
+        sFlyHintGlowTilemap[i] = 0;
+
+    // Mark the full glow tiles for every hint active at the current badge count.
+    for (i = 0; i < ARRAY_COUNT(sFlyHintEntries); i++)
+    {
+        if (sFlyHintEntries[i].badgeCount != badgeCount)
+            continue;
+        for (y = 0; y < sFlyHintEntries[i].height; y++)
+        {
+            for (x = 0; x < sFlyHintEntries[i].width; x++)
+            {
+                sFlyHintGlowTilemap[(sFlyHintEntries[i].y + MAPCURSOR_Y_MIN + y) * GLOW_TILEMAP_WIDTH
+                                  + sFlyHintEntries[i].x + MAPCURSOR_X_MIN + x] = GLOW_FULL;
+            }
+        }
+    }
+
+    // Scan the tilemap. For every "full glow" tile added above, fill in its edges and corners.
+    j = 0;
+    for (y = 0; y < 20; y++)
+    {
+        for (x = 0; x < GLOW_TILEMAP_WIDTH; x++)
+        {
+            if (sFlyHintGlowTilemap[j] == GLOW_FULL)
+            {
+                // Edges
+                if (x != 0 && sFlyHintGlowTilemap[j - 1] != GLOW_FULL)
+                    sFlyHintGlowTilemap[j - 1] |= GLOW_EDGE_L;
+                if (x != GLOW_TILEMAP_WIDTH - 1 && sFlyHintGlowTilemap[j + 1] != GLOW_FULL)
+                    sFlyHintGlowTilemap[j + 1] |= GLOW_EDGE_R;
+                if (y != 0 && sFlyHintGlowTilemap[j - GLOW_TILEMAP_WIDTH] != GLOW_FULL)
+                    sFlyHintGlowTilemap[j - GLOW_TILEMAP_WIDTH] |= GLOW_EDGE_T;
+                if (y != 19 && sFlyHintGlowTilemap[j + GLOW_TILEMAP_WIDTH] != GLOW_FULL)
+                    sFlyHintGlowTilemap[j + GLOW_TILEMAP_WIDTH] |= GLOW_EDGE_B;
+
+                // Corners
+                if (x != 0 && y != 0 && sFlyHintGlowTilemap[j - GLOW_TILEMAP_WIDTH - 1] != GLOW_FULL)
+                    sFlyHintGlowTilemap[j - GLOW_TILEMAP_WIDTH - 1] |= GLOW_CORNER_TL;
+                if (x != GLOW_TILEMAP_WIDTH - 1 && y != 0 && sFlyHintGlowTilemap[j - GLOW_TILEMAP_WIDTH + 1] != GLOW_FULL)
+                    sFlyHintGlowTilemap[j - GLOW_TILEMAP_WIDTH + 1] |= GLOW_CORNER_TR;
+                if (x != 0 && y != 19 && sFlyHintGlowTilemap[j + GLOW_TILEMAP_WIDTH - 1] != GLOW_FULL)
+                    sFlyHintGlowTilemap[j + GLOW_TILEMAP_WIDTH - 1] |= GLOW_CORNER_BL;
+                if (x != GLOW_TILEMAP_WIDTH - 1 && y != 19 && sFlyHintGlowTilemap[j + GLOW_TILEMAP_WIDTH + 1] != GLOW_FULL)
+                    sFlyHintGlowTilemap[j + GLOW_TILEMAP_WIDTH + 1] |= GLOW_CORNER_BR;
+            }
+
+            j++;
+        }
+    }
+
+    // Replace the flag sets with actual tile ids and remove corner flags overlapped by edges.
+    for (i = 0; i < ARRAY_COUNT(sFlyHintGlowTilemap); i++)
+    {
+        if (sFlyHintGlowTilemap[i] == GLOW_FULL)
+        {
+            sFlyHintGlowTilemap[i] = GLOW_TILE_FULL;
+            sFlyHintGlowTilemap[i] |= (GLOW_PALETTE << 12);
+        }
+        else if (sFlyHintGlowTilemap[i])
+        {
+            if (sFlyHintGlowTilemap[i] & GLOW_EDGE_L)
+                sFlyHintGlowTilemap[i] &= ~(GLOW_CORNER_TL | GLOW_CORNER_BL);
+            if (sFlyHintGlowTilemap[i] & GLOW_EDGE_R)
+                sFlyHintGlowTilemap[i] &= ~(GLOW_CORNER_TR | GLOW_CORNER_BR);
+            if (sFlyHintGlowTilemap[i] & GLOW_EDGE_T)
+                sFlyHintGlowTilemap[i] &= ~(GLOW_CORNER_TR | GLOW_CORNER_TL);
+            if (sFlyHintGlowTilemap[i] & GLOW_EDGE_B)
+                sFlyHintGlowTilemap[i] &= ~(GLOW_CORNER_BR | GLOW_CORNER_BL);
+
+            sFlyHintGlowTilemap[i] = sAreaGlowTilemapMapping[sFlyHintGlowTilemap[i]];
+            sFlyHintGlowTilemap[i] |= (GLOW_PALETTE << 12);
+        }
+    }
+}
+
+static void SetupFlyHintGlow(void)
+{
+    if (!FlyHintsActiveForCurrentBadgeCount())
+    {
+        sFlyHintsEnabled = FALSE;
+        return;
+    }
+
+    // The glow lives on BG3, its own blendable layer (the fly map runs in
+    // text mode 0, unlike the Pokedex's affine map). Tiles go at charblock 1
+    // tile 0, so master tile ids map directly.
+    DecompressDataWithHeaderVram(gAreaGlow_Gfx, (u16 *)BG_CHAR_ADDR(1));
+    BuildFlyHintGlowTilemap();
+    LoadBgTilemap(3, sFlyHintGlowTilemap, sizeof(sFlyHintGlowTilemap), 0);
+
+    // Base glow palette (slot 10). The blend sweep starts fully transparent.
+    CpuCopy32(gAreaGlow_Pal, &gPlttBufferUnfaded[BG_PLTT_ID(GLOW_PALETTE)], sizeof(gAreaGlow_Pal));
+    CpuCopy32(gAreaGlow_Pal, &gPlttBufferFaded[BG_PLTT_ID(GLOW_PALETTE)], 32);
+    ShowBg(3);
+    SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG3 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_ALL);
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(0, 16));
+    sFlyHintsEnabled = TRUE;
+    sGlowTimer = 0;
+    sShadeBldArgLo = 0;
+    sShadeBldArgHi = 64;
+    sHoverEntryIndex = 0xFF;
+    sHoverFrames = 0;
+    sAlternateIndex = 0;
+    sLastShownHintText = NULL;
+}
+
+static u8 GetHoveredFlyHint(void)
+{
+    u16 i;
+    u16 x = sRegionMap->cursorPosX;
+    u16 y = sRegionMap->cursorPosY;
+
+    for (i = 0; i < ARRAY_COUNT(sFlyHintEntries); i++)
+    {
+        if (sFlyHintEntries[i].badgeCount != VarGet(VAR_BADGE_COUNT))
+            continue;
+        if (x >= sFlyHintEntries[i].x + MAPCURSOR_X_MIN
+            && x < sFlyHintEntries[i].x + MAPCURSOR_X_MIN + sFlyHintEntries[i].width
+            && y >= sFlyHintEntries[i].y + MAPCURSOR_Y_MIN
+            && y < sFlyHintEntries[i].y + MAPCURSOR_Y_MIN + sFlyHintEntries[i].height)
+            return i;
+    }
+    return 0xFF;
+}
+
+static void DrawFlyHintText(const u8 *text)
+{
+    if (text == NULL)
+        text = gText_FlyToWhere;
+    FillWindowPixelBuffer(WIN_FLY_TO_WHERE, PIXEL_FILL(0));
+    AddTextPrinterParameterized(WIN_FLY_TO_WHERE, FONT_NORMAL, text, 0, 1, 0, NULL);
+    ScheduleBgCopyTilemapToVram(0);
+    sLastShownHintText = text;
+}
+
+static void UpdateFlyHints(void)
+{
+    u8 hoverEntry;
+    const u8 *text;
+
+    if (!sFlyHintsEnabled)
+        return;
+
+    // Pulse the glow exactly like the Pokedex area screen: sweep the alpha
+    // blend (EVA/EVB) with a sine table so the glow fades to fully
+    // transparent, revealing the map beneath.
+    sGlowTimer++;
+    if (sGlowTimer & 1)
+        sShadeBldArgLo = (sShadeBldArgLo + 4) & 0x7f;
+    else
+        sShadeBldArgHi = (sShadeBldArgHi + 4) & 0x7f;
+    PokedexAreaScreen_UpdateAreaShadeBlend(sShadeBldArgLo, sShadeBldArgHi);
+
+    hoverEntry = GetHoveredFlyHint();
+    if (sHoverEntryIndex != hoverEntry)
+    {
+        sHoverEntryIndex = hoverEntry;
+        sHoverFrames = 0;
+        sAlternateIndex = 0;
+    }
+
+    if (hoverEntry == 0xFF)
+    {
+        text = NULL;
+    }
+    else if (sFlyHintEntries[hoverEntry].name2 != NULL)
+    {
+        // Paired hints alternate every 3 seconds while hovered
+        if (++sHoverFrames >= 180)
+        {
+            sHoverFrames = 0;
+            sAlternateIndex ^= 1;
+        }
+        text = sAlternateIndex ? sFlyHintEntries[hoverEntry].name2 : sFlyHintEntries[hoverEntry].name1;
+    }
+    else
+    {
+        text = sFlyHintEntries[hoverEntry].name1;
+    }
+
+    if (text != sLastShownHintText)
+        DrawFlyHintText(text);
 }
 
 u32 FilterFlyDestination(struct RegionMap* regionMap)
