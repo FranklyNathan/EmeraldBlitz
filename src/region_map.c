@@ -2417,12 +2417,14 @@ static void UpdateFlyHints(void)
 
     // Pulse the glow exactly like the Pokedex area screen: sweep the alpha
     // blend (EVA/EVB) with a sine table so the glow fades to fully
-    // transparent, revealing the map beneath.
+    // transparent, revealing the map beneath. The sweep only advances every
+    // fourth frame so the pulse is a quarter as fast as the Pokedex's.
     sGlowTimer++;
-    if (sGlowTimer & 1)
+    if ((sGlowTimer & 3) == 0)
+    {
         sShadeBldArgLo = (sShadeBldArgLo + 4) & 0x7f;
-    else
         sShadeBldArgHi = (sShadeBldArgHi + 4) & 0x7f;
+    }
     PokedexAreaScreen_UpdateAreaShadeBlend(sShadeBldArgLo, sShadeBldArgHi);
 
     hoverEntry = GetHoveredFlyHint();
