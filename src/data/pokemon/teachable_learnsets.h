@@ -23690,6 +23690,7 @@ static const u16 sWoolooTeachableLearnset[] = {
     MOVE_FACADE,
     MOVE_PROTECT,
     MOVE_REST,
+    MOVE_ROLLOUT,
     MOVE_UNAVAILABLE,
 };
 
@@ -23700,6 +23701,8 @@ static const u16 sDubwoolTeachableLearnset[] = {
     MOVE_HYPER_BEAM,
     MOVE_PROTECT,
     MOVE_REST,
+    MOVE_ROCK_SMASH,
+    MOVE_ROLLOUT,
     MOVE_ZEN_HEADBUTT,
     MOVE_UNAVAILABLE,
 };

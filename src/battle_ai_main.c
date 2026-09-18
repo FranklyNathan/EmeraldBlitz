@@ -3347,6 +3347,17 @@ static s32 AI_DoubleBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
     // Specific logic for spread moves.
     if (moveTarget == MOVE_TARGET_FOES_AND_ALLY)
     {
+        // Don't use a spread damage move if both opponents are immune to it.
+        // It would be a fully wasted turn, so this overrides any bonus the
+        // move gets from also not being able to hit our partner.
+        if (GetMovePower(move) != 0
+         && IsBattlerAlive(BATTLE_OPPOSITE(battlerAtk)) && IsBattlerAlive(BATTLE_OPPOSITE(battlerAtkPartner))
+         && aiData->effectiveness[battlerAtk][BATTLE_OPPOSITE(battlerAtk)][gAiThinkingStruct->movesetIndex] == UQ_4_12(0.0)
+         && aiData->effectiveness[battlerAtk][BATTLE_OPPOSITE(battlerAtkPartner)][gAiThinkingStruct->movesetIndex] == UQ_4_12(0.0))
+        {
+            ADJUST_AND_RETURN_SCORE(NO_DAMAGE_OR_FAILS);
+        }
+
         // Don't kill your partner for no reason.
         if (wouldPartnerFaint)
         {

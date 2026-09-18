@@ -70421,7 +70421,8 @@
       "MOVE_SWAGGER"
     ],
     "TutorMoves": [
-      "MOVE_GRASSY_GLIDE"
+      "MOVE_GRASSY_GLIDE",
+      "MOVE_ROLLOUT"
     ]
   },
   "DUBWOOL": {
@@ -70493,6 +70494,7 @@
       "MOVE_BOUNCE",
       "MOVE_PAYBACK",
       "MOVE_GUARD_SWAP",
+      "MOVE_ROCK_SMASH",
       "MOVE_ROUND",
       "MOVE_RETALIATE",
       "MOVE_SWORDS_DANCE",
@@ -70514,7 +70516,8 @@
       "MOVE_SWAGGER"
     ],
     "TutorMoves": [
-      "MOVE_GRASSY_GLIDE"
+      "MOVE_GRASSY_GLIDE",
+      "MOVE_ROLLOUT"
     ]
   },
   "CHEWTLE": {
