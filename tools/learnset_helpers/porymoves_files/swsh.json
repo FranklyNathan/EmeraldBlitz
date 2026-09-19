@@ -70508,7 +70508,8 @@
       "MOVE_ZEN_HEADBUTT",
       "MOVE_ELECTRO_BALL",
       "MOVE_WILD_CHARGE",
-      "MOVE_BODY_PRESS"
+      "MOVE_BODY_PRESS",
+      "MOVE_ROCK_SLIDE"
     ],
     "EggMoves": [
       "MOVE_COUNTER",

@@ -23701,6 +23701,7 @@ static const u16 sDubwoolTeachableLearnset[] = {
     MOVE_HYPER_BEAM,
     MOVE_PROTECT,
     MOVE_REST,
+    MOVE_ROCK_SLIDE,
     MOVE_ROCK_SMASH,
     MOVE_ROLLOUT,
     MOVE_ZEN_HEADBUTT,

@@ -118,7 +118,7 @@ struct
     [CHAR_L_BUTTON]       = { 0x02, 16, 12 },
     [CHAR_R_BUTTON]       = { 0x04, 16, 12 },
     [CHAR_START_BUTTON]   = { 0x06, 24, 12 },
-    [CHAR_SELECT_BUTTON]  = { 0x09, 24, 12 },
+    [CHAR_SELECT_BUTTON]  = { 0x09, 25, 13 },
     [CHAR_DPAD_UP]        = { 0x0C,  8, 12 },
     [CHAR_DPAD_DOWN]      = { 0x0D,  8, 12 },
     [CHAR_DPAD_LEFT]      = { 0x0E,  8, 12 },

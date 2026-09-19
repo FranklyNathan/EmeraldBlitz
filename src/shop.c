@@ -643,7 +643,13 @@ static u16 GetMartItemPrice(u16 itemId)
     {
         // Handle special options first
         if (itemId == ITEM_SCOTT_TM_INVERT)
+        {
+            // While previewing, Invert is not for sale (shows as Sold Out),
+            // since buying it is not possible until the preview is exited.
+            if (sScottTmPreviewMode)
+                return 0;
             return 2000; // Fixed price for Invert
+        }
 
         // Handle TMs
         for (i = 0; i < 5; i++) // Iterate over the 5 TM slots
@@ -653,6 +659,12 @@ static u16 GetMartItemPrice(u16 itemId)
                 // If TM is already purchased, it effectively costs 0 (will show as Sold Out)
                 if (sScottTmPurchased[i])
                     return 0;
+
+                // While previewing the inversion these are the fresh TMs the
+                // player would get by paying to invert, so show the reset
+                // price (4000) instead of the current purchase discount.
+                if (sScottTmPreviewMode)
+                    return 4000;
 
                 // Calculate dynamic price based on number of TMs already purchased
                 switch (sScottTmPurchasedCount)
@@ -1135,8 +1147,8 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
                     return;
                 }
             }
-            // Check if Invert has been purchased
-            if (itemId == ITEM_SCOTT_TM_INVERT && sScottTmInvertPurchased)
+            // Check if Invert has been purchased (or is disabled during preview)
+            if (itemId == ITEM_SCOTT_TM_INVERT && (sScottTmInvertPurchased || sScottTmPreviewMode))
             {
                 StringCopy(gStringVar4, gText_Purchased);
                 x = GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 120);
