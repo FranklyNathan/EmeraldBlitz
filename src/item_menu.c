@@ -55,7 +55,7 @@
 #define TAG_POCKET_SCROLL_ARROW 110
 #define TAG_BAG_SCROLL_ARROW    111
 
-static u8 sBagPokemonIconSpriteIds[10];
+static u8 sBagPokemonIconSpriteIds[MAX_SHOP_POKEMON_ICONS];
 
 // The buffer for the bag item list needs to be large enough to hold the maximum
 // number of item slots that could fit in a single pocket, + 1 for Cancel.
@@ -1006,7 +1006,7 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             if (!shouldShowIcons)
             {
                 u8 i;
-                for (i = 0; i < 10; i++)
+                for (i = 0; i < MAX_SHOP_POKEMON_ICONS; i++)
                 {
                     if (sBagPokemonIconSpriteIds[i] != SPRITE_NONE)
                         FreeAndDestroyMonIconSprite(&gSprites[sBagPokemonIconSpriteIds[i]]);
@@ -1092,7 +1092,7 @@ static void PrintItemDescription(int itemIndex)
     }
     {
         u8 i;
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < MAX_SHOP_POKEMON_ICONS; i++)
         {
             if (sBagPokemonIconSpriteIds[i] != SPRITE_NONE)
                 FreeAndDestroyMonIconSprite(&gSprites[sBagPokemonIconSpriteIds[i]]);
@@ -1158,7 +1158,7 @@ static void DestroyPocketSwitchArrowPair(void)
 static void FreeBagMenu(void)
 {
     u8 i;
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < MAX_SHOP_POKEMON_ICONS; i++)
     {
         if (sBagPokemonIconSpriteIds[i] != SPRITE_NONE)
             FreeAndDestroyMonIconSprite(&gSprites[sBagPokemonIconSpriteIds[i]]);
@@ -1808,7 +1808,7 @@ static void OpenContextMenu(u8 taskId)
     if (gBagPosition.pocket == POCKET_TM_HM)
     {
         u8 i;
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < MAX_SHOP_POKEMON_ICONS; i++)
         {
             if (sBagPokemonIconSpriteIds[i] != SPRITE_NONE)
                 FreeAndDestroyMonIconSprite(&gSprites[sBagPokemonIconSpriteIds[i]]);

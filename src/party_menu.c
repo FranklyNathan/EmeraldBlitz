@@ -1923,7 +1923,7 @@ static void CreatePartyMonSprites(u8 slot)
         if (boxPos != 0xFF)
         {
             struct BoxPokemon *boxMon = &gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos];
-            u16 species = GetBoxMonData(boxMon, MON_DATA_SPECIES);
+            u16 species = GetBoxMonData(boxMon, MON_DATA_SPECIES_OR_EGG);
             u32 personality = GetBoxMonData(boxMon, MON_DATA_PERSONALITY);
             CreatePartyMonIconSpriteParameterized(species, personality, &sPartyMenuBoxes[slot], 1);
             CreatePartyMonHeldItemSpriteParameterized(species, GetBoxMonData(boxMon, MON_DATA_HELD_ITEM), &sPartyMenuBoxes[slot]);

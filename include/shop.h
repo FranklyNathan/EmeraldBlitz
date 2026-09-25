@@ -3,6 +3,9 @@
 
 extern struct ItemSlot gMartPurchaseHistory[3];
 
+// Max number of mini icons shown for a hovered TM (4 per row, 2 rows).
+#define MAX_SHOP_POKEMON_ICONS 8
+
 void CreatePokemartMenu(const u16 *itemsForSale);
 void CreateDecorationShop1Menu(const u16 *itemsForSale);
 void CreateDecorationShop2Menu(const u16 *itemsForSale);

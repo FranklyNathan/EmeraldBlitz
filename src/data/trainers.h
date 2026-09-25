@@ -40905,7 +40905,7 @@ F_TRAINER_FEMALE |
 #line 15795
             .gender = TRAINER_MON_MALE,
 #line 15795
-            .heldItem = ITEM_SITRUS_BERRY,
+            .heldItem = ITEM_ORAN_BERRY,
 #line 15797
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 15799

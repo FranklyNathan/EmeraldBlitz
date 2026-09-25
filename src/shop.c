@@ -114,7 +114,7 @@ struct ShopData
     u8 scrollIndicatorsTaskId;
     u8 iconSlot;
     u8 itemSpriteIds[2];
-    u8 pokemonIconSpriteIds[10];
+    u8 pokemonIconSpriteIds[MAX_SHOP_POKEMON_ICONS];
     s16 viewportObjects[OBJECT_EVENTS_COUNT][5];
 };
 
@@ -1067,7 +1067,7 @@ static void BuyMenuPrintItemDescriptionAndShowItemIcon(s32 item, bool8 onInit, s
         if (VarGet(VAR_POWER_TM_CLERK) == 1)
         {
             u8 i;
-            for (i = 0; i < 10; i++)
+            for (i = 0; i < MAX_SHOP_POKEMON_ICONS; i++)
             {
                 if (sShopData->pokemonIconSpriteIds[i] != SPRITE_NONE)
                     FreeAndDestroyMonIconSprite(&gSprites[sShopData->pokemonIconSpriteIds[i]]);
@@ -1084,7 +1084,7 @@ static void BuyMenuPrintItemDescriptionAndShowItemIcon(s32 item, bool8 onInit, s
         if (item == LIST_CANCEL || item == ITEM_SCOTT_TM_INVERT)
         {
             u8 i;
-            for (i = 0; i < 10; i++)
+            for (i = 0; i < MAX_SHOP_POKEMON_ICONS; i++)
             {
                 if (sShopData->pokemonIconSpriteIds[i] != SPRITE_NONE)
                     FreeAndDestroyMonIconSprite(&gSprites[sShopData->pokemonIconSpriteIds[i]]);
@@ -1190,14 +1190,14 @@ void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds)
     struct Pokemon tempMon;
     bool8 partyOnly = IsInEliteFourArea();
 
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < MAX_SHOP_POKEMON_ICONS; i++)
     {
         if (spriteIds[i] != SPRITE_NONE)
             FreeAndDestroyMonIconSprite(&gSprites[spriteIds[i]]);
         spriteIds[i] = SPRITE_NONE;
     }
 
-    for (i = 0; i < gPlayerPartyCount && count < 10; i++)
+    for (i = 0; i < gPlayerPartyCount && count < MAX_SHOP_POKEMON_ICONS; i++)
     {
         u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
         u16 hp = GetMonData(&gPlayerParty[i], MON_DATA_HP);
@@ -1214,9 +1214,9 @@ void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds)
 
     if (!partyOnly)
     {
-        for (i = 0; i < TOTAL_BOXES_COUNT && count < 10; i++)
+        for (i = 0; i < TOTAL_BOXES_COUNT && count < MAX_SHOP_POKEMON_ICONS; i++)
         {
-            for (j = 0; j < IN_BOX_COUNT && count < 10; j++)
+            for (j = 0; j < IN_BOX_COUNT && count < MAX_SHOP_POKEMON_ICONS; j++)
             {
                 u16 species = GetBoxMonDataAt(i, j, MON_DATA_SPECIES);
                 if (species != SPECIES_NONE)
@@ -1235,7 +1235,7 @@ void CreateShopPokemonIconSprites(u16 itemId, u8 *spriteIds)
                 }
             }
         }
-        for (i = 0; i < DAYCARE_MON_COUNT && count < 10; i++)
+        for (i = 0; i < DAYCARE_MON_COUNT && count < MAX_SHOP_POKEMON_ICONS; i++)
         {
             u16 species = GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_SPECIES);
             u16 hp = GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_HP);
@@ -2053,7 +2053,7 @@ static void Task_ExitBuyMenu(u8 taskId)
         if (VarGet(VAR_POWER_TM_CLERK) == 1)
         {
             u8 i;
-            for (i = 0; i < 10; i++)
+            for (i = 0; i < MAX_SHOP_POKEMON_ICONS; i++)
                 if (sShopData->pokemonIconSpriteIds[i] != SPRITE_NONE)
                     DestroySprite(&gSprites[sShopData->pokemonIconSpriteIds[i]]);
             // Only clear the flag for Scott's TM shop, whose script doesn't

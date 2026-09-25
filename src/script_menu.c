@@ -43,7 +43,6 @@
 
 #define GIFT_MON_RANDOM_ID 1000
 #define GIFT_MON_FINISH_ID 999
-#define MAX_GIFT_MON_LIST 220
 
 #define MAX_GIFT_MON 10
 #define GIFT_MON_LEVEL 15
@@ -523,26 +522,30 @@ static bool8 GiftMonMenu_AddRandomSelection(struct ListMenuItem *items, u32 numM
     if (FlagGet(FLAG_SYS_SOLO_MODE) && VarGet(VAR_SOLO_MODE_POINTS) < GetSpeciesSoloModeCost(GIFT_MON_RANDOM_ID))
         return FALSE;
 
-    u16 availableMons[MAX_GIFT_MON_LIST];
-    u32 availableMonsCount = 0;
     u32 i;
+    u32 availableMonsCount = 0;
+    u16 randomSpecies = SPECIES_NONE;
+    u16 species;
 
+    // Reservoir sampling: each untaken mon in the pool has an equal chance of being
+    // selected, without a fixed-size buffer that can overflow as the pool grows.
     for (i = 0; i < numMons; i++)
     {
-        u16 species = items[i].id;
+        species = items[i].id;
 
         if (species == GIFT_MON_RANDOM_ID || species == GIFT_MON_FINISH_ID || species == SPECIES_EGG)
             continue;
 
-        if (!sGiftMonIsTaken[species])
-            availableMons[availableMonsCount++] = species;
+        if (sGiftMonIsTaken[species])
+            continue;
+
+        availableMonsCount++;
+        if (Random() % availableMonsCount == 0)
+            randomSpecies = species;
     }
 
     if (availableMonsCount == 0)
         return FALSE;
-
-    u32 randomIndex = Random() % availableMonsCount;
-    u16 randomSpecies = availableMons[randomIndex];
 
     return GiftMonMenu_AddSelection(randomSpecies, randomSpecies, randomSpecies, FALSE);
 }
