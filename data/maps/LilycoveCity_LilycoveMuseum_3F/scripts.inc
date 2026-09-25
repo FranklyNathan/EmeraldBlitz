@@ -274,7 +274,7 @@ Museum3F_SetTrainerGfx:
 	case 1, Museum3F_GfxSilver
 	case 2, Museum3F_GfxBlue
 	case 3, Museum3F_GfxPurple
-	case 4, Museum3F_GfxPink
+	case 4, Museum3F_GfxBlack
 	end
 
 Museum3F_GfxOrange:
@@ -289,8 +289,8 @@ Museum3F_GfxBlue:
 Museum3F_GfxPurple:
 	setvar VAR_0x8007, OBJ_EVENT_GFX_BRENDAN_PURPLE
 	goto Museum3F_ApplyTrainerGfx
-Museum3F_GfxPink:
-	setvar VAR_0x8007, OBJ_EVENT_GFX_BRENDAN_PINK
+Museum3F_GfxBlack:
+	setvar VAR_0x8007, OBJ_EVENT_GFX_BRENDAN_BLACK
 	goto Museum3F_ApplyTrainerGfx
 
 Museum3F_ApplyTrainerGfx:
