@@ -1334,8 +1334,8 @@ static void HallOfFame_PrintPlayerInfo(u8 unused1, u8 unused2)
     {
         AddTextPrinterParameterized3(1, FONT_NORMAL, 0, 0x31, sPlayerInfoTextColors, TEXT_SKIP_DRAW, gText_KOLeader);
         
-        GetMonData(&gPlayerParty[leaderIndex], MON_DATA_NICKNAME, gStringVar1);
-        StringGet_Nickname(gStringVar1);
+        u16 species = GetMonData(&gPlayerParty[leaderIndex], MON_DATA_SPECIES, NULL);
+        StringCopy(gStringVar1, GetSpeciesName(species));
         width = GetStringRightAlignXOffset(FONT_NORMAL, gStringVar1, 0x70);
         AddTextPrinterParameterized3(1, FONT_NORMAL, width, 0x31, sPlayerInfoTextColors, TEXT_SKIP_DRAW, gStringVar1);
    
