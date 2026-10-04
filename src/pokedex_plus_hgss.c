@@ -6789,11 +6789,10 @@ static void PrintEvolutionTargetSpeciesAndMethod(u8 taskId, u16 species, u8 dept
                 case IF_LOW_KEY_NATURE:
                     StringAppend(gStringVar4, COMPOUND_STRING("low-Key natures"));
                     break;
-                case IF_RECOIL_DAMAGE_GE:
-                    StringAppend(gStringVar4, COMPOUND_STRING("takes >= "));
+                case IF_FAINTED_LEVEL_SUM_GE:
+                    StringAppend(gStringVar4, COMPOUND_STRING("faint level sum >= "));
                     ConvertIntToDecimalStringN(gStringVar2, evolutions[i].params[j].arg1, STR_CONV_MODE_LEFT_ALIGN, 3);
                     StringAppend(gStringVar4, gStringVar2);
-                    StringAppend(gStringVar4, COMPOUND_STRING(" recoil dmg"));
                     break;
                 case IF_CURRENT_DAMAGE_GE:
                     ConvertIntToDecimalStringN(gStringVar2, evolutions[i].params[j].arg1, STR_CONV_MODE_LEFT_ALIGN, 3);

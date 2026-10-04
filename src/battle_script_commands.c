@@ -3441,7 +3441,6 @@ void SetMoveEffect(u32 battler, u32 effectBattler, enum MoveEffect moveEffect, c
         if (GetBattlerAbility(gEffectBattler) == ABILITY_PARENTAL_BOND)
             recoil *= 2;
         SetPassiveDamageAmount(gEffectBattler, recoil);
-        TryUpdateEvolutionTracker(IF_RECOIL_DAMAGE_GE, gBattleStruct->passiveHpUpdate[gBattlerAttacker], MOVE_NONE);
         BattleScriptPush(battleScript);
         gBattlescriptCurrInstr = BattleScript_MoveEffectRecoil;
         break;
@@ -4348,6 +4347,7 @@ static void Cmd_tryfaintmon(void)
             if (IsOnPlayerSide(battler))
             {
                 gHitMarker |= HITMARKER_PLAYER_FAINTED;
+                AddFaintedMonLevelSum(GetMonData(GetBattlerMon(battler), MON_DATA_LEVEL));
                 if (gBattleResults.playerFaintCounter < 255)
                     {
                     gBattleResults.playerFaintCounter++;
@@ -6009,7 +6009,6 @@ case EFFECT_RECOIL_IF_MISS:
                 break;
 
             SetPassiveDamageAmount(gBattlerAttacker, gBattleScripting.savedDmg * max(1, GetMoveRecoil(gCurrentMove)) / 100);
-            TryUpdateEvolutionTracker(IF_RECOIL_DAMAGE_GE, gBattleStruct->passiveHpUpdate[gBattlerAttacker], MOVE_NONE);
             BattleScriptCall(BattleScript_MoveEffectRecoil);
             effect = TRUE;
         }
@@ -6030,7 +6029,6 @@ case EFFECT_RECOIL_IF_MISS:
         {
             s32 recoil = (GetNonDynamaxMaxHP(gBattlerAttacker) + 1) / 2; // Half of Max HP Rounded UP
             SetPassiveDamageAmount(gBattlerAttacker, recoil);
-            TryUpdateEvolutionTracker(IF_RECOIL_DAMAGE_GE, gBattleStruct->passiveHpUpdate[gBattlerAttacker], MOVE_NONE);
             BattleScriptCall(BattleScript_MaxHp50Recoil);
             effect = TRUE;
         }
@@ -6045,7 +6043,6 @@ case EFFECT_RECOIL_IF_MISS:
 
             s32 recoil = (GetNonDynamaxMaxHP(gBattlerAttacker) + 1) / 2; // Half of Max HP Rounded UP
             SetPassiveDamageAmount(gBattlerAttacker, recoil);
-            TryUpdateEvolutionTracker(IF_RECOIL_DAMAGE_GE, gBattleStruct->passiveHpUpdate[gBattlerAttacker], MOVE_NONE);
             BattleScriptCall(BattleScript_MoveEffectRecoil);
             effect = TRUE;
         }
@@ -15685,17 +15682,11 @@ static void TryUpdateEvolutionTracker(u32 evolutionCondition, u32 upAmount, u16 
                     struct Pokemon *monDef = GetBattlerMon(gBattlerTarget);
                     // We only have 10 bits to use
                     u16 val = min(1023, GetMonData(monAtk, MON_DATA_EVOLUTION_TRACKER) + upAmount);
-                    // Reset progress if you faint for the recoil method.
                     switch (evolutionCondition)
                     {
                         case IF_USED_MOVE_X_TIMES:
                             if (evolutions[i].params[j].arg1 == usedMove)
                                 SetMonData(monAtk, MON_DATA_EVOLUTION_TRACKER, &val);
-                            break;
-                        case IF_RECOIL_DAMAGE_GE:
-                            if (gBattleMons[gBattlerAttacker].hp == 0)
-                                val = 0;
-                            SetMonData(monAtk, MON_DATA_EVOLUTION_TRACKER, &val);
                             break;
                         case IF_DEFEAT_X_WITH_ITEMS:
                             if (GetMonData(monDef, MON_DATA_SPECIES) == evolutions[i].params[j].arg1

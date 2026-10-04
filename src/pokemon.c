@@ -4467,6 +4467,26 @@ u8 GetNature(struct Pokemon *mon)
     return GetMonData(mon, MON_DATA_PERSONALITY, 0) % NUM_NATURES;
 }
 
+#define FAINTED_MON_LEVEL_SUM_CHECK 0xB45C
+
+u16 GetFaintedMonLevelSum(void)
+{
+    u16 sum = gSaveBlock1Ptr->faintedMonLevelSum;
+
+    if (sum > 1023 || gSaveBlock1Ptr->faintedMonLevelSumCheck != (sum ^ FAINTED_MON_LEVEL_SUM_CHECK))
+        return 0;
+
+    return sum;
+}
+
+void AddFaintedMonLevelSum(u16 level)
+{
+    u16 sum = min(1023, GetFaintedMonLevelSum() + level);
+
+    gSaveBlock1Ptr->faintedMonLevelSum = sum;
+    gSaveBlock1Ptr->faintedMonLevelSumCheck = sum ^ FAINTED_MON_LEVEL_SUM_CHECK;
+}
+
 u8 GetNatureFromPersonality(u32 personality)
 {
     return personality % NUM_NATURES;
@@ -4730,8 +4750,8 @@ bool32 DoesMonMeetAdditionalConditions(struct Pokemon *mon, const struct Evoluti
                 break;
             }
             break;
-        case IF_RECOIL_DAMAGE_GE:
-            if (evolutionTracker >= params[i].arg1)
+        case IF_FAINTED_LEVEL_SUM_GE:
+            if (GetFaintedMonLevelSum() >= params[i].arg1)
                 currentCondition = TRUE;
             break;
         case IF_CURRENT_DAMAGE_GE:

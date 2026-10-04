@@ -293,7 +293,7 @@ enum EvolutionConditions {
     IF_NATURE,                          // The Pokémon has a specific nature.
     IF_AMPED_NATURE,                    // The Pokémon has one of the following natures: Hardy, Brave, Adamant, Naughty, Docile, Impish, Lax, Hasty, Jolly, Naive, Rash, Sassy, or Quirky.
     IF_LOW_KEY_NATURE,                  // The Pokémon has one of the following natures: Lonely, Bold, Relaxed, Timid, Serious, Modest, Mild, Quiet, Bashful, Calm, Gentle, or Careful.
-    IF_RECOIL_DAMAGE_GE,                // The Pokémon suffered at least certain amount of non-fainting recoil damage.
+    IF_FAINTED_LEVEL_SUM_GE,             // The player's fainted Pokémon levels sum to at least the defined value.
     IF_CURRENT_DAMAGE_GE,               // The Pokémon has the specified difference of HP from its Max HP.
     IF_CRITICAL_HITS_GE,                // The Pokémon performed the specified number of critical hits in one battle at least.
     IF_USED_MOVE_X_TIMES,               // The Pokémon has used a move for at least X amount of times.
