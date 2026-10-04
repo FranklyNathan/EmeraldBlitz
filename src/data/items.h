@@ -1993,9 +1993,9 @@ const struct Item gItemsInfo[] =
         .name = ITEM_NAME("Serious Mint"),
         .price = 3000,
         .description = COMPOUND_STRING(
-            "Can be smelled. It\n"
-            "makes each stat\n"
-            "grow equally."),
+            "Can be smelled.\n"
+            "Changes a Pokémon's\n"
+            "nature to Serious."),
         .pocket = POCKET_ITEMS,
         .sortType = ITEM_TYPE_NATURE_MINT,
         .type = ITEM_USE_PARTY_MENU,

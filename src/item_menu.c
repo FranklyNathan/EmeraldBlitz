@@ -3178,10 +3178,20 @@ static s32 CompareItemsByIndex(enum Pocket pocketId, struct ItemSlot item1, stru
         return 0;
     }
 
-    if (index1 < index2)
-        return -1;
-    else if (index1 > index2)
-        return 1;
+    if (pocketId == POCKET_BERRIES)
+    {
+        if (index1 < index2)
+            return 1;
+        else if (index1 > index2)
+            return -1;
+    }
+    else
+    {
+        if (index1 < index2)
+            return -1;
+        else if (index1 > index2)
+            return 1;
+    }
 
     return 0; // Cannot have multiple stacks of indexed items
 }

@@ -2423,22 +2423,12 @@ static const u16 sPetililEggMoveLearnset[] = {
 
 #if P_FAMILY_BASCULIN
 static const u16 sBasculinEggMoveLearnset[] = {
-    MOVE_SWIFT,
-    MOVE_BUBBLE_BEAM,
-    MOVE_MUD_SHOT,
-    MOVE_MUDDY_WATER,
-    MOVE_AGILITY,
-    MOVE_WHIRLPOOL,
-    MOVE_RAGE,
-    MOVE_BRINE,
-    MOVE_REVENGE,
-    MOVE_HEAD_SMASH,
+    MOVE_ENDEAVOR,
     MOVE_UNAVAILABLE,
 };
 #if P_HISUIAN_FORMS
 static const u16 sBasculinWhiteStripedEggMoveLearnset[] = {
     MOVE_ENDEAVOR,
-    MOVE_LAST_RESPECTS,
     MOVE_UNAVAILABLE,
 };
 #endif //P_HISUIAN_FORMS
