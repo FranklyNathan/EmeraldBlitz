@@ -653,19 +653,7 @@ static const u16 sChanseyEggMoveLearnset[] = {
 
 #if P_FAMILY_TANGELA
 static const u16 sTangelaEggMoveLearnset[] = {
-    MOVE_FLAIL,
-    MOVE_CONFUSION,
-    MOVE_MEGA_DRAIN,
-    MOVE_AMNESIA,
-    MOVE_LEECH_SEED,
-    MOVE_NATURE_POWER,
-    MOVE_ENDEAVOR,
     MOVE_LEAF_STORM,
-    MOVE_POWER_SWAP,
-    MOVE_GIGA_DRAIN,
-    MOVE_RAGE_POWDER,
-    MOVE_NATURAL_GIFT,
-    MOVE_WAKE_UP_SLAP,
     MOVE_UNAVAILABLE,
 };
 #endif //P_FAMILY_TANGELA
@@ -1286,18 +1274,7 @@ static const u16 sTeddiursaEggMoveLearnset[] = {
 
 #if P_FAMILY_SLUGMA
 static const u16 sSlugmaEggMoveLearnset[] = {
-    MOVE_ACID_ARMOR,
     MOVE_HEAT_WAVE,
-    MOVE_CURSE,
-    MOVE_SMOKESCREEN,
-    MOVE_MEMENTO,
-    MOVE_STOCKPILE,
-    MOVE_SPIT_UP,
-    MOVE_SWALLOW,
-    MOVE_ROLLOUT,
-    MOVE_INFERNO,
-    MOVE_EARTH_POWER,
-    MOVE_GUARD_SWAP,
     MOVE_UNAVAILABLE,
 };
 #endif //P_FAMILY_SLUGMA

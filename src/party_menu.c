@@ -3622,6 +3622,7 @@ static bool8 PartyMonCanEvolve(u16 species, u8 level)
          || species == SPECIES_ARON
          || species == SPECIES_AXEW
          || species == SPECIES_GOOMY
+         || species == SPECIES_KLINK
          || species == SPECIES_GOTHITA
          || species == SPECIES_HONEDGE
          || species == SPECIES_IMPIDIMP
@@ -4261,6 +4262,7 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
         if (gPlayerPartyCount > 1
             && !GetMonData(&mons[slotId], MON_DATA_IS_EGG)
             && GetMonData(&mons[slotId], MON_DATA_HP) == 0
+            && CountMonsInBox(PARTY_PC_BOX_ID) < PARTY_PC_SLOT_COUNT
             && !IsInEliteFourArea())
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_DEPOSIT);
         if (ItemIsMail(GetMonData(&mons[slotId], MON_DATA_HELD_ITEM)))

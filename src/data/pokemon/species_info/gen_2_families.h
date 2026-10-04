@@ -6239,7 +6239,7 @@ const struct SpeciesInfo gSpeciesInfoGen2[] =
         .levelUpLearnset = sSlugmaLevelUpLearnset,
         .teachableLearnset = sSlugmaTeachableLearnset,
         .eggMoveLearnset = sSlugmaEggMoveLearnset,
-        .evolutions = EVOLUTION({EVO_LEVEL, 38, SPECIES_MAGCARGO}),
+        .evolutions = EVOLUTION({EVO_LEVEL, 0, SPECIES_MAGCARGO, CONDITIONS({IF_KNOWS_MOVE, MOVE_ANCIENT_POWER})}),
     },
 
     [SPECIES_MAGCARGO] =
