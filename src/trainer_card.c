@@ -572,6 +572,14 @@ static void UpdateTrainerCardPalette(void)
 
     LoadPalette(palettes, BG_PLTT_ID(0), 3 * PLTT_SIZE_4BPP);
 
+    if (sData->trainerCard.gender != MALE)
+    {
+        if (sData->cardType != CARD_TYPE_FRLG)
+            LoadPalette(sHoennTrainerCardFemaleBg_Pal, BG_PLTT_ID(1), PLTT_SIZE_4BPP);
+        else
+            LoadPalette(sKantoTrainerCardFemaleBg_Pal, BG_PLTT_ID(1), PLTT_SIZE_4BPP);
+    }
+
     if (!sData->onBack)
         DrawStarsAndBadgesOnCard(); // Redraw front-side elements (stars/badges)
     else
