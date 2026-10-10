@@ -430,7 +430,7 @@ void Overworld_ResetStateAfterFly(void)
     FlagClear(FLAG_SYS_SAFARI_MODE);
     FlagClear(FLAG_SYS_USE_STRENGTH);
     FlagClear(FLAG_SYS_USE_FLASH);
-    if (!FlagGet(FLAG_DEFEATED_PETALBURG_GYM)
+    if (!FlagGet(FLAG_HIDE_ROUTE_109_MR_BRINEY_BOAT)
      && sWarpDestination.mapGroup == MAP_GROUP(MAP_DEWFORD_TOWN)
      && sWarpDestination.mapNum == MAP_NUM(MAP_DEWFORD_TOWN))
     {
