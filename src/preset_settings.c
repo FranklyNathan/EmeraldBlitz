@@ -101,6 +101,13 @@ const struct PlayerNamePreset gPlayerNamePresets[] =
         .windowFrameType = PRESET_FRAME_RANDOM,
         .playerPalette = PRESET_PALETTE_RANDOM,
     },
+    {
+        .name = _(".V$"),
+        .shuppetGuides = OPTIONS_SHUPPET_GUIDES_ON,
+        .flygonDust = 0, // Off
+        .windowFrameType = PRESET_FRAME(38),
+        .playerPalette = PRESET_PALETTE_BLACK,
+    },
 };
 
 static const struct PlayerNamePreset *FindPlayerNamePreset(const u8 *playerName)

@@ -13846,8 +13846,8 @@ const struct Item gItemsInfo[] =
         .type = ITEM_USE_FIELD,
         .fieldUseFunc = ItemUseOutOfBattle_MedKit,
         .secondaryId = 0,
-        .iconPic = gItemIcon_BoosterEnergy,
-        .iconPalette = gItemIconPalette_BoosterEnergy,
+        .iconPic = gItemIcon_MedKit,
+        .iconPalette = gItemIconPalette_MedKit,
     },
 
     [ITEM_PORTABLE_PC] =

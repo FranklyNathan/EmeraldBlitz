@@ -2172,7 +2172,30 @@ static u32 GetBestMonIntegrated(struct Pokemon *party, int firstId, int lastId, 
     u32 bestResist = UQ_4_12(2.0), bestResistEffective = UQ_4_12(2.0), typeMatchup; // 2.0 is the default "Neutral" matchup from GetBattleMonTypeMatchup
     bool32 isFreeSwitch = IsFreeSwitch(switchType, battlerIn1, opposingBattler), isSwitchinFirst, isSwitchinFirstPriority, canSwitchinWin1v1;
     u32 invalidMons = 0;
+    u32 invalidMonsForMega = 0, megaCounterMonId;
     uq4_12_t effectiveness = UQ_4_12(1.0);
+
+    // Preserve the Mega counter preference when using integrated switch choices.
+    if (IsBattlerMegaEvolved(opposingBattler))
+    {
+        for (i = firstId; i < lastId; i++)
+        {
+            if (!IsValidForBattle(&party[i])
+                || gBattlerPartyIndexes[battlerIn1] == i
+                || gBattlerPartyIndexes[battlerIn2] == i
+                || i == gBattleStruct->monToSwitchIntoId[battlerIn1]
+                || i == gBattleStruct->monToSwitchIntoId[battlerIn2]
+                || IsAceMon(battler, i)
+                || (GetMonAbility(&party[i]) == ABILITY_TRUANT && IsTruantMonVulnerable(battler, opposingBattler)))
+            {
+                invalidMonsForMega |= 1u << i;
+            }
+        }
+
+        megaCounterMonId = GetBestMonWithFakeOutOrProtect(party, firstId, lastId, invalidMonsForMega);
+        if (megaCounterMonId != PARTY_SIZE)
+            return megaCounterMonId;
+    }
 
     // Iterate through mons
     for (i = firstId; i < lastId; i++)

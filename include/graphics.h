@@ -1738,6 +1738,8 @@ extern const u32 gItemIcon_GimmighoulCoin[];
 extern const u16 gItemIconPalette_GimmighoulCoin[];
 extern const u32 gItemIcon_LeadersCrest[];
 extern const u16 gItemIconPalette_LeadersCrest[];
+extern const u32 gItemIcon_MedKit[];
+extern const u16 gItemIconPalette_MedKit[];
 extern const u32 gItemIcon_LoadedDice[];
 extern const u16 gItemIconPalette_LoadedDice[];
 extern const u32 gItemIcon_MaliciousArmor[];

@@ -106,6 +106,17 @@ EXCLUDED_MOVES_BY_SPECIES = {
     "SWAMPERT": ["MOVE_BULK_UP"],
 }
 
+# Per-species move force-inclusions: species -> moves to keep even if globally excluded
+FORCE_TEACHABLE_BY_SPECIES = {
+    "SLAKOTH": ["MOVE_CUT"],
+    "VIGOROTH": ["MOVE_CUT"],
+    "SLAKING": ["MOVE_CUT"],
+    "BUNEARY": ["MOVE_CUT"],
+    "LOPUNNY": ["MOVE_CUT"],
+    "BUNNELBY": ["MOVE_CUT"],
+    "DIGGERSBY": ["MOVE_CUT"],
+}
+
 # Special teachable rules: species -> moves to always add
 SPECIAL_TEACHABLE_BY_SPECIES = {
     "SHUPPET": ["MOVE_POUNCE"],
@@ -219,8 +230,9 @@ def prepare_output(all_learnables: dict[str, set[str]], repo_teachables: set[str
             continue
 
         species_excluded = set(EXCLUDED_MOVES_BY_SPECIES.get(species_upper, []))
+        species_forced = set(FORCE_TEACHABLE_BY_SPECIES.get(species_upper, []))
         repo_species_teachables = filter(
-            lambda m: m in repo_teachables and m not in species_excluded,
+            lambda m: (m in repo_teachables or m in species_forced) and m not in species_excluded,
             all_learnables[species_upper]
         )
 

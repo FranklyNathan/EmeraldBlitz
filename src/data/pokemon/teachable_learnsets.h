@@ -5576,6 +5576,7 @@ static const u16 sPorygonZTeachableLearnset[] = {
     MOVE_DARK_PULSE,
     MOVE_DOUBLE_EDGE,
     MOVE_FACADE,
+    MOVE_FLASH_CANNON,
     MOVE_HYPER_BEAM,
     MOVE_ICE_BEAM,
     MOVE_ICY_WIND,
@@ -10030,6 +10031,7 @@ static const u16 sSlakothTeachableLearnset[] = {
     MOVE_BLIZZARD,
     MOVE_BRICK_BREAK,
     MOVE_BULK_UP,
+    MOVE_CUT,
     MOVE_DOUBLE_EDGE,
     MOVE_FACADE,
     MOVE_FIRE_BLAST,
@@ -10072,6 +10074,7 @@ static const u16 sVigorothTeachableLearnset[] = {
     MOVE_BLIZZARD,
     MOVE_BRICK_BREAK,
     MOVE_BULK_UP,
+    MOVE_CUT,
     MOVE_DOUBLE_EDGE,
     MOVE_EARTHQUAKE,
     MOVE_FACADE,
@@ -10118,6 +10121,7 @@ static const u16 sSlakingTeachableLearnset[] = {
     MOVE_BODY_PRESS,
     MOVE_BRICK_BREAK,
     MOVE_BULK_UP,
+    MOVE_CUT,
     MOVE_DOUBLE_EDGE,
     MOVE_EARTHQUAKE,
     MOVE_FACADE,
@@ -14113,6 +14117,7 @@ static const u16 sDrifblimTeachableLearnset[] = {
 
 #if P_FAMILY_BUNEARY
 static const u16 sBunearyTeachableLearnset[] = {
+    MOVE_CUT,
     MOVE_FACADE,
     MOVE_FIRE_PUNCH,
     MOVE_HYPER_VOICE,
@@ -14136,6 +14141,7 @@ static const u16 sBunearyTeachableLearnset[] = {
 
 static const u16 sLopunnyTeachableLearnset[] = {
     MOVE_BLIZZARD,
+    MOVE_CUT,
     MOVE_FACADE,
     MOVE_FIRE_PUNCH,
     MOVE_FURY_CUTTER,
@@ -19618,6 +19624,7 @@ static const u16 sGreninjaTeachableLearnset[] = {
 static const u16 sBunnelbyTeachableLearnset[] = {
     MOVE_BRICK_BREAK,
     MOVE_BULK_UP,
+    MOVE_CUT,
     MOVE_EARTHQUAKE,
     MOVE_FACADE,
     MOVE_IRON_TAIL,
@@ -19639,6 +19646,7 @@ static const u16 sBunnelbyTeachableLearnset[] = {
 static const u16 sDiggersbyTeachableLearnset[] = {
     MOVE_BRICK_BREAK,
     MOVE_BULK_UP,
+    MOVE_CUT,
     MOVE_EARTHQUAKE,
     MOVE_FACADE,
     MOVE_FIRE_PUNCH,

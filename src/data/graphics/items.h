@@ -2123,6 +2123,9 @@ const u16 gItemIconPalette_GimmighoulCoin[] = INCBIN_U16("graphics/items/icon_pa
 const u32 gItemIcon_LeadersCrest[] = INCBIN_U32("graphics/items/icons/leaders_crest.4bpp.smol");
 const u16 gItemIconPalette_LeadersCrest[] = INCBIN_U16("graphics/items/icon_palettes/leaders_crest.gbapal");
 
+const u32 gItemIcon_MedKit[] = INCBIN_U32("graphics/items/icons/med_kit.4bpp.smol");
+const u16 gItemIconPalette_MedKit[] = INCBIN_U16("graphics/items/icon_palettes/med_kit.gbapal");
+
 const u32 gItemIcon_MaliciousArmor[] = INCBIN_U32("graphics/items/icons/malicious_armor.4bpp.smol");
 const u16 gItemIconPalette_MaliciousArmor[] = INCBIN_U16("graphics/items/icon_palettes/malicious_armor.gbapal");
 

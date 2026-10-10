@@ -430,6 +430,13 @@ void Overworld_ResetStateAfterFly(void)
     FlagClear(FLAG_SYS_SAFARI_MODE);
     FlagClear(FLAG_SYS_USE_STRENGTH);
     FlagClear(FLAG_SYS_USE_FLASH);
+    if (!FlagGet(FLAG_DEFEATED_PETALBURG_GYM)
+     && sWarpDestination.mapGroup == MAP_GROUP(MAP_DEWFORD_TOWN)
+     && sWarpDestination.mapNum == MAP_NUM(MAP_DEWFORD_TOWN))
+    {
+        VarSet(VAR_BRINEY_LOCATION, 2);
+        RunScriptImmediately(EventScript_ResetMrBriney);
+    }
 }
 
 void Overworld_ResetStateAfterTeleport(void)
