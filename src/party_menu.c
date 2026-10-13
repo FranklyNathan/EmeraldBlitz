@@ -772,6 +772,7 @@ static void RevertInactiveMegas(void)
         u32 i, j;
         for (i = 0; i < gPlayerPartyCount; i++)
         {
+            u32 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
             bool8 isOnField = FALSE;
             for (j = 0; j < gBattlersCount; j++)
             {
@@ -782,7 +783,12 @@ static void RevertInactiveMegas(void)
                 }
             }
 
-            if (!isOnField)
+            if (!isOnField
+             && (gSpeciesInfo[species].isMegaEvolution
+              || gSpeciesInfo[species].isPrimalReversion
+              || gSpeciesInfo[species].isUltraBurst
+              || gSpeciesInfo[species].isGigantamax
+              || gSpeciesInfo[species].isTeraForm))
                 TryRevertPartyMonFormChange(i);
         }
     }
