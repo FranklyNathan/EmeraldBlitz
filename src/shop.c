@@ -2108,10 +2108,19 @@ static void RecordItemPurchase(u8 taskId)
 #undef tCallbackLo
 #undef tIsScottTmShopExit
 
-void CreateScottTmShopMenu(void)
+static void SetupScottTmShopMenu(bool8 isFreshVisit)
 {
-    u8 i;
-    PrepareScottTmShopInventory();
+    if (isFreshVisit)
+    {
+        u8 i;
+        PrepareScottTmShopInventory();
+        // Initialize purchase tracking for this session
+        for (i = 0; i < 5; i++)
+            sScottTmPurchased[i] = FALSE;
+        sScottTmPurchasedCount = 0; // Initialize new counter
+        sScottTmInvertPurchased = FALSE;
+    }
+
     SetShopItemsForSale(sScottTmItemList);
     sMartInfo.priceList = sScottTmPriceList;
     ClearItemPurchases();
@@ -2119,14 +2128,22 @@ void CreateScottTmShopMenu(void)
     LockPlayerFieldControls();
     sMartInfo.martType = MART_TYPE_NORMAL;
     sIsScottTmShop = TRUE;
-    // Initialize purchase tracking for this session
-    for (i = 0; i < 5; i++)
-        sScottTmPurchased[i] = FALSE;
-    sScottTmPurchasedCount = 0; // Initialize new counter
-    sScottTmInvertPurchased = FALSE;
     sScottTmPreviewMode = FALSE; // Reset preview mode
     VarSet(VAR_POWER_TM_CLERK, 1);
     CreateTask(Task_HandleShopMenuBuy, 8);
+}
+
+void CreateScottTmShopMenu(void)
+{
+    SetupScottTmShopMenu(TRUE);
+}
+
+// Re-opens Scott's TM shop after the player declined to quit. Unlike a fresh
+// visit this keeps the existing inventory and purchase progress, so the shop
+// returns in exactly the state it was in before the player tried to leave.
+void ReopenScottTmShopMenu(void)
+{
+    SetupScottTmShopMenu(FALSE);
 }
 
 void CreatePokemartMenu(const u16 *itemsForSale)

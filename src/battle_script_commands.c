@@ -2448,6 +2448,7 @@ static void MoveDamageDataHpUpdate(u32 battler, u32 scriptBattler, const u8 *nex
             gBattleMons[battler].species = SPECIES_MIMIKYU_BUSTED_TOTEM;
         else
             gBattleMons[battler].species = SPECIES_MIMIKYU_BUSTED;
+        SetMonData(GetBattlerMon(battler), MON_DATA_SPECIES, &gBattleMons[battler].species);
         if (GetConfig(CONFIG_DISGUISE_HP_LOSS) >= GEN_8)
             SetPassiveDamageAmount(battler, GetNonDynamaxMaxHP(battler) / 8);
         BattleScriptPush(nextInstr);
@@ -5469,6 +5470,7 @@ static void Cmd_isdmgblockedbydisguise(void)
         gBattleMons[gBattlerAttacker].species = SPECIES_MIMIKYU_BUSTED_TOTEM;
     else
         gBattleMons[gBattlerAttacker].species = SPECIES_MIMIKYU_BUSTED;
+    SetMonData(GetBattlerMon(gBattlerAttacker), MON_DATA_SPECIES, &gBattleMons[gBattlerAttacker].species);
     if (GetConfig(CONFIG_DISGUISE_HP_LOSS) >= GEN_8)
         SetPassiveDamageAmount(gBattlerAttacker, GetNonDynamaxMaxHP(gBattlerAttacker) / 8);
     BattleScriptPush(BattleScript_MoveEnd);
@@ -9749,6 +9751,8 @@ static void HandleScriptMegaPrimalBurst(u32 caseId, u32 battler, u32 type)
             TryBattleFormChange(battler, FORM_CHANGE_BATTLE_PRIMAL_REVERSION);
         else
             TryBattleFormChange(battler, FORM_CHANGE_BATTLE_ULTRA_BURST);
+
+        RecordAbilityBattle(battler, gBattleMons[battler].ability);
 
         PREPARE_SPECIES_BUFFER(gBattleTextBuff1, gBattleMons[battler].species);
 

@@ -69,3 +69,19 @@ Common_EventScript_ScottFlyAway::
 	removeobject VAR_LAST_TALKED
 	waitfieldeffect FLDEFF_NPCFLY_OUT
 	return
+
+@ Opens Scott's TM shop after a gym. When the player backs out, ask whether
+@ they are really finished; if not, re-open the shop in the exact state it was
+@ left in instead of re-rolling the inventory.
+Common_EventScript_ScottTmShop::
+	special OpenScottTmShop
+	waitstate
+Common_EventScript_ScottTmShop_Ask:
+	msgbox gText_ScottFinishedBuyingTMs, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Common_EventScript_ScottTmShop_Reopen
+	return
+
+Common_EventScript_ScottTmShop_Reopen:
+	special ReopenScottTmShop
+	waitstate
+	goto Common_EventScript_ScottTmShop_Ask

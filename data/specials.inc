@@ -117,6 +117,7 @@ gSpecials::
 	def_special TryContestGModeLinkup
 	def_special SaveGame
 	def_special OpenScottTmShop
+	def_special ReopenScottTmShop
 	def_special DoWateringBerryTreeAnim
 	def_special ShowEasyChatScreen
 	def_special Special_GetQuizAnswer

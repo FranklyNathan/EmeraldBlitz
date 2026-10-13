@@ -28,8 +28,7 @@ FortreeCity_EventScript_ScottText3::
 	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym3, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_FORTREE_SCOTT
-	special OpenScottTmShop
-	waitstate
+	call Common_EventScript_ScottTmShop
 	msgbox gText_ScottFinalSentence3, MSGBOX_DEFAULT
 	playfanfare MUS_OBTAIN_ITEM
 	giveitem ITEM_HM_FLY
@@ -51,8 +50,7 @@ FortreeCity_EventScript_ScottText4::
 	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym4, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_FORTREE_SCOTT
-	special OpenScottTmShop
-	waitstate
+	call Common_EventScript_ScottTmShop
 	msgbox gText_ScottFinalSentence3, MSGBOX_DEFAULT
 	giveitem ITEM_HM_FLY
 	setflag FLAG_RECEIVED_HM_FLY
@@ -63,8 +61,7 @@ FortreeCity_EventScript_ScottText5::
 	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym5, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_FORTREE_SCOTT
-	special OpenScottTmShop
-	waitstate
+	call Common_EventScript_ScottTmShop
 	msgbox gText_ScottFinalSentence3, MSGBOX_DEFAULT
 	giveitem ITEM_HM_FLY
 	setflag FLAG_RECEIVED_HM_FLY

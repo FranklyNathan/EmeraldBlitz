@@ -12,7 +12,14 @@
 #define MULTICHOICE_DYNAMIC_STACK_SIZE 5
 #define MULTICHOICE_DYNAMIC_STACK_INC 5
 
+#define GIFT_MON_FINISH_ID 999
+#define GIFT_MON_RANDOM_ID 1000
+#define GIFT_MON_RAND_TEAM_ID 1001
+#define GIFT_MON_TEAM_SIZE 8
+
 extern const u8 *const gStdStrings[];
+
+u8 GenerateRandomGiftTeam(struct ListMenuItem *items, u32 numItems, u16 *outTeam);
 
 struct DynamicMultichoiceStack
 {

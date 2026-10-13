@@ -714,8 +714,7 @@ DewfordTown_EventScript_ScottText0::
 	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
-	special OpenScottTmShop
-	waitstate
+	call Common_EventScript_ScottTmShop
 	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
 	call Common_EventScript_ScottFlyAway
 	return
@@ -724,8 +723,7 @@ DewfordTown_EventScript_ScottText1::
 	call_if_eq VAR_SLATEPORT_RENTAL_STATE, 1, Common_EventScript_CheckRentalFraudforScott
 	msgbox gText_ScottPostGym1, MSGBOX_DEFAULT
 	setvar VAR_LAST_TALKED, LOCALID_DEWFORD_SCOTT
-	special OpenScottTmShop
-	waitstate
+	call Common_EventScript_ScottTmShop
 	msgbox gText_ScottFinalSentence1, MSGBOX_DEFAULT
 	call Common_EventScript_ScottFlyAway
 	return

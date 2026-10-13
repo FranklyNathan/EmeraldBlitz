@@ -181,6 +181,12 @@ void OpenScottTmShop(void)
     ScriptContext_Stop();
 }
 
+void ReopenScottTmShop(void)
+{
+    ReopenScottTmShopMenu();
+    ScriptContext_Stop();
+}
+
 void Special_ShowDiploma(void)
 {
     SetMainCallback2(CB2_ShowDiploma);

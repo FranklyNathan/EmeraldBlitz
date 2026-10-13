@@ -41,9 +41,6 @@
 #define TAG_GIFT_MON_PIC_TILES 5510
 #define TAG_GIFT_MON_PIC_PALETTE 5511
 
-#define GIFT_MON_RANDOM_ID 1000
-#define GIFT_MON_FINISH_ID 999
-
 #define MAX_GIFT_MON 10
 #define GIFT_MON_LEVEL 15
 
@@ -235,6 +232,8 @@ static bool8 GiftMonMenu_RecordSelection(u16 species, u16 displaySpecies, u16 ta
 static bool8 GiftMonMenu_AddSelection(u16 species, u16 displaySpecies, u16 takenKey, bool8 giveEgg);
 static bool8 GiftMonMenu_AddEggSelection(void);
 static bool8 GiftMonMenu_AddRandomSelection(struct ListMenuItem *items, u32 numMons);
+static bool8 GiftMonMenu_AddRandomTeamSelection(struct ListMenuItem *items, u32 numMons);
+static void GiftMonMenu_RemoveAllSelections(void);
 static bool8 GiftMonMenu_RemoveSelection(u16 takenKey);
 static bool8 GiftMonMenu_RemoveSelectionEntry(struct GiftMonMenuSelection *selection);
 static bool8 GiftMonMenu_RemoveFromParty(u16 species, u32 personality);
@@ -276,7 +275,7 @@ static void GiftMonMenu_CreateFrontSprite(u16 species)
     sGiftMonMenuData.selectedMonSpecies = species;
     if (species != GIFT_MON_FINISH_ID)
     {
-        if (species == GIFT_MON_RANDOM_ID)
+        if (species == GIFT_MON_RANDOM_ID || species == GIFT_MON_RAND_TEAM_ID)
             species = SPECIES_NONE;
 
         // Use the species ID as the palette tag to ensure each Pokémon gets its own unique palette, except for the question mark.
@@ -550,6 +549,58 @@ static bool8 GiftMonMenu_AddRandomSelection(struct ListMenuItem *items, u32 numM
     return GiftMonMenu_AddSelection(randomSpecies, randomSpecies, randomSpecies, FALSE);
 }
 
+// Clears every current pick (refunding solo points) so a new team can be drafted from scratch.
+static void GiftMonMenu_RemoveAllSelections(void)
+{
+    u8 i;
+
+    for (i = 0; i < MAX_GIFT_MON; i++)
+    {
+        struct GiftMonMenuSelection *selection = &sGiftMonSelections[i];
+
+        if (!selection->active)
+            continue;
+
+        GiftMonMenu_RemoveSelectionEntry(selection);
+
+        if (FlagGet(FLAG_SYS_SOLO_MODE))
+        {
+            u8 cost = GetSpeciesSoloModeCost(selection->species);
+            VarSet(VAR_SOLO_MODE_POINTS, VarGet(VAR_SOLO_MODE_POINTS) + cost);
+        }
+
+        sGiftMonIsTaken[selection->takenKey] = FALSE;
+        memset(selection, 0, sizeof(*selection));
+    }
+
+    GiftMonMenu_RebuildChosenMonIcons();
+}
+
+static bool8 GiftMonMenu_AddRandomTeamSelection(struct ListMenuItem *items, u32 numMons)
+{
+    u16 team[GIFT_MON_TEAM_SIZE];
+    u8 count;
+    u8 i;
+
+    count = GenerateRandomGiftTeam(items, numMons, team);
+    if (count == 0)
+        return FALSE;
+
+    GiftMonMenu_RemoveAllSelections();
+
+    for (i = 0; i < count; i++)
+    {
+        u16 species = team[i];
+
+        if (species == SPECIES_EGG)
+            GiftMonMenu_AddEggSelection();
+        else
+            GiftMonMenu_AddSelection(species, species, species, FALSE);
+    }
+
+    return TRUE;
+}
+
 static bool8 GiftMonMenu_RemoveSelection(u16 takenKey)
 {
     struct GiftMonMenuSelection *selection = GiftMonMenu_FindSelection(takenKey);
@@ -669,6 +720,9 @@ static u8 CountTakenGiftMons(void)
     return count;
 }
 
+static const u8 sText_RandomLabel[] = _("Random");
+static const u8 sText_RandTeam[] = _("Rand Team");
+
 static void GiftMonMenu_ItemPrintFunc(u8 windowId, u32 speciesId, u8 y)
 {
     const u8 *colors;
@@ -677,10 +731,12 @@ static void GiftMonMenu_ItemPrintFunc(u8 windowId, u32 speciesId, u8 y)
     
     if (speciesId == SPECIES_EGG)
         name = gText_EggNickname;
-    else if (speciesId == 999)
+    else if (speciesId == GIFT_MON_FINISH_ID)
         name = gText_Finished;
     else if (speciesId == GIFT_MON_RANDOM_ID)
-        name = gText_Finished;
+        name = sText_RandomLabel;
+    else if (speciesId == GIFT_MON_RAND_TEAM_ID)
+        name = sText_RandTeam;
     else
         name = gSpeciesInfo[speciesId].speciesName;
 
@@ -690,7 +746,8 @@ static void GiftMonMenu_ItemPrintFunc(u8 windowId, u32 speciesId, u8 y)
     FillWindowPixelRect(windowId, PIXEL_FILL(1), 8, y, GetWindowAttribute(windowId, WINDOW_WIDTH) * 8 - 8, 16);
     AddTextPrinterParameterized4(windowId, FONT_NORMAL, 8, y, 0, 0, colors, TEXT_SKIP_DRAW, name);
 
-    if (FlagGet(FLAG_SYS_SOLO_MODE) && speciesId != 999)
+    if (FlagGet(FLAG_SYS_SOLO_MODE) && speciesId != GIFT_MON_FINISH_ID
+     && speciesId != GIFT_MON_RANDOM_ID && speciesId != GIFT_MON_RAND_TEAM_ID)
     {
         cost = GetSpeciesSoloModeCost(speciesId);
         ConvertIntToDecimalStringN(gStringVar1, cost, STR_CONV_MODE_LEFT_ALIGN, 2);
@@ -1284,6 +1341,22 @@ static void Task_HandleScrollingMultichoiceInput(u8 taskId)
                     {
                         PlaySE(SE_FAILURE);
                     }
+                }
+            }
+            else if ((u16)input == GIFT_MON_RAND_TEAM_ID)
+            {
+                struct ListMenuItem *items;
+
+                LoadWordFromTwoHalfwords((u16 *)&gTasks[taskId].data[3], (u32 *)&items);
+                if (GiftMonMenu_AddRandomTeamSelection(items, gTasks[taskId].data[5]))
+                {
+                    PlaySE(SE_SUCCESS);
+                    RedrawListMenu(gTasks[taskId].data[0]);
+                    GiftMonMenu_UpdatePointsDisplay();
+                }
+                else
+                {
+                    PlaySE(SE_FAILURE);
                 }
             }
             else if ((u16)input == SPECIES_EGG)
