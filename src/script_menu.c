@@ -155,6 +155,7 @@ static EWRAM_DATA u8 sDynamicMenuEventId = 0;
 static EWRAM_DATA struct DynamicMultichoiceStack *sDynamicMultiChoiceStack = NULL;
 static EWRAM_DATA u16 *sDynamicMenuEventScratchPad = NULL;
 static EWRAM_DATA bool8 sGiftMonIsTaken[SPECIES_EGG + 1] = {0};
+static EWRAM_DATA bool8 sGiftMonRandTeamActive = FALSE;
 static EWRAM_DATA bool8 sIsGiftMonMenu = FALSE; // TODO: Make this a part of the dynamic list menu args
 static u8 sLilycoveSSTidalSelections[SSTIDAL_SELECTION_COUNT] = {0}; // TODO: Make this a part of the dynamic list menu args
 
@@ -721,7 +722,7 @@ static u8 CountTakenGiftMons(void)
 }
 
 static const u8 sText_RandomLabel[] = _("Random");
-static const u8 sText_RandTeam[] = _("Rand Team");
+static const u8 sText_RandTeam[] = _("Random Team");
 
 static void GiftMonMenu_ItemPrintFunc(u8 windowId, u32 speciesId, u8 y)
 {
@@ -740,7 +741,10 @@ static void GiftMonMenu_ItemPrintFunc(u8 windowId, u32 speciesId, u8 y)
     else
         name = gSpeciesInfo[speciesId].speciesName;
 
-    colors = sGiftMonIsTaken[speciesId] ? sGiftMenuTextColors[1] : sGiftMenuTextColors[0];
+    if (speciesId == GIFT_MON_RAND_TEAM_ID)
+        colors = sGiftMonRandTeamActive ? sGiftMenuTextColors[1] : sGiftMenuTextColors[0];
+    else
+        colors = sGiftMonIsTaken[speciesId] ? sGiftMenuTextColors[1] : sGiftMenuTextColors[0];
 
     // Clear the area before drawing to prevent overwriting issues.
     FillWindowPixelRect(windowId, PIXEL_FILL(1), 8, y, GetWindowAttribute(windowId, WINDOW_WIDTH) * 8 - 8, 16);
@@ -1093,6 +1097,7 @@ for (i = 0; i < argc; ++i) {
         sGiftMonMenuData.pointsWindowId = WINDOW_NONE;
         memset(sGiftMonIsTaken, 0, sizeof(sGiftMonIsTaken));
         memset(sGiftMonSelections, 0, sizeof(sGiftMonSelections));
+        sGiftMonRandTeamActive = FALSE;
         GiftMonMenu_ClearChosenMonIcons();
         sGiftMonMenuData.selectedMonSpriteId = 0xFFFF;
         sGiftMonMenuData.selectedMonSpecies = 0;
@@ -1333,6 +1338,7 @@ static void Task_HandleScrollingMultichoiceInput(u8 taskId)
                     LoadWordFromTwoHalfwords((u16 *)&gTasks[taskId].data[3], (u32 *)&items);
                     if (GiftMonMenu_AddRandomSelection(items, gTasks[taskId].data[5]))
                     {
+                        sGiftMonRandTeamActive = FALSE;
                         PlaySE(SE_SUCCESS);
                         RedrawListMenu(gTasks[taskId].data[0]);
                         GiftMonMenu_UpdatePointsDisplay();
@@ -1345,28 +1351,57 @@ static void Task_HandleScrollingMultichoiceInput(u8 taskId)
             }
             else if ((u16)input == GIFT_MON_RAND_TEAM_ID)
             {
-                struct ListMenuItem *items;
-
-                LoadWordFromTwoHalfwords((u16 *)&gTasks[taskId].data[3], (u32 *)&items);
-                if (GiftMonMenu_AddRandomTeamSelection(items, gTasks[taskId].data[5]))
+                if (sGiftMonRandTeamActive)
                 {
-                    PlaySE(SE_SUCCESS);
+                    // Pressing again deselects: remove the whole team and clear no picks.
+                    GiftMonMenu_RemoveAllSelections();
+                    sGiftMonRandTeamActive = FALSE;
+                    PlaySE(SE_PC_OFF);
                     RedrawListMenu(gTasks[taskId].data[0]);
                     GiftMonMenu_UpdatePointsDisplay();
                 }
                 else
                 {
-                    PlaySE(SE_FAILURE);
+                    struct ListMenuItem *items;
+
+                    LoadWordFromTwoHalfwords((u16 *)&gTasks[taskId].data[3], (u32 *)&items);
+                    if (GiftMonMenu_AddRandomTeamSelection(items, gTasks[taskId].data[5]))
+                    {
+                        sGiftMonRandTeamActive = TRUE;
+                        PlaySE(SE_SUCCESS);
+                        RedrawListMenu(gTasks[taskId].data[0]);
+                        GiftMonMenu_UpdatePointsDisplay();
+                    }
+                    else
+                    {
+                        PlaySE(SE_FAILURE);
+                    }
                 }
             }
             else if ((u16)input == SPECIES_EGG)
             {
-                if (CountTakenGiftMons() >= MAX_GIFT_MON)
+                if (sGiftMonIsTaken[SPECIES_EGG])
+                {
+                    // Pressing again deselects the egg, just like a normal mon pick.
+                    if (GiftMonMenu_RemoveSelection(SPECIES_EGG))
+                    {
+                        sGiftMonRandTeamActive = FALSE;
+                        PlaySE(SE_PC_OFF);
+                        RedrawListMenu(gTasks[taskId].data[0]);
+                        GiftMonMenu_UpdatePointsDisplay();
+                    }
+                    else
+                    {
+                        PlaySE(SE_FAILURE);
+                    }
+                }
+                else if (CountTakenGiftMons() >= MAX_GIFT_MON)
                 {
                     PlaySE(SE_FAILURE);
                 }
                 else if (GiftMonMenu_AddEggSelection())
                 {
+                    sGiftMonRandTeamActive = FALSE;
                     PlaySE(SE_SUCCESS);
                     RedrawListMenu(gTasks[taskId].data[0]);
                     GiftMonMenu_UpdatePointsDisplay();
@@ -1393,6 +1428,7 @@ static void Task_HandleScrollingMultichoiceInput(u8 taskId)
                         if (partnerSpecies != SPECIES_NONE && sGiftMonIsTaken[partnerSpecies])
                             GiftMonMenu_RemoveSelection(partnerSpecies);
 
+                        sGiftMonRandTeamActive = FALSE;
                         PlaySE(SE_PC_OFF);
                         RedrawListMenu(gTasks[taskId].data[0]);
                         GiftMonMenu_UpdatePointsDisplay();
@@ -1411,6 +1447,7 @@ static void Task_HandleScrollingMultichoiceInput(u8 taskId)
                     if (partnerSpecies != SPECIES_NONE && !sGiftMonIsTaken[partnerSpecies])
                         GiftMonMenu_AddSelection(partnerSpecies, partnerSpecies, partnerSpecies, FALSE);
 
+                    sGiftMonRandTeamActive = FALSE;
                     PlaySE(SE_SUCCESS);
                     RedrawListMenu(gTasks[taskId].data[0]);
                     GiftMonMenu_UpdatePointsDisplay();
