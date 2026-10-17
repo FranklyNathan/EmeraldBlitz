@@ -937,7 +937,7 @@ static void Task_EvolutionScene(u8 taskId)
                         BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
                 }
             }
-            if (JOY_NEW(B_BUTTON))
+            else if (JOY_NEW(B_BUTTON))
             {
                 // Equivalent to selecting NO
                 HandleBattleWindow(YESNOBOX_X_Y, WINDOW_CLEAR);

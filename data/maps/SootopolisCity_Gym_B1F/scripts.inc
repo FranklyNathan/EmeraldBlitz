@@ -13,6 +13,7 @@ SootopolisCity_Gym_B1F_EventScript_HideGabbyTy:
 
 SootopolisCity_Gym_B1F_EventScript_InterviewScene::
 	setvar VAR_SOOTOPOLIS_GYM_B1F_SCENE, 0
+	goto_if_set FLAG_SOOTOPOLIS_GYM_INTERVIEWED_TWICE, SootopolisCity_Gym_B1F_EventScript_NoMoreInterviews
 	lockall
 	clearflag FLAG_HIDE_SOOTOPOLIS_GYM_B1F_GABBY_TY
 	addobject LOCALID_SOOTOPOLIS_GYM_B1F_GABBY
@@ -307,6 +308,7 @@ SootopolisCity_Gym_B1F_EventScript_RepeatLoop_AfterGabbyJump:
 	closemessage
 	setvar VAR_0x8004, OPTIONS_TEXT_SPEED_FAST
 	special SetOptionsTextSpeed
+	setflag FLAG_SOOTOPOLIS_GYM_INTERVIEWED_TWICE
 	fadescreen FADE_TO_BLACK
 	delay 30
 	removeobject LOCALID_SOOTOPOLIS_GYM_B1F_GABBY
@@ -316,6 +318,9 @@ SootopolisCity_Gym_B1F_EventScript_RepeatLoop_AfterGabbyJump:
 	delay 10
 	fadescreen FADE_FROM_BLACK
 	releaseall
+	end
+
+SootopolisCity_Gym_B1F_EventScript_NoMoreInterviews:
 	end
 
 SootopolisCity_Gym_B1F_EventScript_Andrea::

@@ -90,6 +90,7 @@
 #define FLAG_UNUSED_0x044    0x44 // Unused Flag
 #define FLAG_SOOTOPOLIS_GYM_INTERVIEWED FLAG_UNUSED_0x044
 #define FLAG_UNUSED_0x045    0x45 // Unused Flag
+#define FLAG_SOOTOPOLIS_GYM_INTERVIEWED_TWICE FLAG_UNUSED_0x045
 #define FLAG_UNUSED_0x046    0x46 // Unused Flag
 #define FLAG_UNUSED_0x047    0x47 // Unused Flag
 #define FLAG_UNUSED_0x048    0x48 // Unused Flag

@@ -7030,7 +7030,10 @@ void CB2_ShowPartyMenuForItemUse(void)
         menuType = PARTY_MENU_TYPE_FIELD;
         if (!IsInEliteFourArea()
             && (GetItemPocket(gSpecialVar_ItemId) == POCKET_TM_HM
-                || CheckIfItemIsTMHMOrEvolutionStone(gSpecialVar_ItemId) == 2))
+                || CheckIfItemIsTMHMOrEvolutionStone(gSpecialVar_ItemId) == 2
+                || GetItemFieldFunc(gSpecialVar_ItemId) == ItemUseOutOfBattle_AbilityCapsule
+                || GetItemFieldFunc(gSpecialVar_ItemId) == ItemUseOutOfBattle_AbilityPatch
+                || GetItemFieldFunc(gSpecialVar_ItemId) == ItemUseOutOfBattle_Mint))
             partyLayout = PARTY_LAYOUT_SINGLE_PC;
         else
             partyLayout = PARTY_LAYOUT_SINGLE;
@@ -7281,6 +7284,35 @@ void ItemUseCB_Medicine(u8 taskId, TaskFunc task)
     }
 }
 
+static struct Pokemon sItemUsePcMon;
+
+static struct Pokemon *GetItemUseTargetMon(u8 slotId)
+{
+    u8 boxPos;
+
+    if (!IsPcSlot(slotId))
+        return &gPlayerParty[slotId];
+
+    boxPos = GetPcSlotBoxPosition(slotId);
+    if (boxPos == 0xFF)
+        return NULL;
+
+    BoxMonToMon(&gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos], &sItemUsePcMon);
+    return &sItemUsePcMon;
+}
+
+static void SaveItemUseTargetMon(u8 slotId, struct Pokemon *mon)
+{
+    u8 boxPos;
+
+    if (!IsPcSlot(slotId))
+        return;
+
+    boxPos = GetPcSlotBoxPosition(slotId);
+    if (boxPos != 0xFF)
+        gPokemonStoragePtr->boxes[PARTY_PC_BOX_ID][boxPos] = mon->box;
+}
+
 #define tState      data[0]
 #define tSpecies    data[1]
 #define tAbilityNum data[2]
@@ -7292,6 +7324,7 @@ void Task_AbilityCapsule(u8 taskId)
     static const u8 askText[] = _("Would you like to change {STR_VAR_1}'s\nability to {STR_VAR_2}?");
     static const u8 doneText[] = _("{STR_VAR_1}'s ability became\n{STR_VAR_2}!{PAUSE_UNTIL_PRESS}");
     s16 *data = gTasks[taskId].data;
+    struct Pokemon *mon;
 
     switch (tState)
     {
@@ -7310,7 +7343,7 @@ void Task_AbilityCapsule(u8 taskId)
             return;
         }
         gPartyMenuUseExitCallback = TRUE;
-        GetMonNickname(&gPlayerParty[tMonId], gStringVar1);
+        GetMonNickname(GetItemUseTargetMon(tMonId), gStringVar1);
         StringCopy(gStringVar2, gAbilitiesInfo[GetAbilityBySpecies(tSpecies, tAbilityNum)].name);
         StringExpandPlaceholders(gStringVar4, askText);
         PlaySE(SE_SELECT);
@@ -7356,7 +7389,9 @@ void Task_AbilityCapsule(u8 taskId)
             tState++;
         break;
     case 5:
-        SetMonData(&gPlayerParty[tMonId], MON_DATA_ABILITY_NUM, &tAbilityNum);
+        mon = GetItemUseTargetMon(tMonId);
+        SetMonData(mon, MON_DATA_ABILITY_NUM, &tAbilityNum);
+        SaveItemUseTargetMon(tMonId, mon);
         RemoveBagItem(gSpecialVar_ItemId, 1);
         gTasks[taskId].func = Task_ClosePartyMenu;
         break;
@@ -7366,11 +7401,12 @@ void Task_AbilityCapsule(u8 taskId)
 void ItemUseCB_AbilityCapsule(u8 taskId, TaskFunc task)
 {
     s16 *data = gTasks[taskId].data;
+    struct Pokemon *mon = GetItemUseTargetMon(gPartyMenu.slotId);
 
     tState = 0;
     tMonId = gPartyMenu.slotId;
-    tSpecies = GetMonData(&gPlayerParty[tMonId], MON_DATA_SPECIES, NULL);
-    tAbilityNum = GetMonData(&gPlayerParty[tMonId], MON_DATA_ABILITY_NUM, NULL) ^ 1;
+    tSpecies = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    tAbilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL) ^ 1;
     SetWordTaskArg(taskId, tOldFunc, (uintptr_t)(gTasks[taskId].func));
     gTasks[taskId].func = Task_AbilityCapsule;
 }
@@ -7380,6 +7416,7 @@ void Task_AbilityPatch(u8 taskId)
     static const u8 askText[] = _("Would you like to change {STR_VAR_1}'s\nability to {STR_VAR_2}?");
     static const u8 doneText[] = _("{STR_VAR_1}'s ability became\n{STR_VAR_2}!{PAUSE_UNTIL_PRESS}");
     s16 *data = gTasks[taskId].data;
+    struct Pokemon *mon;
 
     switch (tState)
     {
@@ -7397,7 +7434,7 @@ void Task_AbilityPatch(u8 taskId)
             return;
         }
         gPartyMenuUseExitCallback = TRUE;
-        GetMonNickname(&gPlayerParty[tMonId], gStringVar1);
+        GetMonNickname(GetItemUseTargetMon(tMonId), gStringVar1);
         StringCopy(gStringVar2, gAbilitiesInfo[GetAbilityBySpecies(tSpecies, tAbilityNum)].name);
         StringExpandPlaceholders(gStringVar4, askText);
         PlaySE(SE_SELECT);
@@ -7443,7 +7480,9 @@ void Task_AbilityPatch(u8 taskId)
             tState++;
         break;
     case 5:
-        SetMonData(&gPlayerParty[tMonId], MON_DATA_ABILITY_NUM, &tAbilityNum);
+        mon = GetItemUseTargetMon(tMonId);
+        SetMonData(mon, MON_DATA_ABILITY_NUM, &tAbilityNum);
+        SaveItemUseTargetMon(tMonId, mon);
         RemoveBagItem(gSpecialVar_ItemId, 1);
         gTasks[taskId].func = Task_ClosePartyMenu;
         break;
@@ -7453,11 +7492,12 @@ void Task_AbilityPatch(u8 taskId)
 void ItemUseCB_AbilityPatch(u8 taskId, TaskFunc task)
 {
     s16 *data = gTasks[taskId].data;
+    struct Pokemon *mon = GetItemUseTargetMon(gPartyMenu.slotId);
 
     tState = 0;
     tMonId = gPartyMenu.slotId;
-    tSpecies = GetMonData(&gPlayerParty[tMonId], MON_DATA_SPECIES, NULL);
-    if (GetMonData(&gPlayerParty[tMonId], MON_DATA_ABILITY_NUM, NULL) == 2)
+    tSpecies = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    if (GetMonData(mon, MON_DATA_ABILITY_NUM, NULL) == 2)
         tAbilityNum = 0;
     else
         tAbilityNum = 2;
@@ -7482,6 +7522,7 @@ void Task_Mint(u8 taskId)
     static const u8 askText[] = _("It might affect {STR_VAR_1}'s stats.\nAre you sure you want to use it?");
     static const u8 doneText[] = _("{STR_VAR_1}'s stats may have changed due\nto the effects of the {STR_VAR_2}!{PAUSE_UNTIL_PRESS}");
     s16 *data = gTasks[taskId].data;
+    struct Pokemon *mon;
 
     switch (tState)
     {
@@ -7497,7 +7538,7 @@ void Task_Mint(u8 taskId)
             return;
         }
         gPartyMenuUseExitCallback = TRUE;
-        GetMonNickname(&gPlayerParty[tMonId], gStringVar1);
+        GetMonNickname(GetItemUseTargetMon(tMonId), gStringVar1);
         CopyItemName(gSpecialVar_ItemId, gStringVar2);
         StringExpandPlaceholders(gStringVar4, askText);
         PlaySE(SE_SELECT);
@@ -7543,8 +7584,10 @@ void Task_Mint(u8 taskId)
             tState++;
         break;
     case 5:
-        SetMonData(&gPlayerParty[tMonId], MON_DATA_HIDDEN_NATURE, &tNewNature);
-        CalculateMonStats(&gPlayerParty[tMonId]);
+        mon = GetItemUseTargetMon(tMonId);
+        SetMonData(mon, MON_DATA_HIDDEN_NATURE, &tNewNature);
+        CalculateMonStats(mon);
+        SaveItemUseTargetMon(tMonId, mon);
         RemoveBagItem(gSpecialVar_ItemId, 1);
         gTasks[taskId].func = Task_ClosePartyMenu;
         break;
@@ -7554,10 +7597,11 @@ void Task_Mint(u8 taskId)
 void ItemUseCB_Mint(u8 taskId, TaskFunc task)
 {
     s16 *data = gTasks[taskId].data;
+    struct Pokemon *mon = GetItemUseTargetMon(gPartyMenu.slotId);
 
     tState = 0;
     tMonId = gPartyMenu.slotId;
-    tOldNature = GetMonData(&gPlayerParty[tMonId], MON_DATA_HIDDEN_NATURE);
+    tOldNature = GetMonData(mon, MON_DATA_HIDDEN_NATURE);
     tNewNature = GetItemSecondaryId(gSpecialVar_ItemId);
     SetWordTaskArg(taskId, tOldFunc, (uintptr_t)(gTasks[taskId].func));
     gTasks[taskId].func = Task_Mint;
