@@ -127,7 +127,6 @@ LilycoveCity_LilycoveMuseum_1F_EventScript_Psyduck::
 LilycoveCity_LilycoveMuseum_1F_EventScript_Zigzagoon::
     lock
     faceplayer
-    waitmovement 0
     playmoncry SPECIES_ZIGZAGOON, CRY_MODE_NORMAL
     msgbox LilycoveCity_LilycoveMuseum_1F_Text_Zigzagoon, MSGBOX_DEFAULT
     waitmoncry
@@ -176,7 +175,6 @@ LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepLeft:
 LilycoveCity_LilycoveMuseum_1F_EventScript_Victini::
     lock
     faceplayer
-    waitmovement 0
     playmoncry SPECIES_VICTINI, CRY_MODE_NORMAL
     msgbox LilycoveCity_LilycoveMuseum_1F_Text_Victini, MSGBOX_DEFAULT
     waitmoncry
