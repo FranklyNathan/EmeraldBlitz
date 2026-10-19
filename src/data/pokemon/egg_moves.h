@@ -2729,18 +2729,7 @@ static const u16 sShelmetEggMoveLearnset[] = {
 
 #if P_FAMILY_STUNFISK
 static const u16 sStunfiskEggMoveLearnset[] = {
-    MOVE_SHOCK_WAVE,
-    MOVE_EARTH_POWER,
-    MOVE_YAWN,
-    MOVE_SLEEP_TALK,
-    MOVE_ASTONISH,
-    MOVE_CURSE,
-    MOVE_SPITE,
-    MOVE_SPARK,
-    MOVE_PAIN_SPLIT,
     MOVE_EERIE_IMPULSE,
-    MOVE_REFLECT_TYPE,
-    MOVE_ME_FIRST,
     MOVE_UNAVAILABLE,
 };
 #if P_GALARIAN_FORMS

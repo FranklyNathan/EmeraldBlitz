@@ -291,6 +291,7 @@ static const struct GiftPokemon sGiftPokemonList2[] = {
     {SPECIES_SEVIPER, 10},
     {SPECIES_SKARMORY, 10},
     {SPECIES_STONJOURNER, 10},
+    {SPECIES_STUNFISK, 10},
     {SPECIES_TOGEDEMARU, 10},
     {SPECIES_TORKOAL, 10},
     {SPECIES_TROPIUS, 10},

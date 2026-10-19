@@ -6638,6 +6638,8 @@ static void InitCanReleaseMonVars(void)
         case SPECIES_COMFEY:
         case SPECIES_CRYOGONAL:
         case SPECIES_STONJOURNER:
+        case SPECIES_ALOMOMOLA:
+        case SPECIES_STUNFISK:
             sStorage->releaseStatusResolved = TRUE;
             sStorage->canReleaseMon = FALSE;
             return;

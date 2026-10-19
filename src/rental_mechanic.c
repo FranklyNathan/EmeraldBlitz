@@ -157,7 +157,7 @@ void GenerateRentalOffer(void)
     // Deterministic seed based on Player ID and Badge Count.
     // This ensures the same species is offered until a badge is earned.
     u32 seed = (u32)trainerId + (badges * 127);
-    gSpecialVar_Result = seed % 28;
+    gSpecialVar_Result = seed % 29;
 }
 
 void TakeAllMoney(void)

@@ -1253,6 +1253,7 @@ SlateportCity_EventScript_ShadyRentalMan::
 	case 25, SlateportCity_EventScript_SetOfferCryogonal
 	case 26, SlateportCity_EventScript_SetOfferStonjourner
 	case 27, SlateportCity_EventScript_SetOfferAlomomola
+	case 28, SlateportCity_EventScript_SetOfferStunfisk
 	end
 
 SlateportCity_EventScript_SetOfferSkarmory::
@@ -1338,6 +1339,9 @@ SlateportCity_EventScript_SetOfferStonjourner::
 	goto SlateportCity_EventScript_ShadyManShowOffer
 SlateportCity_EventScript_SetOfferAlomomola::
 	setvar VAR_RENTAL_MON_OFFER, SPECIES_ALOMOMOLA
+	goto SlateportCity_EventScript_ShadyManShowOffer
+SlateportCity_EventScript_SetOfferStunfisk::
+	setvar VAR_RENTAL_MON_OFFER, SPECIES_STUNFISK
 	goto SlateportCity_EventScript_ShadyManShowOffer
 
 SlateportCity_EventScript_ShadyManShowOffer::
