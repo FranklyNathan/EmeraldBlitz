@@ -15797,7 +15797,7 @@ Level: 24
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Static
-- Bite
+- Pounce
 - Fire Fang
 - Shock Wave
 - Howl
@@ -15847,7 +15847,7 @@ Level: 29
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Static
-- Bite
+- Pounce
 - Fire Fang
 - Shock Wave
 - Howl
@@ -15900,7 +15900,7 @@ Ability: Static
 - Fire Fang
 - Discharge
 - Shock Wave
-- Bite
+- Pounce
 
 === TRAINER_WATTSON_6 ===
 Name: WATTSON
@@ -15960,7 +15960,7 @@ Ability: Static
 - Fire Fang
 - Discharge
 - Shock Wave
-- Bite
+- Crunch
 
 === TRAINER_WATTSON_7 ===
 Name: WATTSON
@@ -16288,7 +16288,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Cursed Body
 - Overheat
-- Shadow Bone
+- Shadow Punch
 - Will O Wisp
 - Sunny Day
 

@@ -127,6 +127,7 @@ LilycoveCity_LilycoveMuseum_1F_EventScript_Psyduck::
 LilycoveCity_LilycoveMuseum_1F_EventScript_Zigzagoon::
     lock
     faceplayer
+    waitmovement 0
     playmoncry SPECIES_ZIGZAGOON, CRY_MODE_NORMAL
     msgbox LilycoveCity_LilycoveMuseum_1F_Text_Zigzagoon, MSGBOX_DEFAULT
     waitmoncry
@@ -175,12 +176,19 @@ LilycoveCity_LilycoveMuseum_1F_Movement_PangoroStepLeft:
 LilycoveCity_LilycoveMuseum_1F_EventScript_Victini::
     lock
     faceplayer
+    waitmovement 0
     playmoncry SPECIES_VICTINI, CRY_MODE_NORMAL
     msgbox LilycoveCity_LilycoveMuseum_1F_Text_Victini, MSGBOX_DEFAULT
     waitmoncry
+    msgbox LilycoveCity_LilycoveMuseum_1F_Text_VictiniRelive, MSGBOX_YESNO
+    goto_if_eq VAR_RESULT, NO, LilycoveCity_LilycoveMuseum_1F_EventScript_VictiniDecline
     closemessage
     fadescreen FADE_TO_BLACK
     callnative Script_DoHallOfFameScreenDontSaveData
+    end
+
+LilycoveCity_LilycoveMuseum_1F_EventScript_VictiniDecline::
+    release
     end
 
 LilycoveCity_LilycoveMuseum_1F_Text_VeryOldPainting:
@@ -286,6 +294,9 @@ LilycoveCity_LilycoveMuseum_1F_Text_PangoroNap:
 
 LilycoveCity_LilycoveMuseum_1F_Text_Victini:
     .string "Victini is basking in your victory!$"
+
+LilycoveCity_LilycoveMuseum_1F_Text_VictiniRelive:
+    .string "Relive your glory with VICTINI?$"
 
 LilycoveCity_LilycoveMuseum_1F_Text_Trapped:
 	.string "Ah, to return to HOENN!\n"

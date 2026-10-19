@@ -429,6 +429,9 @@ generated: $(AUTO_GEN_TARGETS)
 %.8bpp:     %.png  ; $(GFX) $< $@
 %.gbapal:   %.pal  ; $(GFX) $< $@
 %.gbapal:   %.png  ; $(GFX) $< $@
+
+# Palette light markers are optional. Add them as prerequisites only when present.
+$(foreach pla,$(wildcard data/tilesets/primary/*/palettes/*.pla data/tilesets/secondary/*/palettes/*.pla),$(eval $(patsubst %.pla,%.gbapal,$(pla)): $(pla)))
 %.lz:       %      ; $(GFX) $< $@
 %.smolTM:   %      ; $(SMOLTM) $< $@
 %.fastSmol: %      ; $(SMOL) -w $< $@ false false false
