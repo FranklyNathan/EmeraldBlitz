@@ -5462,6 +5462,8 @@ static void Cmd_isdmgblockedbydisguise(void)
         return;
     }
 
+    // BattleScript_TargetFormChange operates on BS_TARGET, which is the other battler for self-hit damage
+    gBattlerTarget = gBattlerAttacker;
     gBattleScripting.battler = gBattlerAttacker;
     if (GetBattlerPartyState(gBattlerAttacker)->changedSpecies == SPECIES_NONE)
         GetBattlerPartyState(gBattlerAttacker)->changedSpecies = gBattleMons[gBattlerAttacker].species;
