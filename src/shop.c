@@ -122,45 +122,9 @@ static EWRAM_DATA struct MartInfo sMartInfo = {0};
 static EWRAM_DATA struct ShopData *sShopData = NULL;
 static u16 sScottTmItemList[7]; // 5 TMs + INVERT + ITEM_NONE
 static u16 sScottTmPriceList[7]; // 5 TM prices + INVERT price + 0
-static const u16 sScottTmPool[] = {
-    ITEM_TM_SEED_BOMB,
-    ITEM_TM_GIGA_DRAIN,
-    ITEM_TM_FIRE_PUNCH,
-    ITEM_TM_FLAMETHROWER,
-    ITEM_TM_THUNDER_PUNCH,
-    ITEM_TM_THUNDERBOLT,
-    ITEM_TM_ICE_PUNCH,
-    ITEM_TM_ICE_BEAM,
-    ITEM_TM_BRICK_BREAK,
-    ITEM_TM_BODY_PRESS,
-    ITEM_TM_X_SCISSOR,
-    ITEM_TM_BUG_BUZZ,
-    ITEM_TM_ROCK_SLIDE,
-    ITEM_TM_POWER_GEM,
-    ITEM_TM_DRAGON_CLAW,
-    ITEM_TM_DRAGON_PULSE,
-    ITEM_TM_IRON_TAIL,
-    ITEM_TM_FLASH_CANNON,
-    ITEM_TM_PLAY_ROUGH,
-    ITEM_TM_DAZZLING_GLEAM,
-    ITEM_TM_EARTHQUAKE,
-    ITEM_TM_SCORCHING_SANDS,
-    ITEM_TM_SHADOW_CLAW,
-    ITEM_TM_SHADOW_BALL,
-    ITEM_TM_ZEN_HEADBUTT,
-    ITEM_TM_PSYCHIC,
-    ITEM_TM_RETURN,
-    ITEM_TM_HYPER_VOICE,
-    ITEM_TM_POISON_JAB,
-    ITEM_TM_SLUDGE_BOMB,
-    ITEM_TM_CRUNCH,
-    ITEM_TM_DARK_PULSE,
-    ITEM_TM_FLIP_TURN,
-    ITEM_TM_SCALD,
-    ITEM_TM_DUAL_WINGBEAT,
-    ITEM_TM_AIR_SLASH,
-    ITEM_NONE
-};
+#define SCOTT_TM_BATCHES    5
+#define SCOTT_TM_BATCH_SIZE 5
+#define SCOTT_TM_TOTAL      (SCOTT_TM_BATCHES * SCOTT_TM_BATCH_SIZE)
 
 // Partner TM pairs for Invert option
 static const u16 sScottTmPartners[][2] = {
@@ -492,135 +456,107 @@ static void SetShopItemsForSale(const u16 *items)
     }
 }
 
-static u16 GetScottTmPairIndex(u16 tmId)
+static u32 ScottTmRandom(u32 *state)
 {
-    u16 i;
-    for (i = 0; i < ARRAY_COUNT(sScottTmPartners); i++)
+    *state = *state * 1103515245 + 12345;
+    return *state >> 16;
+}
+
+static bool8 IsScottTmScheduleValid(const u8 *slots)
+{
+    u32 a, b;
+
+    for (a = 0; a < SCOTT_TM_TOTAL; a++)
     {
-        if (sScottTmPartners[i][0] == tmId || sScottTmPartners[i][1] == tmId)
-            return i;
+        for (b = a + 1; b < SCOTT_TM_TOTAL; b++)
+        {
+            u32 batchA = a / SCOTT_TM_BATCH_SIZE;
+            u32 batchB = b / SCOTT_TM_BATCH_SIZE;
+            // Same type may not share a batch or appear in adjacent batches.
+            if (slots[a] == slots[b] && batchB - batchA <= 1)
+                return FALSE;
+        }
     }
-    return ARRAY_COUNT(sScottTmPartners);
+    return TRUE;
 }
 
-static u32 GetScottTmMask(u16 varLow, u16 varHigh)
+// Deterministically expands the seed into the 25 TMs Scott will ever offer.
+static void BuildScottTmSchedule(u32 seed, u16 *schedule)
 {
-    return (u32)VarGet(varLow) | ((u32)VarGet(varHigh) << 16);
-}
+    u8 slots[SCOTT_TM_TOTAL];
+    u8 order[ARRAY_COUNT(sScottTmPartners)];
+    bool8 firstBit[SCOTT_TM_TOTAL];
+    u32 state = seed;
+    u32 i, j;
 
-static void SetScottTmMask(u16 varLow, u16 varHigh, u32 mask)
-{
-    VarSet(varLow, (u16)(mask & 0xFFFF));
-    VarSet(varHigh, (u16)(mask >> 16));
+    do
+    {
+        // Every type once, plus 7 randomly chosen types a second time.
+        for (i = 0; i < ARRAY_COUNT(order); i++)
+            order[i] = i;
+        for (i = ARRAY_COUNT(order) - 1; i > 0; i--)
+        {
+            u8 tmp;
+            j = ScottTmRandom(&state) % (i + 1);
+            tmp = order[i];
+            order[i] = order[j];
+            order[j] = tmp;
+        }
+        for (i = 0; i < SCOTT_TM_TOTAL; i++)
+            slots[i] = (i < ARRAY_COUNT(order)) ? order[i] : order[i - ARRAY_COUNT(order)];
+        for (i = SCOTT_TM_TOTAL - 1; i > 0; i--)
+        {
+            u8 tmp;
+            j = ScottTmRandom(&state) % (i + 1);
+            tmp = slots[i];
+            slots[i] = slots[j];
+            slots[j] = tmp;
+        }
+    } while (!IsScottTmScheduleValid(slots));
+
+    // A repeated type uses the other TM of the pair, so no TM is offered twice.
+    for (i = 0; i < SCOTT_TM_TOTAL; i++)
+    {
+        firstBit[i] = ScottTmRandom(&state) & 1;
+        for (j = 0; j < i; j++)
+        {
+            if (slots[j] == slots[i])
+                firstBit[i] = !firstBit[j];
+        }
+        schedule[i] = sScottTmPartners[slots[i]][firstBit[i]];
+    }
 }
 
 static void PrepareScottTmShopInventory(void)
 {
-    u16 poolItems[ARRAY_COUNT(sScottTmPool)] = {0};
-    u16 poolSize = 0;
-    u16 unseenPairs[ARRAY_COUNT(sScottTmPartners)];
-    u16 numUnseen = 0;
-    bool8 isLastVisit;
-    u32 seenMask;
-    u32 lastOfferedMask;
-    u32 offeredThisVisitMask = 0;
-    u16 i = 0, j;
+    u16 schedule[SCOTT_TM_TOTAL];
+    u32 seed = (u32)VarGet(VAR_SCOTT_TM_SEED_L) | ((u32)VarGet(VAR_SCOTT_TM_SEED_H) << 16);
+    u16 visitState = VarGet(VAR_SCOTT_TM_VISIT_STATE);
+    u8 batch = visitState >> 8;
+    u8 badges = VarGet(VAR_BADGE_COUNT);
+    u16 i;
 
-    // Scott's shop memory is kept in save data (vars), not RAM, because RAM is
-    // wiped on every boot - otherwise he would forget the last gym's offer and
-    // could roll the partner TM of that stock at the next gym. He only ever
-    // avoids his most recent visit, so anything older may show up again.
-    seenMask = GetScottTmMask(VAR_SCOTT_TM_SEEN_PAIRS_L, VAR_SCOTT_TM_SEEN_PAIRS_H);
-    lastOfferedMask = GetScottTmMask(VAR_SCOTT_TM_LAST_OFFERED_L, VAR_SCOTT_TM_LAST_OFFERED_H);
-
-    // The badge-8 visit is Scott's last one, so guarantee that every type the
-    // player has never been offered before finally shows up.
-    isLastVisit = (VarGet(VAR_BADGE_COUNT) >= 8);
-
-    if (isLastVisit)
+    if (seed == 0)
     {
-        for (i = 0; i < ARRAY_COUNT(sScottTmPartners); i++)
-        {
-            if (!(seenMask & (1u << i)))
-                unseenPairs[numUnseen++] = i;
-        }
-        // Shuffle the unseen pairs so the selection stays random.
-        for (i = 0; i < numUnseen; i++)
-        {
-            u16 swapIdx = Random() % numUnseen;
-            u16 tmp = unseenPairs[i];
-            unseenPairs[i] = unseenPairs[swapIdx];
-            unseenPairs[swapIdx] = tmp;
-        }
-        // Force the never-seen types onto the table first.
-        for (i = 0; i < 5 && i < numUnseen; i++)
-        {
-            u16 pairIdx = unseenPairs[i];
-            sScottTmItemList[i] = sScottTmPartners[pairIdx][Random() % 2];
-            offeredThisVisitMask |= (1u << pairIdx);
-        }
+        // First encounter: fix every future offer.
+        seed = Random32();
+        if (seed == 0)
+            seed = 1;
+        VarSet(VAR_SCOTT_TM_SEED_L, seed & 0xFFFF);
+        VarSet(VAR_SCOTT_TM_SEED_H, seed >> 16);
+        batch = 0;
     }
-
-    // Build the pool from every pair except the ones offered last visit and the
-    // ones already put on the table this visit.
-    for (j = 0; sScottTmPool[j] != ITEM_NONE; j++)
+    else if ((visitState & 0xFF) != badges)
     {
-        u16 pairIdx = GetScottTmPairIndex(sScottTmPool[j]);
-        if (lastOfferedMask & (1u << pairIdx))
-            continue;
-        if (offeredThisVisitMask & (1u << pairIdx))
-            continue;
-        poolItems[poolSize++] = sScottTmPool[j];
+        // A new badge since the last visit means a new batch.
+        if (batch < SCOTT_TM_BATCHES - 1)
+            batch++;
     }
+    VarSet(VAR_SCOTT_TM_VISIT_STATE, (batch << 8) | badges);
 
-    // Select the remaining TMs at random, ensuring no two from one pair.
-    for (; i < 5; i++)
-    {
-        bool8 validItemFound = FALSE;
-        while (!validItemFound)
-        {
-            u16 chosenIndex = Random() % poolSize;
-            u16 chosenItem = poolItems[chosenIndex];
-            bool8 isPartnerPresent = FALSE;
-
-            // Check if partner is already in our list (sScottTmItemList 0 to i-1)
-            for (j = 0; j < i; j++)
-            {
-                if (sScottTmItemList[j] == GetScottTmPartner(chosenItem))
-                {
-                    isPartnerPresent = TRUE;
-                    break;
-                }
-            }
-
-            if (!isPartnerPresent)
-            {
-                sScottTmItemList[i] = chosenItem;
-                offeredThisVisitMask |= (1u << GetScottTmPairIndex(chosenItem));
-                // Remove the chosen TM and its partner from the pool so the
-                // same type can never be offered twice in one visit.
-                for (j = chosenIndex; j < poolSize - 1; j++)
-                    poolItems[j] = poolItems[j + 1];
-                poolSize--;
-                for (j = 0; j < poolSize; j++)
-                {
-                    if (poolItems[j] == GetScottTmPartner(chosenItem))
-                    {
-                        u16 k;
-                        for (k = j; k < poolSize - 1; k++)
-                            poolItems[k] = poolItems[k + 1];
-                        poolSize--;
-                        break;
-                    }
-                }
-                validItemFound = TRUE;
-            }
-        }
-    }
-
-    // Persist the tracking so the next visit respects it even after a reboot.
-    SetScottTmMask(VAR_SCOTT_TM_SEEN_PAIRS_L, VAR_SCOTT_TM_SEEN_PAIRS_H, seenMask | offeredThisVisitMask);
-    SetScottTmMask(VAR_SCOTT_TM_LAST_OFFERED_L, VAR_SCOTT_TM_LAST_OFFERED_H, offeredThisVisitMask);
+    BuildScottTmSchedule(seed, schedule);
+    for (i = 0; i < SCOTT_TM_BATCH_SIZE; i++)
+        sScottTmItemList[i] = schedule[batch * SCOTT_TM_BATCH_SIZE + i];
 
     // Assign initial prices for TMs (all 4000). These are effectively dummy values for TMs
     // because GetMartItemPrice will calculate the actual dynamic price.

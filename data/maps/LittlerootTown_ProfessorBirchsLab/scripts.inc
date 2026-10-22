@@ -123,7 +123,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_GiveStarterEvent::
 
 	setflag FLAG_RECEIVED_POTION_OLDALE
 
-	@ setflag FLAG_SYS_OPPONENT_LEVEL_1
+	setflag FLAG_SYS_OPPONENT_LEVEL_1
 
 	@ Petalburg Woods Flags
 	setvar VAR_PETALBURG_WOODS_STATE, 1  //First set of speedchoice variables to set
