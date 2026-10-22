@@ -5804,10 +5804,14 @@ BattleScript_MegaEvolution::
 	printstring STRINGID_MEGAEVOREACTING
 BattleScript_MegaEvolutionAfterString:
 	waitmessage B_WAIT_TIME_LONG
+	setspriteignore0hp TRUE
+	call BattleScript_SwapFromSubstitute
 	handlemegaevo BS_SCRIPTING, 0
 	playanimation BS_SCRIPTING, B_ANIM_MEGA_EVOLUTION
 	waitanimation
 	handlemegaevo BS_SCRIPTING, 1
+	call BattleScript_SwapToSubstitute
+	setspriteignore0hp FALSE
 	printstring STRINGID_MEGAEVOEVOLVED
 	waitmessage B_WAIT_TIME_LONG
 	switchinabilities BS_SCRIPTING
@@ -8759,17 +8763,23 @@ BattleScript_DynamaxEnds_Ret::
 
 BattleScript_MegaEvolutionEnds::
 	flushtextbox
+	setspriteignore0hp TRUE
+	call BattleScript_SwapFromSubstitute
 	undomegas BS_SCRIPTING
 	playanimation BS_SCRIPTING, B_ANIM_FORM_CHANGE
 	waitanimation
+	call BattleScript_SwapToSubstitute
+	setspriteignore0hp FALSE
 	end2
 
 BattleScript_MegaEvolutionEnds_Ret::
 	flushtextbox
 	setspriteignore0hp TRUE
+	call BattleScript_SwapFromSubstitute
 	undomegas BS_SCRIPTING
 	playanimation BS_SCRIPTING, B_ANIM_FORM_CHANGE
 	waitanimation
+	call BattleScript_SwapToSubstitute
 	setspriteignore0hp FALSE
 	pause B_WAIT_TIME_SHORT
 	return
