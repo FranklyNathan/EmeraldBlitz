@@ -5151,8 +5151,7 @@ BattleScript_DmgHazardsOnAttackerFainted::
 	setbyte sGIVEEXP_STATE, 0
 	getexp BS_ATTACKER
 	moveendall
-	tryabsorbtoxicspikesonfaint
-	goto BattleScript_HandleFaintedMon
+	goto BattleScript_DmgHazardsFaintedEnd
 
 BattleScript_DmgHazardsOnTarget::
 	healthbarupdate BS_TARGET, PASSIVE_HP_UPDATE
@@ -5166,8 +5165,7 @@ BattleScript_DmgHazardsOnTargetFainted::
 	setbyte sGIVEEXP_STATE, 0
 	getexp BS_TARGET
 	moveendall
-	tryabsorbtoxicspikesonfaint
-	goto BattleScript_HandleFaintedMon
+	goto BattleScript_DmgHazardsFaintedEnd
 
 BattleScript_DmgHazardsOnBattlerScripting::
 	healthbarupdate BS_SCRIPTING, PASSIVE_HP_UPDATE
@@ -5181,8 +5179,7 @@ BattleScript_DmgHazardsOnBattlerScriptingFainted::
 	setbyte sGIVEEXP_STATE, 0
 	getexp BS_SCRIPTING
 	moveendall
-	tryabsorbtoxicspikesonfaint
-	goto BattleScript_HandleFaintedMon
+	goto BattleScript_DmgHazardsFaintedEnd
 
 BattleScript_DmgHazardsOnFaintedBattler::
 	healthbarupdate BS_FAINTED, PASSIVE_HP_UPDATE
@@ -5196,8 +5193,15 @@ BattleScript_DmgHazardsOnFaintedBattlerFainted::
 	setbyte sGIVEEXP_STATE, 0
 	getexp BS_FAINTED
 	moveendall
+	goto BattleScript_DmgHazardsFaintedEnd
+
+@ Mid-turn: defer the replacement to end of turn so remaining actions still run.
+BattleScript_DmgHazardsFaintedEnd:
 	tryabsorbtoxicspikesonfaint
+	jumpifbytenotequal gCurrentTurnActionNumber, gBattlersCount, BattleScript_DmgHazardsFaintedEnd_Deferred
 	goto BattleScript_HandleFaintedMon
+BattleScript_DmgHazardsFaintedEnd_Deferred:
+	end2
 
 BattleScript_PrintHurtByDmgHazards::
 	printfromtable gDmgHazardsStringIds
