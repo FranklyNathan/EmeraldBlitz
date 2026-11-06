@@ -293,26 +293,34 @@ SINGLE_BATTLE_TEST("Multi hit moves print the hit count exactly once when KOing 
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
         TURN { MOVE(player, MOVE_BULLET_SEED); SEND_OUT(opponent, 1); }
+        TURN { MOVE(player, MOVE_CELEBRATE); }
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_BULLET_SEED, player);
+        NOT MESSAGE("The Pokémon was hit 1 time(s)!");
         MESSAGE("The opposing Wobbuffet fainted!");
         MESSAGE("The Pokémon was hit 1 time(s)!");
+        NOT MESSAGE("The Pokémon was hit 1 time(s)!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, player);
     }
 }
 
 SINGLE_BATTLE_TEST("Multi hit moves print the hit count exactly once when KOing on a later hit")
 {
     GIVEN {
-        PLAYER(SPECIES_WOBBUFFET) { Ability(ABILITY_SKILL_LINK); };
-        OPPONENT(SPECIES_WOBBUFFET) { Ability(ABILITY_STURDY); };
+        PLAYER(SPECIES_WOBBUFFET) { Ability(ABILITY_SKILL_LINK); Attack(500); };
+        OPPONENT(SPECIES_WOBBUFFET) { Ability(ABILITY_STURDY); Defense(1); };
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
         TURN { MOVE(player, MOVE_BULLET_SEED); SEND_OUT(opponent, 1); }
+        TURN { MOVE(player, MOVE_CELEBRATE); }
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_BULLET_SEED, player);
         ANIMATION(ANIM_TYPE_MOVE, MOVE_BULLET_SEED, player);
         MESSAGE("The opposing Wobbuffet endured the hit using Sturdy!");
+        NOT MESSAGE("The Pokémon was hit 2 time(s)!");
         MESSAGE("The opposing Wobbuffet fainted!");
         MESSAGE("The Pokémon was hit 2 time(s)!");
+        NOT MESSAGE("The Pokémon was hit 2 time(s)!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, player);
     }
 }

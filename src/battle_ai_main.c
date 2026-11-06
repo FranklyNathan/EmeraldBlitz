@@ -4167,6 +4167,91 @@ static s32 AI_CalcHoldEffectMoveScore(u32 battlerAtk, u32 battlerDef, u32 move, 
     return score;
 }
 
+static bool32 AI_HasKnownMoveThatLowersSpeed(u32 battler)
+{
+    u16 *moves = GetMovesArray(battler);
+    u32 i, j;
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        if (moves[i] == MOVE_NONE || moves[i] == MOVE_UNAVAILABLE)
+            continue;
+
+        switch (GetMoveEffect(moves[i]))
+        {
+        case EFFECT_SPEED_DOWN:
+        case EFFECT_SPEED_DOWN_2:
+            return TRUE;
+        default:
+            break;
+        }
+
+        for (j = 0; j < GetMoveAdditionalEffectCount(moves[i]); j++)
+        {
+            const struct AdditionalEffect *additionalEffect = GetMoveAdditionalEffectById(moves[i], j);
+
+            if (!additionalEffect->self
+             && (additionalEffect->moveEffect == MOVE_EFFECT_SPD_MINUS_1
+              || additionalEffect->moveEffect == MOVE_EFFECT_SPD_MINUS_2))
+                return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+static bool32 AI_SpeedBoostWouldOutspeed(u32 battlerAtk, u32 battlerDef, u32 stages, struct AiLogicData *aiData)
+{
+    u32 currentStage = gBattleMons[battlerAtk].statStages[STAT_SPEED];
+    u32 boostedStage;
+    u32 boostedSpeed;
+
+    if (currentStage >= MAX_STAT_STAGE
+     || aiData->speedStats[battlerAtk] >= aiData->speedStats[battlerDef]
+        || aiData->abilities[battlerAtk] == ABILITY_CONTRARY
+        || AI_HasKnownMoveThatLowersSpeed(battlerDef))
+        return FALSE;
+
+    if (aiData->abilities[battlerAtk] == ABILITY_SIMPLE)
+        stages *= 2;
+
+    boostedStage = currentStage + stages;
+    if (boostedStage > MAX_STAT_STAGE)
+        boostedStage = MAX_STAT_STAGE;
+    boostedSpeed = aiData->speedStats[battlerAtk]
+                 * gStatStageRatios[currentStage][1]
+                 * gStatStageRatios[boostedStage][0]
+                 / gStatStageRatios[currentStage][0]
+                 / gStatStageRatios[boostedStage][1];
+
+    return boostedSpeed > aiData->speedStats[battlerDef];
+}
+
+static u32 AI_GetSpeedBoostStages(enum BattleMoveEffects moveEffect)
+{
+    switch (moveEffect)
+    {
+    case EFFECT_SPEED_UP:
+    case EFFECT_DRAGON_DANCE:
+    case EFFECT_QUIVER_DANCE:
+    case EFFECT_VICTORY_DANCE:
+    case EFFECT_NO_RETREAT:
+    case EFFECT_CLANGOROUS_SOUL:
+        return 1;
+    case EFFECT_AUTOTOMIZE:
+    case EFFECT_SPEED_UP_2:
+    case EFFECT_SHIFT_GEAR:
+    case EFFECT_SHELL_SMASH:
+    case EFFECT_GEOMANCY:
+    case EFFECT_FILLET_AWAY:
+        return 2;
+    case EFFECT_TIDY_UP:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
 static s32 AI_CalcMoveEffectScore(u32 battlerAtk, u32 battlerDef, u32 move, struct AiLogicData *aiData)
 {
     // move data
@@ -5767,6 +5852,13 @@ static s32 AI_CalcMoveEffectScore(u32 battlerAtk, u32 battlerDef, u32 move, stru
         break;
     } // move effect checks
 
+    if (IsBattleMoveStatus(move))
+    {
+        u32 speedBoostStages = AI_GetSpeedBoostStages(moveEffect);
+        if (speedBoostStages != 0 && AI_SpeedBoostWouldOutspeed(battlerAtk, battlerDef, speedBoostStages, aiData))
+            ADJUST_SCORE(3);
+    }
+
     return score;
 }
 
@@ -6712,7 +6804,6 @@ static s32 AI_PredictSwitch(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
     u32 i;
     u32 unmodifiedScore = score;
     enum Ability ability = gBattleMons[battlerAtk].ability;
-    bool32 opposingHazardFlags = DoesSideHaveDamagingHazards(GetBattlerSide(battlerDef));
     bool32 aiHazardFlags = AreAnyHazardsOnSide(GetBattlerSide(battlerAtk));
     enum BattleMoveEffects moveEffect = GetMoveEffect(move);
     struct AiLogicData *aiData = gAiLogicData;
