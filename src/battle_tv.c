@@ -300,14 +300,20 @@ void BattleTv_SetDataBasedOnString(enum StringID stringId)
             AddMovePoints(PTS_STAT_DECREASE_SELF, moveSlot, gBattleTextBuff1[2] - 1, 0);
         break;
     case STRINGID_DEFENDERSSTATFELL:
+    case STRINGID_SPREADSTATFELL:
+    case STRINGID_SPREADSINGLESTATFELL:
         if (gBattleTextBuff1[2] != 0)
         {
-            if (*statStringId == STRINGID_SEVERELY)
-                AddMovePoints(PTS_STAT_DECREASE_3, moveSlot, gBattleTextBuff1[2] - 1, 0);
-            else if (*statStringId == STRINGID_STATHARSHLY)
-                AddMovePoints(PTS_STAT_DECREASE_2, moveSlot, gBattleTextBuff1[2] - 1, 0);
-            else
-                AddMovePoints(PTS_STAT_DECREASE_1, moveSlot, gBattleTextBuff1[2] - 1, 0);
+            u32 count = stringId == STRINGID_DEFENDERSSTATFELL ? 1 : gBattleStruct->spreadStatDropMessageCount;
+            while (count--)
+            {
+                if (*statStringId == STRINGID_SEVERELY)
+                    AddMovePoints(PTS_STAT_DECREASE_3, moveSlot, gBattleTextBuff1[2] - 1, 0);
+                else if (*statStringId == STRINGID_STATHARSHLY)
+                    AddMovePoints(PTS_STAT_DECREASE_2, moveSlot, gBattleTextBuff1[2] - 1, 0);
+                else
+                    AddMovePoints(PTS_STAT_DECREASE_1, moveSlot, gBattleTextBuff1[2] - 1, 0);
+            }
         }
         break;
     case STRINGID_PKMNLAIDCURSE:

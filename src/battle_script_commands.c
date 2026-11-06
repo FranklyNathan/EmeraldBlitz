@@ -2853,6 +2853,32 @@ static void Cmd_printfromtable(void)
     if (gBattleControllerExecFlags == 0)
     {
         const u16 *ptr = cmd->ptr;
+        if ((gBattlescriptCurrInstr == BattleScript_StatDownPrintString
+               || gBattlescriptCurrInstr == BattleScript_StatDown
+               || gBattlescriptCurrInstr == BattleScript_VenomDrenchPrintAttack
+               || gBattlescriptCurrInstr == BattleScript_VenomDrenchPrintSpAttack
+               || gBattlescriptCurrInstr == BattleScript_VenomDrenchPrintSpeed)
+         && ptr == gStatDownStringIds
+         && IsDoubleBattle()
+         && (GetBattlerMoveTargetType(gBattlerAttacker, gCurrentMove) == MOVE_TARGET_BOTH
+             || GetBattlerMoveTargetType(gBattlerAttacker, gCurrentMove) == MOVE_TARGET_FOES_AND_ALLY)
+         && gBattlerAttacker != gBattlerTarget
+         && gBattleCommunication[MULTISTRING_CHOOSER] == B_MSG_DEFENDER_STAT_CHANGED
+         && (gBattleScripting.statChanger & STAT_BUFF_NEGATIVE))
+        {
+            u32 stat = gBattleTextBuff1[2];
+            u32 adjective = gBattleTextBuff2[2] | (gBattleTextBuff2[3] << 8);
+            u32 magnitude = adjective == STRINGID_STATHARSHLY ? 1 : adjective == STRINGID_SEVERELY ? 2 : 0;
+
+            if (stat < NUM_BATTLE_STATS)
+            {
+                gBattleStruct->spreadStatDrops[gBattlerAttacker][stat][magnitude] |= 1u << gBattlerTarget;
+                gBattlescriptCurrInstr = cmd->nextInstr;
+                gBattleCommunication[MSG_DISPLAY] = 0;
+                HandleStatDropMessageEffects(STRINGID_DEFENDERSSTATFELL);
+                return;
+            }
+        }
         ptr += gBattleCommunication[MULTISTRING_CHOOSER];
 
         gBattlescriptCurrInstr = cmd->nextInstr;
@@ -5660,6 +5686,43 @@ static u32 GetNextTarget(u32 moveTarget, bool32 excludeCurrent)
     return battler;
 }
 
+static bool32 PrintSpreadStatDrop(void)
+{
+    u32 index;
+
+    for (index = 0; index < NUM_BATTLE_STATS * 3; index++)
+    {
+        u32 stat = index / 3;
+        u32 magnitude = index % 3;
+        u32 battlers = gBattleStruct->spreadStatDrops[gBattlerAttacker][stat][magnitude];
+        u32 battler;
+        u32 count = 0;
+
+        if (!battlers)
+            continue;
+
+        gBattleStruct->spreadStatDrops[gBattlerAttacker][stat][magnitude] = 0;
+        PREPARE_STAT_BUFFER(gBattleTextBuff1, stat);
+        PREPARE_STRING_BUFFER(gBattleTextBuff2, magnitude == 1 ? STRINGID_STATHARSHLY : magnitude == 2 ? STRINGID_SEVERELY : STRINGID_EMPTYSTRING3);
+        for (battler = 0; battler < gBattlersCount; battler++)
+            if (battlers & (1u << battler))
+                count++;
+        gBattleStruct->spreadStatDropMessageCount = count;
+        for (battler = 0; battler < gBattlersCount; battler++)
+            if (battlers & (1u << battler))
+                break;
+        PREPARE_MON_NICK_WITH_PREFIX_BUFFER(gBattleTextBuff3, battler, gBattlerPartyIndexes[battler]);
+        BtlController_EmitPrintString(gBattlerAttacker, B_COMM_TO_CONTROLLER,
+                                      (battlers & (battlers - 1)) ? STRINGID_SPREADSTATFELL : STRINGID_SPREADSINGLESTATFELL);
+        MarkBattlerForControllerExec(gBattlerAttacker);
+        gBattleCommunication[MSG_DISPLAY] = 1;
+        BattleScriptPush(gBattlescriptCurrInstr);
+        gBattlescriptCurrInstr = BattleScript_WaitSpreadStatDrop;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 static inline bool32 IsProtectivePadsProtected(u32 battler, enum HoldEffect holdEffect)
 {
     if (holdEffect != HOLD_EFFECT_PROTECTIVE_PADS)
@@ -6635,6 +6698,11 @@ case MOVEEND_ABSORB:
                 // Check if the move used was actually a bounced move. If so, we need to go back to the original attacker and make sure, its move hits all 2 or 3 pokemon.
                 else if (gBattleStruct->bouncedMoveIsUsed)
                 {
+                    if (PrintSpreadStatDrop())
+                    {
+                        effect = TRUE;
+                        break;
+                    }
                     u8 originalBounceTarget = gBattlerAttacker;
                     gBattleStruct->bouncedMoveIsUsed = FALSE;
                     gBattlerAttacker = gBattleStruct->attackerBeforeBounce;
@@ -6655,6 +6723,11 @@ case MOVEEND_ABSORB:
                         return;
                     }
                 }
+            }
+            if (PrintSpreadStatDrop())
+            {
+                effect = TRUE;
+                break;
             }
             RecordLastUsedMoveBy(gBattlerAttacker, gCurrentMove);
             gBattleScripting.moveendState++;
@@ -7195,6 +7268,7 @@ case MOVEEND_ABSORB:
              && IsTypeStellarBoosted(gBattlerAttacker, moveType))
                 ExpendTypeStellarBoost(gBattlerAttacker, moveType);
             memset(gQueuedStatBoosts, 0, sizeof(gQueuedStatBoosts));
+            memset(gBattleStruct->spreadStatDrops[gBattlerAttacker], 0, sizeof(gBattleStruct->spreadStatDrops[gBattlerAttacker]));
 
             for (i = 0; i < gBattlersCount; i++)
             {

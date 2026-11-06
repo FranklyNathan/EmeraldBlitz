@@ -9,7 +9,9 @@
 #include "constants/pokemon.h"
 #include "data/pokemon/form_species_tables.h"
 #include "constants/flags.h"
+#include "constants/items.h"
 #include "event_data.h"
+#include "script_pokemon_util.h"
 
 static const u8 sText_Random[] = _("Random");
 static const u8 sText_RandTeam[] = _("Random Team");
@@ -298,6 +300,107 @@ static const struct GiftPokemon sGiftPokemonList2[] = {
     {SPECIES_TURTONATOR, 10},
     {SPECIES_ZANGOOSE, 10}
 };
+
+// Placed at fixed EWRAM address 0x0203F100 by ld_script_modern.ld/ld_script_test.ld
+// (".auto_obtain" section); the website writes the drafted team here.
+volatile struct AutoObtainRequest gAutoObtainRequest __attribute__((section(".auto_obtain")));
+
+static u16 FindGiftSpeciesByDexNum(u16 id)
+{
+    u32 i;
+
+    // 1. If id is already a SPECIES_* constant directly:
+    if (id < NUM_SPECIES && id != SPECIES_NONE && id != SPECIES_EGG)
+    {
+        for (i = 0; i < ARRAY_COUNT(sGiftPokemonList); i++)
+        {
+            if (sGiftPokemonList[i].species == id)
+                return id;
+        }
+        for (i = 0; i < ARRAY_COUNT(sGiftPokemonList2); i++)
+        {
+            if (sGiftPokemonList2[i].species == id)
+                return id;
+        }
+        if (gSpeciesInfo[id].natDexNum != 0)
+            return id;
+    }
+
+    // 2. Otherwise, treat id as a National Dex number:
+    for (i = 0; i < ARRAY_COUNT(sGiftPokemonList); i++)
+    {
+        u16 species = sGiftPokemonList[i].species;
+        if (species != SPECIES_EGG && gSpeciesInfo[species].natDexNum == id)
+            return species;
+    }
+    for (i = 0; i < ARRAY_COUNT(sGiftPokemonList2); i++)
+    {
+        u16 species = sGiftPokemonList2[i].species;
+        if (species != SPECIES_EGG && gSpeciesInfo[species].natDexNum == id)
+            return species;
+    }
+    return NationalPokedexNumToSpecies(id);
+}
+
+static u16 PickGiftSpeciesForm(u16 species)
+{
+    if (species == SPECIES_MINIOR_CORE)
+        return SPECIES_MINIOR_CORE_RED + (Random() % (SPECIES_MINIOR_CORE_VIOLET - SPECIES_MINIOR_CORE_RED + 1));
+    if (species == SPECIES_FLABEBE)
+        return sFlabebeFormSpeciesIdTable[Random() % (ARRAY_COUNT(sFlabebeFormSpeciesIdTable) - 1)];
+    if (species == SPECIES_SCATTERBUG)
+        return sScatterbugFormSpeciesIdTable[Random() % (ARRAY_COUNT(sScatterbugFormSpeciesIdTable) - 1)];
+    if (species == SPECIES_DEERLING)
+        return sDeerlingFormSpeciesIdTable[Random() % (ARRAY_COUNT(sDeerlingFormSpeciesIdTable) - 1)];
+    return species;
+}
+
+// Gives the team the website queued in gAutoObtainRequest, using the same
+// ScriptGiveMon/ScriptGiveEgg calls as the notebook menu. No-op without a request.
+void GiveAutoObtainMons(void)
+{
+    u32 i, count;
+    bool8 gavePair = FALSE;
+
+    if (gAutoObtainRequest.magic != AUTO_OBTAIN_MAGIC)
+        return;
+
+    gAutoObtainRequest.magic = 0;
+    count = gAutoObtainRequest.count;
+    if (count > AUTO_OBTAIN_MAX_MONS)
+        count = AUTO_OBTAIN_MAX_MONS;
+
+    for (i = 0; i < count; i++)
+    {
+        u16 dexNum = gAutoObtainRequest.dexNums[i];
+        u16 species;
+
+        if (dexNum == AUTO_OBTAIN_EGG_ID)
+        {
+            ScriptGiveEgg(GetRandomGiftEggSpecies());
+            continue;
+        }
+
+        species = FindGiftSpeciesByDexNum(dexNum);
+        if (species == SPECIES_NONE)
+            continue;
+
+        // Plusle and Minun are only ever given together.
+        if (species == SPECIES_PLUSLE || species == SPECIES_MINUN)
+        {
+            if (gavePair)
+                continue;
+            gavePair = TRUE;
+            ScriptGiveMon(SPECIES_PLUSLE, 15, ITEM_NONE);
+            ScriptGiveMon(SPECIES_MINUN, 15, ITEM_NONE);
+            continue;
+        }
+
+        ScriptGiveMon(PickGiftSpeciesForm(species), 15, ITEM_NONE);
+    }
+
+    gAutoObtainRequest.count = 0;
+}
 
 u8 GetGiftMonCost(u16 species)
 {

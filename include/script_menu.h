@@ -20,6 +20,22 @@
 extern const u8 *const gStdStrings[];
 
 u8 GenerateRandomGiftTeam(struct ListMenuItem *items, u32 numItems, u16 *outTeam);
+u16 GetRandomGiftEggSpecies(void);
+
+// Draft team handed in by the website's embedded emulator at the fixed EWRAM
+// address 0x0203F100 (see ".auto_obtain" in ld_script_modern.ld). Entries are
+// national dex numbers; AUTO_OBTAIN_EGG_ID means a Mystery Egg.
+#define AUTO_OBTAIN_MAGIC 0xB17A
+#define AUTO_OBTAIN_MAX_MONS 12
+#define AUTO_OBTAIN_EGG_ID 0xFFFF
+struct AutoObtainRequest // 28 bytes
+{
+    vu16 magic; // AUTO_OBTAIN_MAGIC while a request is pending; cleared once consumed
+    vu16 count;
+    vu16 dexNums[AUTO_OBTAIN_MAX_MONS];
+};
+extern volatile struct AutoObtainRequest gAutoObtainRequest;
+void GiveAutoObtainMons(void);
 
 struct DynamicMultichoiceStack
 {

@@ -81,6 +81,7 @@
 #include "constants/songs.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
+#include "constants/flags.h"
 
 STATIC_ASSERT((B_FLAG_FOLLOWERS_DISABLED == 0 || OW_FOLLOWERS_ENABLED), FollowersFlagAssignedWithoutEnablingThem);
 
@@ -254,6 +255,11 @@ void UpdateLiveBattleStatus(void)
         sLiveStatusFrameCounter = 0;
         gLiveWarpStatus.money = GetMoney(&gSaveBlock1Ptr->money);
         gLiveWarpStatus.inBattle = gMain.inBattle;
+    }
+
+    if (gAutoObtainRequest.magic == AUTO_OBTAIN_MAGIC && FlagGet(FLAG_GAVE_STARTER_EEVEE) && !gMain.inBattle)
+    {
+        GiveAutoObtainMons();
     }
 }
 

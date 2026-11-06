@@ -243,6 +243,7 @@ bool32 WasUnableToUseMove(u32 battler);
 bool32 IsLastMonToMove(u32 battler);
 bool32 ShouldDefiantCompetitiveActivate(u32 battler, enum Ability ability);
 void PrepareStringBattle(enum StringID stringId, u32 battler);
+void HandleStatDropMessageEffects(enum StringID stringId);
 void ResetSentPokesToOpponentValue(void);
 void OpponentSwitchInResetSentPokesToOpponentValue(u32 battler);
 void UpdateSentPokesToOpponentValue(u32 battler);

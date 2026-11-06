@@ -798,6 +798,8 @@ struct BattleStruct
     u8 echoedVoiceCounter:3;
     u8 regeneratorPending[MAX_BATTLERS_COUNT];
     u8 padding3:4;
+    u8 spreadStatDrops[MAX_BATTLERS_COUNT][NUM_BATTLE_STATS][3];
+    u8 spreadStatDropMessageCount;
 };
 
 struct AiBattleData

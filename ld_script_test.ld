@@ -37,6 +37,12 @@ SECTIONS {
         KEEP(*(.live_warp));
     } > EWRAM
 
+    .auto_obtain 0x0203F100 (NOLOAD) :
+    ALIGN(4)
+    {
+        KEEP(*(.auto_obtain));
+    } > EWRAM
+
     .iwram ORIGIN(IWRAM) : AT (__iwram_lma)
     ALIGN(4)
     {

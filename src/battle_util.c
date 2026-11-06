@@ -1268,6 +1268,26 @@ bool32 ShouldDefiantCompetitiveActivate(u32 battler, enum Ability ability)
     return gSideTimers[side].stickyWebBattlerSide != side;
 }
 
+void HandleStatDropMessageEffects(enum StringID stringId)
+{
+    u16 targetAbility = GetBattlerAbility(gBattlerTarget);
+
+    if (gCurrentMove == MOVE_HOLD_HANDS
+     && (stringId == STRINGID_DEFENDERSSTATFELL || stringId == STRINGID_STATSWONTDECREASE || stringId == STRINGID_PKMNCUTSATTACKWITH))
+        sCantCritBattlers |= (1u << gBattlerTarget);
+
+    if ((stringId == STRINGID_PKMNCUTSATTACKWITH || stringId == STRINGID_DEFENDERSSTATFELL)
+     && ShouldDefiantCompetitiveActivate(gBattlerTarget, targetAbility))
+    {
+        gBattlerAbility = gBattlerTarget;
+        BattleScriptCall(BattleScript_AbilityRaisesDefenderStat);
+        if (targetAbility == ABILITY_DEFIANT)
+            SET_STATCHANGER(STAT_ATK, 2, FALSE);
+        else
+            SET_STATCHANGER(STAT_SPATK, 2, FALSE);
+    }
+}
+
 void PrepareStringBattle(enum StringID stringId, u32 battler)
 {
     u16 battlerAbility = GetBattlerAbility(battler);
@@ -1321,23 +1341,7 @@ void PrepareStringBattle(enum StringID stringId, u32 battler)
         break;
     }
 
-    //if (gCurrentMove == MOVE_BABY_DOLL_EYES || gCurrentMove == MOVE_FAKE_TEARS || gCurrentMove == MOVE_PLAY_NICE || gCurrentMove == MOVE_TEARFUL_LOOK)
-    if (gCurrentMove == MOVE_HOLD_HANDS)
-    {
-        if (stringId == STRINGID_DEFENDERSSTATFELL || stringId == STRINGID_STATSWONTDECREASE || stringId == STRINGID_PKMNCUTSATTACKWITH)
-            sCantCritBattlers |= (1u << gBattlerTarget);
-    }
-
-    if ((stringId == STRINGID_PKMNCUTSATTACKWITH || stringId == STRINGID_DEFENDERSSTATFELL)
-     && ShouldDefiantCompetitiveActivate(gBattlerTarget, targetAbility))
-    {
-        gBattlerAbility = gBattlerTarget;
-        BattleScriptCall(BattleScript_AbilityRaisesDefenderStat);
-        if (targetAbility == ABILITY_DEFIANT)
-            SET_STATCHANGER(STAT_ATK, 2, FALSE);
-        else
-            SET_STATCHANGER(STAT_SPATK, 2, FALSE);
-    }
+    HandleStatDropMessageEffects(stringId);
 
     BtlController_EmitPrintString(battler, B_COMM_TO_CONTROLLER, stringId);
     MarkBattlerForControllerExec(battler);

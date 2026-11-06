@@ -181,6 +181,11 @@ const u16 sGiftEggPool[] =
     SPECIES_AZURILL,
 };
 
+u16 GetRandomGiftEggSpecies(void)
+{
+    return sGiftEggPool[Random() % ARRAY_COUNT(sGiftEggPool)];
+}
+
 static const u8 sGiftMenuTextColors[][3] =
 {
     [0] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY}, // Normal

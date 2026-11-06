@@ -108,6 +108,20 @@ const struct PlayerNamePreset gPlayerNamePresets[] =
         .windowFrameType = PRESET_FRAME(38),
         .playerPalette = PRESET_PALETTE_BLACK,
     },
+    {
+        .name = _("Code$"),
+        .shuppetGuides = OPTIONS_SHUPPET_GUIDES_ON,
+        .flygonDust = 0, // Off
+        .windowFrameType = PRESET_FRAME(5),
+        .playerPalette = PRESET_PALETTE_BLUE,
+    },
+    {
+        .name = _("Dougy$"),
+        .shuppetGuides = OPTIONS_SHUPPET_GUIDES_ON,
+        .flygonDust = 0, // Off
+        .windowFrameType = PRESET_FRAME(12),
+        .playerPalette = PRESET_PALETTE_YELLOW,
+    },
 };
 
 static const struct PlayerNamePreset *FindPlayerNamePreset(const u8 *playerName)
