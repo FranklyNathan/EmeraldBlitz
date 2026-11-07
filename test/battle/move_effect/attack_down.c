@@ -1,6 +1,26 @@
 #include "global.h"
 #include "test/battle.h"
 
+DOUBLE_BATTLE_TEST("Fainting after a spread stat drop does not repeat the message")
+{
+    GIVEN {
+        ASSUME(GetMoveTarget(MOVE_TAIL_WHIP) == MOVE_TARGET_BOTH);
+        PLAYER(SPECIES_EEVEE) { Speed(100); }
+        PLAYER(SPECIES_GOLETT) { Speed(90); }
+        OPPONENT(SPECIES_SOLROCK) { HP(1); Speed(110); }
+        OPPONENT(SPECIES_LUNATONE) { Speed(110); }
+    } WHEN {
+        TURN { MOVE(playerLeft, MOVE_TAIL_WHIP); MOVE(playerRight, MOVE_SHADOW_PUNCH, target: opponentLeft); }
+        TURN { MOVE(playerLeft, MOVE_CELEBRATE); }
+    } SCENE {
+        MESSAGE("The Pokemons' Defense fell!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SHADOW_PUNCH, playerRight);
+        MESSAGE("The opposing Solrock fainted!");
+        NOT MESSAGE("The Pokemons' Defense fell!");
+        MESSAGE("Eevee used Celebrate!");
+    }
+}
+
 ASSUMPTIONS
 {
     ASSUME(GetMoveEffect(MOVE_GROWL) == EFFECT_ATTACK_DOWN);

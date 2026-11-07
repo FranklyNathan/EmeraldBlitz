@@ -4,17 +4,63 @@
 #include "battle_main.h"
 #include "battle_message.h"
 #include "battle_setup.h"
+#include "bg.h"
 #include "item.h"
 #include "malloc.h"
 #include "main_menu.h"
 #include "string_util.h"
 #include "text.h"
+#include "window.h"
 #include "constants/abilities.h"
 #include "constants/battle.h"
 #include "constants/battle_string_ids.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "test/overworld_script.h"
+
+TEST("A page-clear prompt updates the visible window tiles")
+{
+    static const struct BgTemplate backgrounds[] = {
+        { .bg = 0, .charBaseIndex = 0, .mapBaseIndex = 31 },
+    };
+    static const struct WindowTemplate windows[] = {
+        { .bg = 0, .width = 1, .height = 1, .baseBlock = 0x20 },
+        DUMMY_WIN_TEMPLATE,
+    };
+    static const u8 text[] = { CHAR_PROMPT_CLEAR, EOS };
+    struct TextPrinterTemplate printer = {
+        .currentChar = text,
+        .windowId = 0,
+        .fontId = FONT_NORMAL,
+        .fgColor = 1,
+        .bgColor = 15,
+        .shadowColor = 2,
+    };
+    volatile u16 *tiles = (volatile u16 *)(BG_VRAM + 0x20 * 32);
+    u32 frame;
+
+    ResetBgsAndClearDma3BusyFlags(0);
+    InitBgsFromTemplates(0, backgrounds, ARRAY_COUNT(backgrounds));
+    ShowBg(0);
+    EXPECT_EQ(InitWindows(windows), TRUE);
+    SetDefaultFontsPointer();
+    FillWindowPixelBuffer(0, PIXEL_FILL(1));
+    CopyWindowToVram(0, COPYWIN_GFX);
+    VBlankIntrWait();
+    EXPECT_EQ(tiles[0], 0x1111);
+
+    gTextFlags.autoScroll = TRUE;
+    EXPECT_EQ(AddTextPrinter(&printer, 1, NULL), TRUE);
+    for (frame = 0; frame < 128 && IsTextPrinterActive(0); frame++)
+    {
+        RunTextPrinters();
+        VBlankIntrWait();
+    }
+    EXPECT_EQ(IsTextPrinterActive(0), FALSE);
+    EXPECT_EQ(tiles[0], 0xffff);
+    gTextFlags.autoScroll = FALSE;
+    FreeAllWindowBuffers();
+}
 
 TEST("Move names fit on Pokemon Summary Screen")
 {

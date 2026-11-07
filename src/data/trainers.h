@@ -37763,7 +37763,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 14440
-                MOVE_BLOCK,
+                MOVE_ROCK_SMASH,
                 MOVE_HARDEN,
                 MOVE_TACKLE,
                 MOVE_ROCK_TOMB,
@@ -37880,7 +37880,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 14490
-                MOVE_BLOCK,
+                MOVE_ROCK_SMASH,
                 MOVE_HARDEN,
                 MOVE_SPARK,
                 MOVE_ROCK_TOMB,
@@ -37997,7 +37997,7 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 14540
-                MOVE_BLOCK,
+                MOVE_ROCK_SMASH,
                 MOVE_HARDEN,
                 MOVE_SPARK,
                 MOVE_ROCK_TOMB,
@@ -39027,8 +39027,8 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 14980
                 MOVE_BUBBLE_BEAM,
-                MOVE_QUIVER_DANCE,
-                MOVE_SILVER_WIND,
+                MOVE_AGILITY,
+                MOVE_BUG_BITE,
                 MOVE_AIR_CUTTER,
             },
             },
@@ -41328,7 +41328,7 @@ F_TRAINER_FEMALE |
                 MOVE_ROCK_BLAST,
                 MOVE_EARTHQUAKE,
                 MOVE_STEALTH_ROCK,
-                MOVE_SHOCK_WAVE,
+                MOVE_THUNDERPUNCH,
             },
             },
             {
@@ -41415,7 +41415,7 @@ F_TRAINER_FEMALE |
 #line 16020
                 MOVE_FLAMETHROWER,
                 MOVE_WILD_CHARGE,
-                MOVE_SHOCK_WAVE,
+                MOVE_DISCHARGE,
                 MOVE_CRUNCH,
             },
             },
@@ -41463,7 +41463,7 @@ F_TRAINER_FEMALE |
                 MOVE_STONE_EDGE,
                 MOVE_EARTHQUAKE,
                 MOVE_STEALTH_ROCK,
-                MOVE_SHOCK_WAVE,
+                MOVE_THUNDERPUNCH,
             },
             },
             {
@@ -41550,7 +41550,7 @@ F_TRAINER_FEMALE |
 #line 16080
                 MOVE_FLAMETHROWER,
                 MOVE_WILD_CHARGE,
-                MOVE_SHOCK_WAVE,
+                MOVE_DISCHARGE,
                 MOVE_CRUNCH,
             },
             },
@@ -42068,7 +42068,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 16300
                 MOVE_OVERHEAT,
-                MOVE_ANCIENT_POWER,
+                MOVE_BODY_SLAM,
                 MOVE_LIGHT_SCREEN,
                 MOVE_SUNNY_DAY,
             },
@@ -43950,7 +43950,7 @@ F_TRAINER_FEMALE |
 #line 17110
                 MOVE_LEAF_TORNADO,
                 MOVE_AERIAL_ACE,
-                MOVE_DRAGON_DANCE,
+                MOVE_SUNNY_DAY,
                 MOVE_BODY_SLAM,
             },
             },
@@ -44492,7 +44492,7 @@ F_TRAINER_FEMALE |
 #line 17340
                 MOVE_EARTHQUAKE,
                 MOVE_DRAGON_PULSE,
-                MOVE_MOONBLAST,
+                MOVE_DRAGON_DANCE,
                 MOVE_AERIAL_ACE,
             },
             },
@@ -46689,7 +46689,7 @@ F_TRAINER_FEMALE |
 #line 18296
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 18298
-            .ability = ABILITY_ADAPTABILITY,
+            .ability = ABILITY_HYPER_CUTTER,
 #line 18295
             .lvl = 53,
 #line 18297
@@ -46698,9 +46698,9 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 18299
                 MOVE_CRABHAMMER,
-                MOVE_SWORDS_DANCE,
+                MOVE_DRAGON_DANCE,
                 MOVE_KNOCK_OFF,
-                MOVE_FACADE,
+                MOVE_BRICK_BREAK,
             },
             },
             {
@@ -46743,10 +46743,10 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 18319
+                MOVE_X_SCISSOR,
+                MOVE_NIGHT_SLASH,
                 MOVE_AERIAL_ACE,
                 MOVE_ROCK_SLIDE,
-                MOVE_SWORDS_DANCE,
-                MOVE_NIGHT_SLASH,
             },
             },
         },
@@ -47888,8 +47888,8 @@ F_TRAINER_FEMALE |
 #line 18817
                 MOVE_METEOR_MASH,
                 MOVE_HAMMER_ARM,
-                MOVE_ZEN_HEADBUTT,
                 MOVE_PSYCHIC_NOISE,
+                MOVE_HYPER_BEAM,
             },
             },
         },

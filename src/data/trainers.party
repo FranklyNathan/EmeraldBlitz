@@ -14437,7 +14437,7 @@ Level: 15
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Sturdy
-- Block
+- Rock Smash
 - Harden
 - Tackle
 - Rock Tomb
@@ -14487,7 +14487,7 @@ Level: 19
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Sturdy
-- Block
+- Rock Smash
 - Harden
 - Spark
 - Rock Tomb
@@ -14537,7 +14537,7 @@ Level: 24
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Sturdy
-- Block
+- Rock Smash
 - Harden
 - Spark
 - Rock Tomb
@@ -14978,8 +14978,8 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Intimidate
 - Bubble Beam
-- Quiver Dance
-- Silver Wind
+- Agility
+- Bug Bite
 - Air Cutter
 
 Volbeat (M)
@@ -15980,7 +15980,7 @@ Ability: Sturdy
 - Rock Blast
 - Earthquake
 - Stealth Rock
-- Shock Wave
+- Thunderpunch
 
 Electrode-Hisui
 Level: 39
@@ -16019,7 +16019,7 @@ Nature: Serious
 Ability: Static
 - Flamethrower
 - Wild Charge
-- Shock Wave
+- Discharge
 - Crunch
 
 === TRAINER_WATTSON_8 ===
@@ -16040,7 +16040,7 @@ Ability: Sturdy
 - Stone Edge
 - Earthquake
 - Stealth Rock
-- Shock Wave
+- Thunderpunch
 
 Electrode-Hisui
 Level: 43
@@ -16079,7 +16079,7 @@ Nature: Serious
 Ability: Static
 - Flamethrower
 - Wild Charge
-- Shock Wave
+- Discharge
 - Crunch
 
 === TRAINER_FLANNERY_1 ===
@@ -16298,7 +16298,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Flame Body
 - Overheat
-- Ancient Power
+- Body Slam
 - Light Screen
 - Sunny Day
 
@@ -17109,7 +17109,7 @@ Nature: Serious
 Ability: Chlorophyll
 - Leaf Tornado
 - Aerial Ace
-- Dragon Dance
+- Sunny Day
 - Body Slam
 
 === TRAINER_WINONA_5 ===
@@ -17339,7 +17339,7 @@ Nature: Serious
 Ability: Natural Cure
 - Earthquake
 - Dragon Pulse
-- Moonblast
+- Dragon Dance
 - Aerial Ace
 
 === TRAINER_TATE_AND_LIZA_1 ===
@@ -18295,11 +18295,11 @@ Crawdaunt (M)
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Adaptability
+Ability: Hyper Cutter
 - Crabhammer
-- Swords Dance
+- Dragon Dance
 - Knock Off
-- Facade
+- Brick Break
 
 Grimmsnarl (M)
 Level: 53
@@ -18316,10 +18316,10 @@ Level: 55
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Super Luck
+- X Scissor
+- Night Slash
 - Aerial Ace
 - Rock Slide
-- Swords Dance
-- Night Slash
 
 === TRAINER_SPENSER ===
 Name: SPENSER
@@ -18816,8 +18816,8 @@ Nature: Serious
 Ability: Clear Body
 - Meteor Mash
 - Hammer Arm
-- Zen Headbutt
 - Psychic Noise
+- Hyper Beam
 
 === TRAINER_WALLY ===
 Name: WALLY

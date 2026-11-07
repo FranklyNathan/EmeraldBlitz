@@ -421,6 +421,7 @@ OldaleTown_House2_Basement_Mart_MegaStones:
 	.hword ITEM_GARDEVOIRITE
 	.hword ITEM_GENGARITE
 	.hword ITEM_GLALITITE
+	.hword ITEM_GOLURKITE
 	.hword ITEM_GRENINJITE
 	.hword ITEM_HAWLUCHANITE
 	.hword ITEM_HERACRONITE

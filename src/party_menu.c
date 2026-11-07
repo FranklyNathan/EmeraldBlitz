@@ -3603,7 +3603,7 @@ static bool8 PartyMonCanEvolve(u16 species, u8 level)
          || species == SPECIES_TIRTOUGA
          || species == SPECIES_AMAURA
          || species == SPECIES_VAROOM
-         //|| species == SPECIES_GOLETT
+         || species == SPECIES_GOLETT
          || species == SPECIES_RUFFLET
          || species == SPECIES_FRILLISH
          || species == SPECIES_SANDYGAST

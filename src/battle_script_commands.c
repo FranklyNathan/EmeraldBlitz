@@ -4881,12 +4881,6 @@ static void Cmd_getexp(void)
                 gBattleResources->beforeLvlUp->stats[STAT_SPDEF] = GetMonData(&gPlayerParty[*expMonId], MON_DATA_SPDEF);
                 gBattleResources->beforeLvlUp->level             = currLvl;
                 gBattleResources->beforeLvlUp->learnMultipleMoves = FALSE;
-
-                if (gBattleStruct->expGetterBattlerId != 0)
-                {
-                //BtlController_EmitExpUpdate(gBattleStruct->expGetterBattlerId, BUFFER_A, *expMonId, gBattleStruct->battlerExpReward);
-                }
-                MarkBattlerForControllerExec(gBattleStruct->expGetterBattlerId);
             }
             gBattleScripting.getexpState++;
         }
