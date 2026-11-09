@@ -6774,8 +6774,10 @@ bool32 IsBattlerProtected(u32 battlerAtk, u32 battlerDef, u32 move)
     {
         if (IsZMove(move) || IsMaxMove(move))
             return FALSE; // Z-Moves and Max Moves bypass protection (except Max Guard).
-        if (GetBattlerAbility(battlerAtk) == ABILITY_PIERCING_DRILL
-         && IsMoveMakingContact(battlerAtk, battlerDef, ABILITY_PIERCING_DRILL, GetBattlerHoldEffect(battlerAtk), move))
+        enum Ability abilityAtk = GetBattlerAbility(battlerAtk);
+
+        if ((abilityAtk == ABILITY_UNSEEN_FIST || abilityAtk == ABILITY_PIERCING_DRILL)
+         && IsMoveMakingContact(battlerAtk, battlerDef, abilityAtk, GetBattlerHoldEffect(battlerAtk), move))
             return FALSE;
     }
 

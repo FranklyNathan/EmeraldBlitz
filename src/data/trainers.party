@@ -18295,11 +18295,11 @@ Crawdaunt (M)
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
-Ability: Hyper Cutter
+Ability: Adaptability
 - Crabhammer
-- Dragon Dance
+- Swords Dance
 - Knock Off
-- Brick Break
+- Facade
 
 Grimmsnarl (M)
 Level: 53
@@ -18316,10 +18316,10 @@ Level: 55
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Super Luck
-- X Scissor
 - Night Slash
 - Aerial Ace
 - Rock Slide
+- Swords Dance
 
 === TRAINER_SPENSER ===
 Name: SPENSER

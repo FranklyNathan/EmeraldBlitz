@@ -46689,7 +46689,7 @@ F_TRAINER_FEMALE |
 #line 18296
             .iv = TRAINER_PARTY_IVS(31, 31, 31, 31, 31, 31),
 #line 18298
-            .ability = ABILITY_HYPER_CUTTER,
+            .ability = ABILITY_ADAPTABILITY,
 #line 18295
             .lvl = 53,
 #line 18297
@@ -46698,9 +46698,9 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 18299
                 MOVE_CRABHAMMER,
-                MOVE_DRAGON_DANCE,
+                MOVE_SWORDS_DANCE,
                 MOVE_KNOCK_OFF,
-                MOVE_BRICK_BREAK,
+                MOVE_FACADE,
             },
             },
             {
@@ -46743,10 +46743,10 @@ F_TRAINER_FEMALE |
             .dynamaxLevel = MAX_DYNAMAX_LEVEL,
             .moves = {
 #line 18319
-                MOVE_X_SCISSOR,
                 MOVE_NIGHT_SLASH,
                 MOVE_AERIAL_ACE,
                 MOVE_ROCK_SLIDE,
+                MOVE_SWORDS_DANCE,
             },
             },
         },
