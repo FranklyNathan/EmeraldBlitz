@@ -131,9 +131,10 @@ SlateportCity_EventScript_EnergyGuru::
 	goto_if_ge VAR_0x8004, PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT, SlateportCity_EventScript_EnergyGuru_Decline
 	callnative CheckSelectedMonForEnergyGuru
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyGuru_InvalidMon
-	msgbox SlateportCity_Text_EnergyNPC_Confirm, MSGBOX_YESNO
+	call SlateportCity_EventScript_EnergyNPC_Confirm
 	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_EnergyNPC_DeclineConfirm
 	goto_if_set FLAG_FREE_SHOP, SlateportCity_EventScript_EnergyGuru_SkipMoney
+	goto_if_set FLAG_TEMP_5, SlateportCity_EventScript_EnergyGuru_SkipMoney
 	checkmoney 1000
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_HiddenPowerNPC_NotEnoughMoney
 	removemoney 1000
@@ -168,6 +169,15 @@ SlateportCity_EventScript_EnergyNPC_DeclineConfirm::
 	release
 	end
 
+SlateportCity_EventScript_EnergyNPC_Confirm::
+	goto_if_set FLAG_TEMP_5, SlateportCity_EventScript_EnergyNPC_ConfirmFree
+	msgbox SlateportCity_Text_EnergyNPC_Confirm, MSGBOX_YESNO
+	return
+
+SlateportCity_EventScript_EnergyNPC_ConfirmFree::
+	msgbox SlateportCity_Text_EnergyNPC_ConfirmFree, MSGBOX_YESNO
+	return
+
 SlateportCity_EventScript_EnergyOracle::
 	lock
 	faceplayer
@@ -182,9 +192,10 @@ SlateportCity_EventScript_EnergyOracle::
 	goto_if_ge VAR_0x8004, PARTY_PC_SLOT_START + PARTY_PC_SLOT_COUNT, SlateportCity_EventScript_EnergyOracle_Decline
 	callnative CheckSelectedMonForEffortRibbon
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_EnergyOracle_InvalidMon
-	msgbox SlateportCity_Text_EnergyNPC_Confirm, MSGBOX_YESNO
+	call SlateportCity_EventScript_EnergyNPC_Confirm
 	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_EnergyNPC_DeclineConfirm
 	goto_if_set FLAG_FREE_SHOP, SlateportCity_EventScript_EnergyOracle_SkipMoney
+	goto_if_set FLAG_TEMP_5, SlateportCity_EventScript_EnergyOracle_SkipMoney
 	checkmoney 1000
 	goto_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_HiddenPowerNPC_NotEnoughMoney
 	removemoney 1000
@@ -2248,6 +2259,12 @@ SlateportCity_Text_EnergyNPC_Confirm:
 	.string "teeming with untapped Energy.\p"
 	.string "Would you like me to help this POKéMON\n"
 	.string "evolve for ¥1000?$"
+
+SlateportCity_Text_EnergyNPC_ConfirmFree:
+	.string "Excellent choice! This POKéMON is just\n"
+	.string "teeming with untapped Energy.\p"
+	.string "Would you like me to help this POKéMON\n"
+	.string "evolve?$"
 
 SlateportCity_Text_EnergyNPC_DeclineConfirm:
 	.string "That's quite alright!\p"

@@ -1361,10 +1361,12 @@ OldaleTown_House2_Basement_Text_HiddenPowerNPC_Intro:
 	.string "Would you like to do that?$"
 
 OldaleTown_House2_Basement_EventScript_EnergyGuru::
+	setflag FLAG_TEMP_5  @ Energy services are free inside the Basement
 	goto SlateportCity_EventScript_EnergyGuru
 	goto_if_lt VAR_BADGE_COUNT, 2, OldaleTown_House2_Basement_EventScript_EnergyGuruNotEnoughBadges
 
 OldaleTown_House2_Basement_EventScript_EnergyOracle::
+	setflag FLAG_TEMP_5  @ Energy services are free inside the Basement
 	goto SlateportCity_EventScript_EnergyOracle
 
 OldaleTown_House2_Basement_EventScript_EnergyGuruNotEnoughBadges::
