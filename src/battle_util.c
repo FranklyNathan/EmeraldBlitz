@@ -10940,7 +10940,11 @@ bool32 CanMoveSkipAccuracyCalc(u32 battlerAtk, u32 battlerDef, enum Ability abil
     enum BattleMoveEffects moveEffect = GetMoveEffect(move);
     u32 nonVolatileStatus = GetMoveNonVolatileStatus(move);
 
-    if (FlagGet(FLAG_DISABLE_ACCURACY_CHECKS))
+    // Debug flag: moves bypass accuracy checks during actual combat, but not during AI
+    // scoring, and never bypass semi-invulnerable states (Dig, Fly, Commander, etc.).
+    if (FlagGet(FLAG_DISABLE_ACCURACY_CHECKS)
+     && option == RUN_SCRIPT
+     && BreaksThroughSemiInvulnerablity(battlerDef, move))
     {
         effect = TRUE;
     }

@@ -15028,7 +15028,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Intimidate
 - Bubble Beam
-- Quiver Dance
+- Whirlwind
 - Bug Buzz
 - Air Cutter
 
@@ -15060,7 +15060,7 @@ Ability: Swarm
 - Giga Drain
 - Air Cutter
 - Leech Life
-- Psychic
+- Quiver Dance
 
 === TRAINER_VIOLA_6 ===
 Name: VIOLA
@@ -15078,7 +15078,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 Nature: Serious
 Ability: Intimidate
 - Hydro Pump
-- Quiver Dance
+- Whirlwind
 - Bug Buzz
 - Air Cutter
 

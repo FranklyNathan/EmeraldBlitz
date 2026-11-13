@@ -39144,7 +39144,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 15030
                 MOVE_BUBBLE_BEAM,
-                MOVE_QUIVER_DANCE,
+                MOVE_WHIRLWIND,
                 MOVE_BUG_BUZZ,
                 MOVE_AIR_CUTTER,
             },
@@ -39214,7 +39214,7 @@ F_TRAINER_FEMALE |
                 MOVE_GIGA_DRAIN,
                 MOVE_AIR_CUTTER,
                 MOVE_LEECH_LIFE,
-                MOVE_PSYCHIC,
+                MOVE_QUIVER_DANCE,
             },
             },
         },
@@ -39261,7 +39261,7 @@ F_TRAINER_FEMALE |
             .moves = {
 #line 15080
                 MOVE_HYDRO_PUMP,
-                MOVE_QUIVER_DANCE,
+                MOVE_WHIRLWIND,
                 MOVE_BUG_BUZZ,
                 MOVE_AIR_CUTTER,
             },
