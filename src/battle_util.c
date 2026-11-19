@@ -10,6 +10,7 @@
 #include "battle_setup.h"
 #include "battle_z_move.h"
 #include "battle_gimmick.h"
+#include "battle_main.h"
 #include "battle_hold_effects.h"
 #include "generational_changes.h"
 #include "party_menu.h"
@@ -2054,6 +2055,8 @@ static enum MoveCanceler CancelerRecharge(struct BattleContext *ctx)
 {
     if (gDisableStructs[ctx->battlerAtk].rechargeTimer > 0)
     {
+        if (GetConfig(CONFIG_TRUANT) >= GEN_5 && ctx->abilities[ctx->battlerAtk] == ABILITY_TRUANT)
+            gDisableStructs[ctx->battlerAtk].truantCounter = 0;
         CancelMultiTurnMoves(ctx->battlerAtk, SKY_DROP_ATTACKCANCELER_CHECK);
         gBattlescriptCurrInstr = BattleScript_MoveUsedMustRecharge;
         gHitMarker |= HITMARKER_UNABLE_TO_USE_MOVE;
@@ -2219,7 +2222,14 @@ static enum MoveCanceler CancelerPowerPoints(struct BattleContext *ctx)
 
 static enum MoveCanceler CancelerTruant(struct BattleContext *ctx)
 {
-    if (GetBattlerAbility(ctx->battlerAtk) == ABILITY_TRUANT && gDisableStructs[ctx->battlerAtk].truantCounter)
+    if (ctx->abilities[ctx->battlerAtk] != ABILITY_TRUANT)
+        return MOVE_STEP_SUCCESS;
+
+    bool32 shouldLoaf = gDisableStructs[ctx->battlerAtk].truantCounter;
+    if (GetConfig(CONFIG_TRUANT) >= GEN_5)
+        gDisableStructs[ctx->battlerAtk].truantCounter ^= 1;
+
+    if (shouldLoaf)
     {
         CancelMultiTurnMoves(ctx->battlerAtk, SKY_DROP_ATTACKCANCELER_CHECK);
         gHitMarker |= HITMARKER_UNABLE_TO_USE_MOVE;
@@ -2227,6 +2237,9 @@ static enum MoveCanceler CancelerTruant(struct BattleContext *ctx)
         gBattlerAbility = ctx->battlerAtk;
         gBattlescriptCurrInstr = BattleScript_TruantLoafingAround;
         gBattleStruct->moveResultFlags[ctx->battlerDef] |= MOVE_RESULT_MISSED;
+        // The new base sets this from the generic missed-move check, but locally a protected
+        // move also reports MOVE_RESULT_MISSED, so set it here to only cover loafing turns.
+        gBattleStruct->battlerState[ctx->battlerAtk].stompingTantrumTimer = 2;
         return MOVE_STEP_FAILURE;
     }
     return MOVE_STEP_SUCCESS;
@@ -4935,7 +4948,8 @@ u32 AbilityBattleEffects(enum AbilityEffect caseID, u32 battler, enum Ability ab
                 }
                 break;
             case ABILITY_TRUANT:
-                gDisableStructs[gBattlerAttacker].truantCounter ^= 1;
+                if (GetConfig(CONFIG_TRUANT) <= GEN_4)
+                    gDisableStructs[battler].truantCounter ^= 1;
                 break;
             case ABILITY_SLOW_START:
                 if (gDisableStructs[battler].slowStartTimer > 0 && --gDisableStructs[battler].slowStartTimer == 0)
@@ -5160,7 +5174,7 @@ u32 AbilityBattleEffects(enum AbilityEffect caseID, u32 battler, enum Ability ab
 
                 RemoveAbilityFlags(gBattlerAttacker);
                 gLastUsedAbility = gBattleMons[gBattlerAttacker].ability;
-                gBattleMons[gBattlerAttacker].ability = gDisableStructs[gBattlerAttacker].overwrittenAbility = gBattleMons[gBattlerTarget].ability;
+                OverwriteBattlerAbility(gBattlerAttacker, gBattleMons[gBattlerTarget].ability);
                 BattleScriptCall(BattleScript_MummyActivates);
                 effect++;
                 break;
@@ -5186,8 +5200,8 @@ u32 AbilityBattleEffects(enum AbilityEffect caseID, u32 battler, enum Ability ab
 
                 RemoveAbilityFlags(gBattlerAttacker);
                 gLastUsedAbility = gBattleMons[gBattlerAttacker].ability;
-                gBattleMons[gBattlerAttacker].ability = gDisableStructs[gBattlerAttacker].overwrittenAbility = gBattleMons[gBattlerTarget].ability;
-                gBattleMons[gBattlerTarget].ability = gDisableStructs[gBattlerTarget].overwrittenAbility = gLastUsedAbility;
+                OverwriteBattlerAbility(gBattlerAttacker, gBattleMons[gBattlerTarget].ability);
+                OverwriteBattlerAbility(gBattlerTarget, gLastUsedAbility);
                 BattleScriptCall(BattleScript_WanderingSpiritActivates);
                 effect++;
                 break;
@@ -5736,6 +5750,12 @@ u32 AbilityBattleEffects(enum AbilityEffect caseID, u32 battler, enum Ability ab
         if (gLastUsedAbility == ABILITY_NEUTRALIZING_GAS && !gDisableStructs[battler].neutralizingGas)
         {
             gDisableStructs[battler].neutralizingGas = TRUE;
+            for (u32 battlerDef = 0; battlerDef < gBattlersCount; battlerDef++)
+            {
+                if (battler == battlerDef || GetBattlerHoldEffectIgnoreAbility(battlerDef) == HOLD_EFFECT_ABILITY_SHIELD)
+                    continue;
+                ResetTruantToggleOnAbilitySuppression(battlerDef);
+            }
             gBattlerAbility = battler;
             gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SWITCHIN_NEUTRALIZING_GAS;
             if (caseID == ABILITYEFFECT_NEUTRALIZINGGAS_FIRST_TURN)
@@ -5898,6 +5918,116 @@ u32 GetBattlerAbilityIgnoreMoldBreaker(u32 battler)
 enum Ability GetBattlerAbility(u32 battler)
 {
     return GetBattlerAbilityInternal(battler, FALSE, FALSE);
+}
+
+bool32 IsBattlerLoafing(u32 battler)
+{
+    return GetBattlerAbility(battler) == ABILITY_TRUANT
+        && gDisableStructs[battler].truantCounter;
+}
+
+bool32 AreEndTurnEventsRunning(void)
+{
+    if (gBattleMainFunc == BattleTurnPassed)
+        return TRUE;
+
+    for (u32 i = 0; i < gBattleResources->battleCallbackStack->size; i++)
+    {
+        if (gBattleResources->battleCallbackStack->function[i] == BattleTurnPassed)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static bool32 HasBattlerUsedItsMoveThisTurn(u32 battler)
+{
+    for (u32 i = 0; i <= gCurrentTurnActionNumber && i < gBattlersCount; i++)
+    {
+        if (gBattlerByTurnOrder[i] == battler)
+            return gActionsByTurnOrder[i] == B_ACTION_USE_MOVE;
+    }
+    return FALSE;
+}
+
+void UpdateTruantToggle(u32 battler)
+{
+    if (GetConfig(CONFIG_TRUANT) < GEN_5)
+        return;
+
+    bool32 switchIn = gBattleStruct->battlerState[battler].switchIn;
+
+    if ((HasBattlerUsedItsMoveThisTurn(battler) && !switchIn)
+     || (gBattleStruct->gimmick.activatedThisTurn & (1u << battler)))
+        gDisableStructs[battler].truantCounter = 1;
+    else
+        gDisableStructs[battler].truantCounter = 0;
+}
+
+void UpdateTruantToggleForAbilityChange(u32 battler, enum Ability oldAbility)
+{
+    enum Ability newAbility = gBattleMons[battler].ability;
+
+    if (oldAbility == ABILITY_TRUANT && newAbility != ABILITY_TRUANT)
+    {
+        if (GetConfig(CONFIG_TRUANT) >= GEN_4)
+            gDisableStructs[battler].truantCounter = 0;
+    }
+    else if (oldAbility != ABILITY_TRUANT && newAbility == ABILITY_TRUANT)
+    {
+        if (IsNeutralizingGasOnField()
+         && GetBattlerHoldEffectIgnoreAbility(battler) != HOLD_EFFECT_ABILITY_SHIELD)
+            gDisableStructs[battler].truantCounter = 0;
+        else if (GetConfig(CONFIG_TRUANT) <= GEN_4 && gBattleStruct->battlerState[battler].switchIn)
+        {
+            // Trace and friends copying Truant as the battler enters. Gen 3-4 advance the toggle at
+            // the end of every turn, so store the value it needs to hold before that advance.
+            // isDuringEndTurn is FALSE for battlers entering during the action phase, which still
+            // have that advance ahead of them this turn.
+            bool32 isDuringEndTurn = AreEndTurnEventsRunning();
+            bool32 endTurnUpdatePending = !isDuringEndTurn || gBattleStruct->eventState.endTurn <= ENDTURN_THIRD_EVENT_BLOCK;
+            // Gen 3 advances the toggle before the copying ability resolves, so a battler entering
+            // outside of the end turn block misses that advance and loafs on its first turn.
+            bool32 loafsOnFirstTurn = GetConfig(CONFIG_TRUANT) == GEN_3 && !isDuringEndTurn;
+
+            if (gBattleStruct->eventState.beforeFristTurn != 0) // Sent out at the start of the battle
+                gDisableStructs[battler].truantCounter = 0;
+            else
+                gDisableStructs[battler].truantCounter = endTurnUpdatePending ^ loafsOnFirstTurn;
+        }
+        else
+        {
+            UpdateTruantToggle(battler);
+        }
+    }
+}
+
+void OverwriteBattlerAbility(u32 battler, enum Ability ability)
+{
+    enum Ability oldAbility = gBattleMons[battler].ability;
+
+    gBattleMons[battler].ability = gDisableStructs[battler].overwrittenAbility = ability;
+    UpdateTruantToggleForAbilityChange(battler, oldAbility);
+}
+
+void ResetTruantToggleOnAbilitySuppression(u32 battler)
+{
+    if (GetConfig(CONFIG_TRUANT) >= GEN_4 && gBattleMons[battler].ability == ABILITY_TRUANT)
+        gDisableStructs[battler].truantCounter = 0;
+}
+
+void UpdateTruantTogglesOnNeutralizingGasEnd(void)
+{
+    if (GetConfig(CONFIG_TRUANT) < GEN_5)
+        return;
+
+    for (u32 battler = B_BATTLER_0; battler < gBattlersCount; battler++)
+    {
+        if (IsBattlerAlive(battler)
+         && gBattleMons[battler].ability == ABILITY_TRUANT
+         && !gBattleMons[battler].volatiles.gastroAcid
+         && GetBattlerHoldEffectIgnoreAbility(battler) != HOLD_EFFECT_ABILITY_SHIELD)
+            UpdateTruantToggle(battler);
+    }
 }
 
 u32 GetBattlerAbilityInternal(u32 battler, u32 ignoreMoldBreaker, u32 noAbilityShield)
@@ -9463,6 +9593,7 @@ bool32 TryBattleFormChange(u32 battler, enum FormChanges method)
     struct Pokemon *party = GetBattlerParty(battler);
     u32 currentSpecies = GetMonData(&party[monId], MON_DATA_SPECIES);
     u32 targetSpecies;
+    enum Ability oldAbility = gBattleMons[battler].ability;
 
     if (!CanBattlerFormChange(battler, method))
         return FALSE;
@@ -9481,6 +9612,7 @@ bool32 TryBattleFormChange(u32 battler, enum FormChanges method)
         SetMonData(&party[monId], MON_DATA_SPECIES, &targetSpecies);
         gBattleMons[battler].species = targetSpecies;
         RecalcBattlerStats(battler, &party[monId], method == FORM_CHANGE_BATTLE_GIGANTAMAX);
+        UpdateTruantToggleForAbilityChange(battler, oldAbility);
         // Reset Protean/Libero when species changes (e.g., Mega Evolution)
         gDisableStructs[battler].usedProteanLibero = FALSE;
         return TRUE;

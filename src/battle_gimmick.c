@@ -105,6 +105,7 @@ bool32 HasTrainerUsedGimmick(u32 battler, enum Gimmick gimmick)
 // Sets a gimmick as used by a trainer with checks for Multi Battles.
 void SetGimmickAsActivated(u32 battler, enum Gimmick gimmick)
 {
+    gBattleStruct->gimmick.activatedThisTurn |= 1u << battler;
     gBattleStruct->gimmick.activated[battler][gimmick] = TRUE;
     if (IsDoubleBattle() && IsPartnerMonFromSameTrainer(battler))
         gBattleStruct->gimmick.activated[BATTLE_PARTNER(battler)][gimmick] = TRUE;

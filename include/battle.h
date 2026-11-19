@@ -127,7 +127,7 @@ struct DisableStruct
     u8 usedProteanLibero:1;
     u8 flashFireBoosted:1;
     u8 boosterEnergyActivated:1;
-    u8 padding1:1;
+    u8 truantPrimed:1; // Truant's switch-in counter was already set for this switch-in
     u16 overwrittenAbility;   // abilities overwritten during battle (keep separate from battle history in case of switching)
     u8 roostActive:1;
     u8 unburdenActive:1;
@@ -558,6 +558,7 @@ struct BattleGimmickData
     u8 triggerSpriteId;
     u8 indicatorSpriteId[MAX_BATTLERS_COUNT];
     u8 toActivate;                                       // stores whether a battler should transform at start of turn as bitfield
+    u8 activatedThisTurn;                                // stores whether a battler activated a gimmick this turn as bitfield
     u8 activeGimmick[NUM_BATTLE_SIDES][PARTY_SIZE];      // stores the active gimmick for each party member
     bool8 activated[MAX_BATTLERS_COUNT][GIMMICKS_COUNT]; // stores whether a trainer has used gimmick
 };
@@ -596,7 +597,8 @@ struct BattlerState
     u32 wasAboveQuarterHp:1; // For Berserk, Emergency Exit, Wimp Out and Anger Shell.
     u32 commanderSpecies:11;
     u32 selectionScriptFinished:1;
-    u32 padding:3;
+    u32 switchIn:1; // True while this battler's switch-in effects are being processed.
+    u32 padding:2;
     // End of Word
 };
 

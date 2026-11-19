@@ -58,7 +58,7 @@ SINGLE_BATTLE_TEST("Unseen Fist doesn't bypass Protect with non-contact moves")
 
 SINGLE_BATTLE_TEST("Unseen Fist bypasses protect effects without triggering their contact effects")
 {
-    enum Move protectMove = MOVE_NONE;
+    u32 protectMove = MOVE_NONE;
     u8 loweredStat = 0;
 
     PARAMETRIZE { protectMove = MOVE_SPIKY_SHIELD;    loweredStat = 0; }
