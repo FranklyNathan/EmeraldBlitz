@@ -1745,16 +1745,7 @@ static const u16 sSeviperEggMoveLearnset[] = {
 
 #if P_FAMILY_BARBOACH
 static const u16 sBarboachEggMoveLearnset[] = {
-    MOVE_THRASH,
-    MOVE_WHIRLPOOL,
-    MOVE_SPARK,
-    MOVE_HYDRO_PUMP,
-    MOVE_FLAIL,
-    MOVE_TAKE_DOWN,
     MOVE_DRAGON_DANCE,
-    MOVE_EARTH_POWER,
-    MOVE_MUD_SHOT,
-    MOVE_MUDDY_WATER,
     MOVE_UNAVAILABLE,
 };
 #endif //P_FAMILY_BARBOACH

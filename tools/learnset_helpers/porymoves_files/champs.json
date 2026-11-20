@@ -404,5 +404,69 @@
     ],
     "TutorMoves": [],
     "EggMoves": []
+  },
+  "VAPOREON": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_PLAY_ROUGH"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "JOLTEON": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_PLAY_ROUGH"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "FLAREON": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_PLAY_ROUGH"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "ESPEON": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_PLAY_ROUGH"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "UMBREON": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_PLAY_ROUGH"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "LEAFEON": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_PLAY_ROUGH"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "GLACEON": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_PLAY_ROUGH"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
+  },
+  "SYLVEON": {
+    "LevelMoves": [],
+    "TMMoves": [
+      "MOVE_PLAY_ROUGH"
+    ],
+    "TutorMoves": [],
+    "EggMoves": []
   }
 }

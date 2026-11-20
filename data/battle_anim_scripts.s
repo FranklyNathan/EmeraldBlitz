@@ -29662,12 +29662,9 @@ gBattleAnimMove_Return::
 	loadspritegfx ANIM_TAG_IMPACT
 	monbg ANIM_DEF_PARTNER
 	setalpha 12, 8
-	createvisualtask AnimTask_GetReturnPowerLevel, 2
+	// Always use the medium animation regardless of friendship.
 	delay 2
-	jumpreteq 0, ReturnWeak
-	jumpreteq 1, ReturnMedium
-	jumpreteq 2, ReturnStrong
-	jumpreteq 3, ReturnStrongest
+	goto ReturnMedium
 ReturnContinue:
 	waitforvisualfinish
 	clearmonbg ANIM_DEF_PARTNER

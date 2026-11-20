@@ -9479,7 +9479,7 @@ static const struct LevelUpMove sBarboachLevelUpLearnset[] = {
 };
 
 static const struct LevelUpMove sWhiscashLevelUpLearnset[] = {
-    LEVEL_UP_MOVE( 0, MOVE_THRASH),
+    LEVEL_UP_MOVE( 1, MOVE_THRASH),
     //LEVEL_UP_MOVE( 1, MOVE_THRASH),
     LEVEL_UP_MOVE( 1, MOVE_BELCH),
     LEVEL_UP_MOVE( 1, MOVE_ZEN_HEADBUTT),
@@ -9490,7 +9490,7 @@ static const struct LevelUpMove sWhiscashLevelUpLearnset[] = {
     //LEVEL_UP_MOVE( 1, MOVE_WATER_GUN),
     LEVEL_UP_MOVE( 6, MOVE_MUD_SPORT),
     LEVEL_UP_MOVE( 6, MOVE_WATER_SPORT),
-    LEVEL_UP_MOVE( 9, MOVE_WATER_GUN),
+    //LEVEL_UP_MOVE( 9, MOVE_WATER_GUN),
     LEVEL_UP_MOVE(13, MOVE_MUD_BOMB),
     LEVEL_UP_MOVE(15, MOVE_AMNESIA),
     LEVEL_UP_MOVE(17, MOVE_WATER_PULSE),
