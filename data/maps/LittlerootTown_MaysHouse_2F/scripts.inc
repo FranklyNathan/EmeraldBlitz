@@ -415,6 +415,7 @@ RivalsHouse_2F_Text_BrendanWhereShouldIGoNext:
 	.string "battle if you'd like.$"
 
 LittlerootTown_MaysHouse_2F_EventScript_GrandPrixMessage::
+	special Special_BufferGrandPrixPosterName
 	msgbox gText_GrandPrixMessage, MSGBOX_SIGN
 	end
 

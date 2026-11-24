@@ -594,3 +594,4 @@ gSpecials::
 	def_special SootopolisGymB1F_ShowGabbyTy
 	def_special SootopolisGymB1F_ShowGabby
 	def_special GiveAutoObtainMons
+	def_special Special_BufferGrandPrixPosterName

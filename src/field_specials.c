@@ -5104,3 +5104,17 @@ void SetOptionsTextSpeed(void)
 {
     gSaveBlock2Ptr->optionsTextSpeed = gSpecialVar_0x8004;
 }
+
+// Add more names here and they will automatically be included in the random selection.
+static const char *const sGrandPrixPosterNames[] = {
+    "Jeans",
+    "KCH",
+    "Beastly",
+    "Jason",
+    "Freez",
+};
+
+void Special_BufferGrandPrixPosterName(void)
+{
+    StringCopy(gStringVar1, (const u8 *)RandomElement(RNG_NONE, sGrandPrixPosterNames));
+}

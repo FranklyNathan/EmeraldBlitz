@@ -1351,7 +1351,7 @@ const u8 gText_CannotSendMonToBoxHM[] = _("Cannot send that mon to the box,\nbec
 const u8 gText_CannotSendMonToBoxActive[] = _("Cannot send an active battler\nto the box.{PAUSE_UNTIL_PRESS}");
 const u8 gText_CannotSendMonToBoxPartner[] = _("Cannot send a mon that doesn't,\nbelong to you to the box.{PAUSE_UNTIL_PRESS}");
 
-const u8 gText_GrandPrixMessage[] = _("Happy Saturday! Let's do our best\nand win some fights! Yahoo!");
+const u8 gText_GrandPrixMessage[] = _("There's a poster of {STR_VAR_1}\non the wall. They look totally\nepic!$");
 
 // Scott's generic dialogue for post-gym encounters
 const u8 gText_ScottPostGym1[] = _("Excuse me! I hope you don't mind, but\nI caught the tail end of that battle.\pNot bad! You've got quite a bit of\npotential.\pI like helping out trainers like you,\nso here, take a look at what I can\loffer.$");

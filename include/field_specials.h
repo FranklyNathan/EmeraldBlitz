@@ -39,5 +39,6 @@ bool32 CheckPartyHasSpecies(u32);
 void Special_AcroBikeFly(void);
 u16 GetPartyMonSpeciesFromIndex(void);
 void GetFirstEggMoveForSpecies(void);
+void Special_BufferGrandPrixPosterName(void);
 
 #endif // GUARD_FIELD_SPECIALS_H

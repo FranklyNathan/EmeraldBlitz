@@ -535,5 +535,6 @@ PlayersHouse_1F_Text_ReceivedEgg:
 	.string "{PLAYER} received an egg!$"
 
 LittlerootTown_BrendansHouse_2F_EventScript_GrandPrixMessage::
+	special Special_BufferGrandPrixPosterName
 	msgbox gText_GrandPrixMessage, MSGBOX_SIGN
 	end
